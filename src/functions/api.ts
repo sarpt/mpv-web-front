@@ -20,9 +20,6 @@ type Movie = {
   SubtitleStreams: SubtitleStream[],
 };
 
-// to be deleted, workaround for importing types bug
-export function getInitialMovies(): Movie[] { return [] }
-
 export async function getMovies(address: string): Promise<Movie[]> {
   const res = await fetch(`http://${address}/movies`);
   const moviesResponse = await res.json();

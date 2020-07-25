@@ -3,12 +3,11 @@
 
   import Button, {Label} from '@smui/button';
   import Paper, {Title, Content} from '@smui/paper';
-  import Textfield, {Input, Textarea} from '@smui/textfield';
-  import HelperText from '@smui/textfield/helper-text/index';
+  import Textfield from '@smui/textfield';
 	
   const dispatch = createEventDispatcher();
   
-  export let address;
+  export let address: string;
 
 	function dispatchAddress() {
 		dispatch('address-change', {

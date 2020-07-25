@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import Paper, {Title, Content} from '@smui/paper';
+  import LinearProgress from '@smui/linear-progress';
 
-  import { getMovies, getInitialMovies, defaultAddress } from '../functions/api';
+  import { getMovies, defaultAddress } from '../functions/api';
   import ApiAddress from './ApiAddress.svelte';
 
-  let movieFetchFailed: boolean = false;
-  let movies = getInitialMovies();
   let activeMovieEntryIdx = -1
   let apiAddress: string = defaultAddress;
+  let movies = fetchMovies(apiAddress);
 
   $: getElevation = (idx: number): number => {
     return idx === activeMovieEntryIdx ? 7 : 1;
@@ -26,22 +24,19 @@
 
   function handleAddressChange(newAddress: string) {
     apiAddress = newAddress;
-    fetchMovies(apiAddress);
+    movies = fetchMovies(apiAddress);
   }
 
   async function fetchMovies(address: string) {
-    try {
-      movieFetchFailed = false;
-      movies = await getMovies(address);
-    } catch (err) {
-      movieFetchFailed = true;
-    }
+    return await getMovies(address);
   }
-
-  onMount(() => fetchMovies(apiAddress));
 </script>
 
-{#if !movieFetchFailed}
+{#await movies}
+  <Paper transition elevation={1}>
+    <LinearProgress indeterminate />
+  </Paper>
+{:then movies}
   {#if movies.length > 0}
       {#each movies as movie, idx}
         <div class="movie-entry" on:click={() => handleMovieEntryClick(idx)}>
@@ -60,9 +55,9 @@
       Seems there are no movies :/
     </div>
   {/if}
-{:else}
+{:catch}
   <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
-{/if}
+{/await}
 
 <style lang="scss">
   .movie-entry {
