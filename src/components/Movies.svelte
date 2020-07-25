@@ -3,11 +3,13 @@
 
   import Paper, {Title, Content} from '@smui/paper';
 
-  import { getMovies, getInitialMovies } from '../functions/api';
+  import { getMovies, getInitialMovies, defaultAddress } from '../functions/api';
+  import ApiAddress from './ApiAddress.svelte';
 
   let movieFetchFailed: boolean = false;
   let movies = getInitialMovies();
   let activeMovieEntryIdx = -1
+  let apiAddress: string = defaultAddress;
 
   $: getElevation = (idx: number): number => {
     return idx === activeMovieEntryIdx ? 7 : 1;
@@ -22,14 +24,21 @@
     return pathParts[pathParts.length - 1];
   }
 
-  onMount(async () => {
+  function handleAddressChange(newAddress: string) {
+    apiAddress = newAddress;
+    fetchMovies(apiAddress);
+  }
+
+  async function fetchMovies(address: string) {
     try {
       movieFetchFailed = false;
-      movies = await getMovies();
+      movies = await getMovies(address);
     } catch (err) {
       movieFetchFailed = true;
     }
-	});
+  }
+
+  onMount(() => fetchMovies(apiAddress));
 </script>
 
 {#if !movieFetchFailed}
@@ -52,9 +61,7 @@
     </div>
   {/if}
 {:else}
-  <div>
-    Fetch failed oof...
-  </div>
+  <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
 {/if}
 
 <style lang="scss">
