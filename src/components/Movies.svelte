@@ -1,25 +1,47 @@
 <script lang="ts">
   import Paper, {Title, Content} from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
+  import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
+  import Button, {Label, Icon} from '@smui/button';
+  import Checkbox from '@smui/checkbox';
+  import FormField from '@smui/form-field';
 
-  import { getMovies, defaultAddress } from '../functions/api';
+  import { getMovies, defaultAddress, playMovie } from '../functions/api';
+  import type { Movie } from '../functions/api';
+
   import ApiAddress from './ApiAddress.svelte';
 
-  let activeMovieEntryIdx = -1
+  let selectedMovie: Movie | undefined;
+  let playingMovie: Movie | undefined;
   let apiAddress: string = defaultAddress;
   let movies = fetchMovies(apiAddress);
+  let eventDialog;
+  let fullscreen = true;
 
-  $: getElevation = (idx: number): number => {
-    return idx === activeMovieEntryIdx ? 7 : 1;
+  $: getElevation = (movie: Movie): number => {
+    return movie === playingMovie ? 7 : 1;
   }
 
-  function handleMovieEntryClick(idx: number) {
-    activeMovieEntryIdx = idx;
+  function handleMovieEntryClick(movie: Movie, idx: number) {
+    selectedMovie = movie;
+    eventDialog.open()
   }
 
   function getMovieName(path: string): string {
     const pathParts = path.split('/');
     return pathParts[pathParts.length - 1];
+  }
+
+  function closeHandler(action: string) {
+    switch (action) {
+      case 'play':
+        playingMovie = selectedMovie;
+        handlePlay(apiAddress, playingMovie, fullscreen);
+        break;
+      case 'add':
+        break;
+      default:
+    }
   }
 
   function handleAddressChange(newAddress: string) {
@@ -30,6 +52,10 @@
   async function fetchMovies(address: string) {
     return await getMovies(address);
   }
+
+  async function handlePlay(address: string, movie: Movie, fullscreen: boolean) {
+    return await playMovie(address, movie, fullscreen);
+  }
 </script>
 
 {#await movies}
@@ -39,10 +65,12 @@
 {:then movies}
   {#if movies.length > 0}
       {#each movies as movie, idx}
-        <div class="movie-entry" on:click={() => handleMovieEntryClick(idx)}>
-          <Paper transition elevation={getElevation(idx)}>
-            <Title>{getMovieName(movie.Path)}</Title>
-            {#if idx === activeMovieEntryIdx}
+        <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
+          <Paper transition elevation={getElevation(movie)}>
+            <Title>
+              {getMovieName(movie.Path)}
+            </Title>
+            {#if movie === playingMovie}
               <Content>
                 Full path: {movie.Path}
               </Content>
@@ -58,6 +86,26 @@
 {:catch}
   <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
 {/await}
+
+<Dialog bind:this={eventDialog} aria-labelledby="event-title" aria-describedby="event-content" on:MDCDialog:closed={ev => closeHandler(ev.detail.action)}>
+  <DialogTitle id="event-title">{!!selectedMovie && getMovieName(selectedMovie.Path)}</DialogTitle>
+  <DialogContent id="event-content">
+    <FormField>
+      <Checkbox bind:checked={fullscreen} />
+      <span slot="label">Fullscreen</span>
+    </FormField>
+  </DialogContent>
+  <Actions>
+    <Button action="play" default use={[InitialFocus]}>
+      <Icon class="material-icons">play_arrow</Icon>
+      <Label>Play</Label>
+    </Button>
+    <Button action="add">
+      <Icon class="material-icons">playlist_add</Icon>
+      <Label>Add to playlist</Label>
+    </Button>
+  </Actions>
+</Dialog>
 
 <style lang="scss">
   .movie-entry {
