@@ -7,7 +7,7 @@
   import FormField from '@smui/form-field';
 
   import { getMovies, defaultAddress, playMovie } from '../functions/api';
-  import type { Movie } from '../functions/api';
+  import type { Movie } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
 
   import ApiAddress from './ApiAddress.svelte';
 
