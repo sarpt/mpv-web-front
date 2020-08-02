@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import Paper, {Title, Content} from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
   import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
@@ -6,8 +8,8 @@
   import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
 
-  import { getMovies, defaultAddress, playMovie } from '../functions/api';
-  import type { Movie } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
+  import { getMovies, defaultAddress, playMovie, subscribeToPlaybackChanges } from '../functions/api';
+  import type { Movie, Playback } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
 
   import ApiAddress from './ApiAddress.svelte';
 
@@ -32,13 +34,13 @@
     return pathParts[pathParts.length - 1];
   }
 
-  function closeHandler(action: string) {
+  function dialogCloseHandler(action: string) {
     switch (action) {
       case 'play':
-        playingMovie = selectedMovie;
-        handlePlay(apiAddress, playingMovie, fullscreen);
+        handlePlay(apiAddress, selectedMovie, fullscreen);
         break;
       case 'add':
+        // TODO: to be implemented
         break;
       default:
     }
@@ -56,6 +58,14 @@
   async function handlePlay(address: string, movie: Movie, fullscreen: boolean) {
     return await playMovie(address, movie, fullscreen);
   }
+
+  const updatePlayingMovie = (playback: Playback) => {
+    playingMovie = playback.Movie;
+  }
+
+  onMount(() => {
+    subscribeToPlaybackChanges(apiAddress, updatePlayingMovie);
+  });
 </script>
 
 {#await movies}
@@ -70,7 +80,7 @@
             <Title>
               {getMovieName(movie.Path)}
             </Title>
-            {#if movie === playingMovie}
+            {#if !!playingMovie && movie.Path === playingMovie.Path}
               <Content>
                 Full path: {movie.Path}
               </Content>
@@ -87,7 +97,7 @@
   <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
 {/await}
 
-<Dialog bind:this={eventDialog} aria-labelledby="event-title" aria-describedby="event-content" on:MDCDialog:closed={ev => closeHandler(ev.detail.action)}>
+<Dialog bind:this={eventDialog} aria-labelledby="event-title" aria-describedby="event-content" on:MDCDialog:closed={ev => dialogCloseHandler(ev.detail.action)}>
   <DialogTitle id="event-title">{!!selectedMovie && getMovieName(selectedMovie.Path)}</DialogTitle>
   <DialogContent id="event-content">
     <FormField>

@@ -13,12 +13,29 @@ type SubtitleStream = {
   Language: string,
 };
 
+export type Playback = {
+  Movie: Movie,
+  CurrentTime: string,
+};
+
 export type Movie = {
   Path: string,
   VideoStreams: VideoStream[],
   AudioStreams: AudioStream[],
   SubtitleStreams: SubtitleStream[],
 };
+
+let eventSource: EventSource;
+const playbackEvent = "playback";
+export function subscribeToPlaybackChanges(address: string, callback: (playback: Playback) => void) {
+  if (!!eventSource) return;
+
+  eventSource = new EventSource(`http://${address}/sse/playback`);
+
+  eventSource.addEventListener(playbackEvent, (event: any) => {
+    callback(JSON.parse(event.data) as Playback);
+  })
+}
 
 export async function getMovies(address: string): Promise<Movie[]> {
   const res = await fetch(`http://${address}/movies`);
