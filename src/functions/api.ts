@@ -15,11 +15,12 @@ type SubtitleStream = {
 
 export type Playback = {
   Movie: Movie,
-  CurrentTime: string,
+  CurrentTime: number,
 };
 
 export type Movie = {
   Path: string,
+  Duration: number,
   VideoStreams: VideoStream[],
   AudioStreams: AudioStream[],
   SubtitleStreams: SubtitleStream[],

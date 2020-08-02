@@ -8,21 +8,24 @@
   import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
 
+  import { secondsToHHMMSS } from '../functions/time';
   import { getMovies, defaultAddress, playMovie, subscribeToPlaybackChanges } from '../functions/api';
   import type { Movie, Playback } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
 
   import ApiAddress from './ApiAddress.svelte';
 
   let selectedMovie: Movie | undefined;
-  let playingMovie: Movie | undefined;
+  let playback: Playback | undefined;
   let apiAddress: string = defaultAddress;
   let movies = fetchMovies(apiAddress);
   let eventDialog;
   let fullscreen = true;
 
   $: getElevation = (movie: Movie): number => {
-    return movie === playingMovie ? 7 : 1;
+    return !!playback && movie === playback.Movie ? 7 : 1;
   }
+
+  $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
   function handleMovieEntryClick(movie: Movie, idx: number) {
     selectedMovie = movie;
@@ -59,12 +62,12 @@
     return await playMovie(address, movie, fullscreen);
   }
 
-  const updatePlayingMovie = (playback: Playback) => {
-    playingMovie = playback.Movie;
+  const updatePlayback = (updatedPlayback: Playback) => {
+    playback = updatedPlayback;
   }
 
   onMount(() => {
-    subscribeToPlaybackChanges(apiAddress, updatePlayingMovie);
+    subscribeToPlaybackChanges(apiAddress, updatePlayback);
   });
 </script>
 
@@ -80,8 +83,12 @@
             <Title>
               {getMovieName(movie.Path)}
             </Title>
-            {#if !!playingMovie && movie.Path === playingMovie.Path}
+            {#if !!playback && movie.Path === playback.Movie.Path}
               <Content>
+                <div class="progress-container">
+                  <span>{secondsToHHMMSS(playback.CurrentTime)}-{secondsToHHMMSS(playback.Movie.Duration)}</span>
+                  <LinearProgress progress={playingMovieProgress} />
+                </div>
                 Full path: {movie.Path}
               </Content>
             {/if}
@@ -121,5 +128,17 @@
   .movie-entry {
     margin-bottom: 5px;
     cursor: pointer;
+  }
+
+  .progress-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    > span {
+      flex-shrink: 0;
+      flex-grow: 0;
+      margin-right: 0.5rem;
+    }
   }
 </style>
