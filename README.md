@@ -3,7 +3,7 @@
 
 Frontend for the `mpv-web-api`.
 
-Written in svelte with typscript.
+Written in svelte with typescript.
 
 ## Running
 

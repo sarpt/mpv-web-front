@@ -1,16 +1,19 @@
-type VideoStream = {
+export type VideoStream = {
   Language: string,
   Width: number,
   Height: number,
 };
 
-type AudioStream = {
+export type AudioStream = {
+  AudioID: string,
   Language: string,
   Channels: string,
 };
 
-type SubtitleStream = {
+export type SubtitleStream = {
+  SubtitleID: string,
   Language: string,
+  Title: string,
 };
 
 export type Playback = {
@@ -27,30 +30,42 @@ export type Movie = {
 };
 
 let eventSource: EventSource;
-const playbackEvent = "playback";
+const playbackEvent = 'playback';
 export function subscribeToPlaybackChanges(address: string, callback: (playback: Playback) => void) {
   if (!!eventSource) return;
 
   eventSource = new EventSource(`http://${address}/sse/playback`);
 
-  eventSource.addEventListener(playbackEvent, (event: any) => {
-    callback(JSON.parse(event.data) as Playback);
-  })
+  eventSource.addEventListener(playbackEvent, (event: Event & { data?: string }) => {
+    callback(JSON.parse(event.data || '') as Playback);
+  });
 }
 
 export async function getMovies(address: string): Promise<Movie[]> {
   const res = await fetch(`http://${address}/movies`);
   const moviesResponse = await res.json();
+
   return moviesResponse.movies || [];
 }
 
-export async function playMovie(address:string, movie: Movie, fullscreen: boolean): Promise<Response> {
+export type playMovieRequest = {
+  address: string,
+  path: string,
+  fullscreen: boolean,
+  audioId: string,
+  subtitleId: string,
+};
+
+export async function playMovie(request: playMovieRequest): Promise<Response> {
   const formData = new FormData();
-  formData.set('path', movie.Path);
-  formData.set('fullscreen', `${fullscreen}`);
-  return await fetch(`http://${address}/playback`, {
-    method: "POST",
-    body: formData, 
+  formData.set('path', request.path || '');
+  formData.set('fullscreen', `${request.fullscreen}`);
+  formData.set('audioID', request.audioId);
+  formData.set('subtitleID', request.subtitleId);
+
+  return await fetch(`http://${request.address}/playback`, {
+    method: 'POST',
+    body: formData,
   });
 }
 

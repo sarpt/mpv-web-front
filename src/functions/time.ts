@@ -3,5 +3,6 @@ export function secondsToHHMMSS(seconds: number): string {
   date.setSeconds(seconds);
 
   const time = date.toISOString().substr(11, 8);
+
   return seconds < 3600 ? time.slice(3) : time ;
 }

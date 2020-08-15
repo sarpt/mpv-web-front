@@ -1,25 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import type { MDCDialog } from '@material/dialog';
 
   import Paper, {Title, Content} from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
-  import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
-  import Button, {Label, Icon} from '@smui/button';
-  import Checkbox from '@smui/checkbox';
-  import FormField from '@smui/form-field';
 
   import { secondsToHHMMSS } from '../functions/time';
+  import { getMovieName } from '../functions/movie';
   import { getMovies, defaultAddress, playMovie, subscribeToPlaybackChanges } from '../functions/api';
-  import type { Movie, Playback } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
+  import type { Movie, Playback, playMovieRequest, AudioStream, SubtitleStream } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
 
   import ApiAddress from './ApiAddress.svelte';
+  import MovieDialog from './MovieDialog.svelte';
 
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
   let apiAddress: string = defaultAddress;
   let movies = fetchMovies(apiAddress);
-  let eventDialog;
-  let fullscreen = true;
+  let eventDialog: MDCDialog;
 
   $: getElevation = (movie: Movie): number => {
     return !!playback && movie === playback.Movie ? 7 : 1;
@@ -32,15 +30,17 @@
     eventDialog.open()
   }
 
-  function getMovieName(path: string): string {
-    const pathParts = path.split('/');
-    return pathParts[pathParts.length - 1];
-  }
-
-  function dialogCloseHandler(action: string) {
+  function dialogCloseHandler(action: string, fullscreen: boolean, audio: AudioStream, subtitle: SubtitleStream) {
     switch (action) {
       case 'play':
-        handlePlay(apiAddress, selectedMovie, fullscreen);
+        const request: playMovieRequest = {
+          address: apiAddress,
+          path: selectedMovie?.Path || '',
+          fullscreen,
+          audioId: audio.AudioID,
+          subtitleId: subtitle. SubtitleID,
+        }
+        handlePlay(request);
         break;
       case 'add':
         // TODO: to be implemented
@@ -58,8 +58,8 @@
     return await getMovies(address);
   }
 
-  async function handlePlay(address: string, movie: Movie, fullscreen: boolean) {
-    return await playMovie(address, movie, fullscreen);
+  async function handlePlay(req: playMovieRequest) {
+    return await playMovie(req);
   }
 
   const updatePlayback = (updatedPlayback: Playback) => {
@@ -104,25 +104,7 @@
   <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
 {/await}
 
-<Dialog bind:this={eventDialog} aria-labelledby="event-title" aria-describedby="event-content" on:MDCDialog:closed={ev => dialogCloseHandler(ev.detail.action)}>
-  <DialogTitle id="event-title">{!!selectedMovie && getMovieName(selectedMovie.Path)}</DialogTitle>
-  <DialogContent id="event-content">
-    <FormField>
-      <Checkbox bind:checked={fullscreen} />
-      <span slot="label">Fullscreen</span>
-    </FormField>
-  </DialogContent>
-  <Actions>
-    <Button action="play" default use={[InitialFocus]}>
-      <Icon class="material-icons">play_arrow</Icon>
-      <Label>Play</Label>
-    </Button>
-    <Button action="add">
-      <Icon class="material-icons">playlist_add</Icon>
-      <Label>Add to playlist</Label>
-    </Button>
-  </Actions>
-</Dialog>
+<MovieDialog bind:eventDialog={eventDialog} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
 
 <style lang="scss">
   .movie-entry {

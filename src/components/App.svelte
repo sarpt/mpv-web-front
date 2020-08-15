@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TopAppBar, {Row, Section, Title, FixedAdjust } from '@smui/top-app-bar';
 	import IconButton from '@smui/icon-button';
+
 	import Movies from './Movies.svelte';
 
 	let collapsed = false;

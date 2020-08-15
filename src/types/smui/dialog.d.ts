@@ -1,7 +1,7 @@
 declare module '@smui/dialog' {
   export default class Dialog {
     $$prop_def: any;
-    $on: any;
+    $on:  any;
   }
 
   export class Title {
