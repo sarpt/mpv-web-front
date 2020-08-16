@@ -4,15 +4,13 @@
   import Button, {Label} from '@smui/button';
   import Paper, {Title, Content} from '@smui/paper';
   import Textfield from '@smui/textfield';
-	
-  const dispatch = createEventDispatcher();
   
-  export let address: string;
+  import { apiAddress } from '../stores/api_address';
+
+  let address: string = $apiAddress;
 
 	function dispatchAddress() {
-		dispatch('address-change', {
-			address 
-		});
+    apiAddress.set(address);
 	}
 </script>
 

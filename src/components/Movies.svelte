@@ -1,22 +1,33 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import type { MDCDialog } from '@material/dialog';
 
-  import Paper, {Title, Content} from '@smui/paper';
+  import Paper, { Title, Content } from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
 
   import { secondsToHHMMSS } from '../functions/time';
   import { getMovieName } from '../functions/movie';
-  import { getMovies, defaultAddress, playMovie, subscribeToPlaybackChanges } from '../functions/api';
-  import type { Movie, Playback, playMovieRequest, AudioStream, SubtitleStream } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
+  import {
+    getMovies,
+    playMovie,
+    subscribeToPlaybackChanges
+  } from '../functions/api';
+  import type {
+    Movie,
+    Playback,
+    playMovieRequest,
+    AudioStream,
+    SubtitleStream
+  } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
+
+  import { apiAddress } from '../stores/api_address';
 
   import ApiAddress from './ApiAddress.svelte';
   import MovieDialog from './MovieDialog.svelte';
 
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
-  let apiAddress: string = defaultAddress;
-  let movies = fetchMovies(apiAddress);
+  let movies = fetchMovies();
   let eventDialog: MDCDialog;
 
   $: getElevation = (movie: Movie): number => {
@@ -34,7 +45,6 @@
     switch (action) {
       case 'play':
         const request: playMovieRequest = {
-          address: apiAddress,
           path: selectedMovie?.Path || '',
           fullscreen,
           audioId: audio.AudioID,
@@ -49,13 +59,12 @@
     }
   }
 
-  function handleAddressChange(newAddress: string) {
-    apiAddress = newAddress;
-    movies = fetchMovies(apiAddress);
+  function handleAddressChange() {
+    movies = fetchMovies();
   }
 
-  async function fetchMovies(address: string) {
-    return await getMovies(address);
+  async function fetchMovies() {
+    return await getMovies();
   }
 
   async function handlePlay(req: playMovieRequest) {
@@ -66,8 +75,14 @@
     playback = updatedPlayback;
   }
 
+  const apiAddressUnsubscribe = apiAddress.subscribe(handleAddressChange);
+
   onMount(() => {
-    subscribeToPlaybackChanges(apiAddress, updatePlayback);
+    subscribeToPlaybackChanges(updatePlayback);
+  });
+
+  onDestroy(() => {
+    apiAddressUnsubscribe();
   });
 </script>
 
@@ -101,7 +116,7 @@
     </div>
   {/if}
 {:catch}
-  <ApiAddress address={apiAddress} on:address-change={ev => handleAddressChange(ev.detail.address)}></ApiAddress>
+  <ApiAddress></ApiAddress>
 {/await}
 
 <MovieDialog bind:eventDialog={eventDialog} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
