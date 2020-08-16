@@ -36,18 +36,42 @@ let address: string | undefined;
 let eventSource: EventSource;
 const playbackEvent = 'playback';
 
-apiAddress.subscribe(newAddress => {
-  address = newAddress;
-});
+type sseSubscription = {
+  playbackEventHandler: (playback: Playback) => void,
+  errorHandler: (errEvent: Event) => void,
+};
 
-export function subscribeToPlaybackChanges(callback: (playback: Playback) => void) {
-  if (!!eventSource) return;
+const sseSubscribers: sseSubscription[] = [];
+
+export function subscribeToPlaybackChanges(subscription: sseSubscription) {
+  sseSubscribers.push(subscription);
+}
+
+function initializeEventSource() {
+  if (!!eventSource) {
+    eventSource.close();
+  }
 
   eventSource = new EventSource(`http://${address}/sse/playback`);
 
   eventSource.addEventListener(playbackEvent, (event: Event & { data?: string }) => {
-    callback(JSON.parse(event.data || '') as Playback);
+    sseSubscribers.forEach(subscription => {
+      subscription.playbackEventHandler(JSON.parse(event.data || '') as Playback);
+    });
   });
+
+  eventSource.onerror = (ev: Event) => {
+    sseSubscribers.forEach(subscription => {
+      subscription.errorHandler(ev);
+    });
+  };
+}
+
+apiAddress.subscribe(handleApiAddressChange);
+
+function handleApiAddressChange(newAddress: string) {
+  address = newAddress;
+  initializeEventSource();
 }
 
 export async function getMovies(): Promise<Movie[]> {

@@ -75,10 +75,14 @@
     playback = updatedPlayback;
   }
 
+  const handleConnectionError = () => {
+    movies = Promise.reject();
+  }
+
   const apiAddressUnsubscribe = apiAddress.subscribe(handleAddressChange);
 
   onMount(() => {
-    subscribeToPlaybackChanges(updatePlayback);
+    subscribeToPlaybackChanges({ playbackEventHandler: updatePlayback, errorHandler: handleConnectionError });
   });
 
   onDestroy(() => {
