@@ -7,7 +7,7 @@
   import Select, {Option} from '@smui/select';
   import SelectIcon from '@smui/select/icon/index';
 
-  import { getMovieName } from '../functions/movie';
+  import { getMovieName, getStreamName } from '../functions/movie';
 
   import MovieDialog from './MovieDialog.svelte';
   import type { Movie, AudioStream, SubtitleStream } from '../functions/api';
@@ -51,7 +51,7 @@
   aria-describedby="movie-dialog-content"
   on:MDCDialog:closed={handleClose}
 >
-  <DialogTitle id="movie-dialog-title">{!!movie && getMovieName(movie.Path)}</DialogTitle>
+  <DialogTitle id="movie-dialog-title">{!!movie && getMovieName(movie)}</DialogTitle>
   <DialogContent id="movie-dialog-content">
     <div class="row">
       <FormField>
@@ -65,8 +65,12 @@
         <div class="row-controls">
           {#each movie.AudioStreams as audioStream}
             <FormField>
-              <Radio bind:group={selectedAudio} value={audioStream} />
-              <span slot="label">{audioStream.Language}</span>
+              <Radio
+                bind:group={selectedAudio}
+                value={audioStream}
+                disabled={!movie || movie.AudioStreams.length <= 1}
+              />
+              <span slot="label">{getStreamName(audioStream)}</span>
             </FormField>
           {/each}
         </div>
@@ -76,8 +80,12 @@
         <div class="row-controls">
           {#each movie.SubtitleStreams as subtitleStream}
             <FormField>
-              <Radio bind:group={selectedSubtitle} value={subtitleStream} />
-              <span slot="label">{subtitleStream.Language}</span>
+              <Radio
+                bind:group={selectedSubtitle}
+                value={subtitleStream}
+                disabled={!movie || movie.SubtitleStreams.length <= 1}
+              />
+              <span slot="label">{getStreamName(subtitleStream)}</span>
             </FormField>
           {/each}
         </div>

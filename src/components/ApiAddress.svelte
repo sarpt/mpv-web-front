@@ -7,10 +7,10 @@
   
   import { apiAddress } from '../stores/api_address';
 
-  let address: string = $apiAddress;
+  let currentApiAddress = $apiAddress;
 
 	function dispatchAddress() {
-    apiAddress.set(address);
+    apiAddress.set({ address: currentApiAddress.address });
 	}
 </script>
 
@@ -19,7 +19,7 @@
   <Content>
     <span>Movie list could not be fetched from the provided address. Please input a new address:</span>
     <div>
-      <Textfield bind:value={address} label="New address"/>
+      <Textfield bind:value={currentApiAddress.address} label="New address"/>
     </div>
     <div class="retry-button">
       <Button on:click={dispatchAddress} variant="raised" >

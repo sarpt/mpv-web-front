@@ -27,7 +27,7 @@
 
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
-  let movies = fetchMovies();
+  let movies: Promise<Movie[]> = Promise.resolve([]);
   let eventDialog: MDCDialog;
 
   $: getElevation = (movie: Movie): number => {
@@ -100,7 +100,7 @@
         <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
           <Paper transition elevation={getElevation(movie)}>
             <Title>
-              {getMovieName(movie.Path)}
+              {getMovieName(movie)}
             </Title>
             {#if !!playback && movie.Path === playback.Movie.Path}
               <Content>

@@ -10,6 +10,7 @@ export type AudioStream = {
   AudioID: string,
   Language: string,
   Channels: string,
+  Title: string,
 };
 
 export type SubtitleStream = {
@@ -23,12 +24,20 @@ export type Playback = {
   CurrentTime: number,
 };
 
+export type Chapter = {
+  Title: string,
+};
+
 export type Movie = {
+  Title: string,
+  FormatName: string,
+  FormatLongName: string,
   Path: string,
   Duration: number,
   VideoStreams: VideoStream[],
   AudioStreams: AudioStream[],
   SubtitleStreams: SubtitleStream[],
+  Chapters: Chapter[],
 };
 
 let address: string | undefined;
@@ -69,8 +78,8 @@ function initializeEventSource() {
 
 apiAddress.subscribe(handleApiAddressChange);
 
-function handleApiAddressChange(newAddress: string) {
-  address = newAddress;
+function handleApiAddressChange(newAddress: { address: string }) {
+  address = newAddress.address;
   initializeEventSource();
 }
 
