@@ -12,15 +12,14 @@
   import MovieDialog from './MovieDialog.svelte';
   import type { Movie, AudioStream, SubtitleStream } from '../functions/api';
 
-  export let eventDialog: any;
-  export let dialogCloseHandler: (action: string, fullscreen: boolean, audio: AudioStream, subtitle: SubtitleStream) => void;
+  export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
   export let movie: Movie | undefined;
-  let fullscreen: boolean = false;
-  let selectedAudio: AudioStream | undefined;
-  let selectedSubtitle: SubtitleStream | undefined;
+  export let opened: boolean = false;
 
-  $: if (invalidSelectedAudio(selectedAudio, movie)) selectedAudio = movie?.AudioStreams[0];
-  $: if (invalidSelectedSubtitle(selectedSubtitle, movie)) selectedSubtitle = movie?.SubtitleStreams[0];
+  let eventDialog: Dialog;
+  let fullscreen: boolean = false;
+  let selectedAudioId = '';
+  let selectedSubtitleId = '';
 
   type DialogClosedEvent = {
     detail: {
@@ -28,8 +27,16 @@
     }
   };
 
+  $: if (opened && eventDialog && !eventDialog.isOpen()) {
+    selectedAudioId = movie?.AudioStreams[0].AudioID || '';
+    selectedSubtitleId = movie?.SubtitleStreams[0].SubtitleID || '';
+    eventDialog.open();
+  } else if (!opened && eventDialog && eventDialog.isOpen()) {
+    eventDialog.close();
+  }
+
   $: handleClose = (event: DialogClosedEvent) => {
-    dialogCloseHandler(event.detail.action, fullscreen, selectedAudio!, selectedSubtitle!);
+    dialogCloseHandler(event.detail.action, fullscreen, selectedAudioId, selectedSubtitleId);
   }
 
   function invalidSelectedAudio(audio: AudioStream | undefined, movie: Movie | undefined): boolean {
@@ -52,45 +59,39 @@
   on:MDCDialog:closed={handleClose}
 >
   <DialogTitle id="movie-dialog-title">{!!movie && getMovieName(movie)}</DialogTitle>
-  <DialogContent id="movie-dialog-content">
-    <div class="row">
-      <FormField>
-        <Checkbox bind:checked={fullscreen} />
-        <span slot="label">Fullscreen</span>
-      </FormField>
+  <DialogContent>
+    <div id="movie-dialog-content">
+      <div class="row">
+        <FormField>
+          <Checkbox bind:checked={fullscreen} />
+          <span slot="label">Fullscreen</span>
+        </FormField>
+      </div>
+      {#if !!movie}
+        <div class="row">
+          <Select
+            bind:value={selectedAudioId}
+            label="Audio track"
+            disabled={!movie || movie.AudioStreams.length <= 1}
+          >
+            {#each movie.AudioStreams as audioStream}
+              <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
+            {/each}
+          </Select>
+        </div>
+        <div class="row">
+          <Select
+            bind:value={selectedSubtitleId}
+            label="Subtitle track"
+            disabled={!movie || movie.SubtitleStreams.length <= 1}
+          >
+            {#each movie.SubtitleStreams as subtitleStream}
+              <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
+            {/each}
+          </Select>
+        </div>
+      {/if}
     </div>
-    {#if !!movie}
-      <div class="row">
-        <span>Audio track</span>
-        <div class="row-controls">
-          {#each movie.AudioStreams as audioStream}
-            <FormField>
-              <Radio
-                bind:group={selectedAudio}
-                value={audioStream}
-                disabled={!movie || movie.AudioStreams.length <= 1}
-              />
-              <span slot="label">{getStreamName(audioStream)}</span>
-            </FormField>
-          {/each}
-        </div>
-      </div>
-      <div class="row">
-        <span>Subtitle track</span>
-        <div class="row-controls">
-          {#each movie.SubtitleStreams as subtitleStream}
-            <FormField>
-              <Radio
-                bind:group={selectedSubtitle}
-                value={subtitleStream}
-                disabled={!movie || movie.SubtitleStreams.length <= 1}
-              />
-              <span slot="label">{getStreamName(subtitleStream)}</span>
-            </FormField>
-          {/each}
-        </div>
-      </div>
-    {/if}
   </DialogContent>
   <Actions>
     <Button action="play" default use={[InitialFocus]}>
@@ -113,10 +114,5 @@
   .row {
     display: flex;
     flex-direction: column;
-  }
-
-  .row-controls {
-    display: flex;
-    flex-direction: row;
   }
 </style>

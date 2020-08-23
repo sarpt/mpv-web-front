@@ -2,6 +2,10 @@ declare module '@smui/dialog' {
   export default class Dialog {
     $$prop_def: any;
     $on:  any;
+    
+    open: () => void;
+    close: () => void;
+    isOpen: () => boolean;
   }
 
   export class Title {

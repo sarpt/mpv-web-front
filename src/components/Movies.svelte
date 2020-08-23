@@ -25,10 +25,10 @@
   import ApiAddress from './ApiAddress.svelte';
   import MovieDialog from './MovieDialog.svelte';
 
+  let dialogOpened = false;
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
   let movies: Promise<Movie[]> = Promise.resolve([]);
-  let eventDialog: MDCDialog;
 
   $: getElevation = (movie: Movie): number => {
     return !!playback && movie === playback.Movie ? 7 : 1;
@@ -38,17 +38,17 @@
 
   function handleMovieEntryClick(movie: Movie, idx: number) {
     selectedMovie = movie;
-    eventDialog.open()
+    dialogOpened = true;
   }
 
-  function dialogCloseHandler(action: string, fullscreen: boolean, audio: AudioStream, subtitle: SubtitleStream) {
+  function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
     switch (action) {
       case 'play':
         const request: playMovieRequest = {
           path: selectedMovie?.Path || '',
           fullscreen,
-          audioId: audio.AudioID,
-          subtitleId: subtitle. SubtitleID,
+          audioId,
+          subtitleId,
         }
         handlePlay(request);
         break;
@@ -123,7 +123,7 @@
   <ApiAddress></ApiAddress>
 {/await}
 
-<MovieDialog bind:eventDialog={eventDialog} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
+<MovieDialog bind:opened={dialogOpened} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
 
 <style lang="scss">
   .movie-entry {
