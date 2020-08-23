@@ -28,8 +28,8 @@
   };
 
   $: if (opened && eventDialog && !eventDialog.isOpen()) {
-    selectedAudioId = movie?.AudioStreams[0].AudioID || '';
-    selectedSubtitleId = movie?.SubtitleStreams[0].SubtitleID || '';
+    selectedAudioId = movie?.AudioStreams[0]?.AudioID || '';
+    selectedSubtitleId = movie?.SubtitleStreams[0]?.SubtitleID || '';
     eventDialog.open();
   } else if (!opened && eventDialog && eventDialog.isOpen()) {
     eventDialog.close();
