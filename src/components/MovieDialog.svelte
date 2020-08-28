@@ -9,7 +9,6 @@
 
   import { getMovieName, getStreamName } from '../functions/movie';
 
-  import MovieDialog from './MovieDialog.svelte';
   import type { Movie, AudioStream, SubtitleStream } from '../functions/api';
 
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;

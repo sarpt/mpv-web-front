@@ -30,11 +30,9 @@
   let playback: Playback | undefined;
   let movies: Promise<Movie[]> = Promise.resolve([]);
 
-  $: getElevation = (movie: Movie): number => {
-    return !!playback && movie === playback.Movie ? 7 : 1;
+  $: getColor = (movie: Movie, playback: Playback | undefined): string => {
+    return !!playback && movie.Path === playback.Movie.Path ? 'primary' : 'none';
   }
-
-  $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
   function handleMovieEntryClick(movie: Movie, idx: number) {
     selectedMovie = movie;
@@ -71,7 +69,7 @@
     return await playMovie(req);
   }
 
-  const updatePlayback = (updatedPlayback: Playback) => {
+  function updatePlayback(updatedPlayback: Playback) {
     playback = updatedPlayback;
   }
 
@@ -98,19 +96,10 @@
   {#if movies.length > 0}
       {#each movies as movie, idx}
         <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
-          <Paper transition elevation={getElevation(movie)}>
+          <Paper transition color={getColor(movie, playback)}>
             <Title>
               {getMovieName(movie)}
             </Title>
-            {#if !!playback && movie.Path === playback.Movie.Path}
-              <Content>
-                <div class="progress-container">
-                  <span>{secondsToHHMMSS(playback.CurrentTime)}-{secondsToHHMMSS(playback.Movie.Duration)}</span>
-                  <LinearProgress progress={playingMovieProgress} />
-                </div>
-                Full path: {movie.Path}
-              </Content>
-            {/if}
           </Paper>
         </div>
       {/each}
@@ -129,17 +118,5 @@
   .movie-entry {
     margin-bottom: 5px;
     cursor: pointer;
-  }
-
-  .progress-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    
-    > span {
-      flex-shrink: 0;
-      flex-grow: 0;
-      margin-right: 0.5rem;
-    }
   }
 </style>
