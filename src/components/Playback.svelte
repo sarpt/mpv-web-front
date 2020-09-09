@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import LinearProgress from '@smui/linear-progress';
 
-  import { subscribeToPlaybackChanges } from "../functions/api";
   import type { Playback } from "../functions/api";
   import { secondsToHHMMSS } from "../functions/time";
   import { getMovieName } from "../functions/movie";
+  import { playbackStore } from '../stores/playback';
 
   import './Playback.scss';
 
@@ -14,14 +14,16 @@
 
   $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
-  function updatePlayback(updatedPlayback: Playback) {
+  function updatePlayback(updatedPlayback: Playback | undefined) {
     playback = updatedPlayback;
   }
 
-  function handleConnectionError() {}
+  const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
+    updatePlayback(playbackState.playback);
+  });
 
-  onMount(() => {
-    subscribeToPlaybackChanges({ playbackEventHandler: updatePlayback, errorHandler: handleConnectionError });
+  onDestroy(() => {
+    playbackUnsubscribe();
   });
 </script>
 
@@ -31,7 +33,7 @@
       Name: {getMovieName(playback.Movie)}
       <div class="progress-container">
         <span>{secondsToHHMMSS(playback.CurrentTime)}-{secondsToHHMMSS(playback.Movie.Duration)}</span>
-        <LinearProgress class="my-colored-bar" progress={playingMovieProgress} />
+        <LinearProgress class="playback-progress" progress={playingMovieProgress} />
       </div>
     </div>
   {:else}
@@ -40,13 +42,6 @@
 </div>
 
 <style lang="scss">
-  .linear-progress {
-    width: 100%;
-    height: 100%;
-    background-color: none;
-    padding: 1 1;
-  }
-
   .progress-container {
     display: flex;
     flex-direction: row;

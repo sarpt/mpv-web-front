@@ -1,8 +1,13 @@
 import { writable } from 'svelte/store';
 
 const defaultAddress = 'localhost:3001';
-const initialState = {
+
+export type ApiAddressState = {
+  address: string,
+};
+
+const initialState: ApiAddressState = {
   address: defaultAddress,
 };
 
-export const apiAddress = writable(initialState);
+export const apiAddressStore = writable(initialState);

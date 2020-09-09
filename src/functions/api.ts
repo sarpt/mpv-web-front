@@ -1,5 +1,10 @@
-import { apiAddress } from '../stores/api_address';
+import { apiAddressStore } from '../stores/api_address';
+import type { ApiAddressState } from '../stores/api_address';
+import { moviesStore } from '../stores/movies';
+import { playbackStore } from '../stores/playback';
+import { apiConnectionStore } from '../stores/api_connection';
 
+// TODO: move types to separate files
 export type VideoStream = {
   Language: string,
   Width: number,
@@ -42,19 +47,8 @@ export type Movie = {
 
 let address: string | undefined;
 
-let eventSource: EventSource;
+let eventSource: EventSource | undefined;
 const playbackEvent = 'playback';
-
-type sseSubscription = {
-  playbackEventHandler: (playback: Playback) => void,
-  errorHandler: (errEvent: Event) => void,
-};
-
-const sseSubscribers: sseSubscription[] = [];
-
-export function subscribeToPlaybackChanges(subscription: sseSubscription) {
-  sseSubscribers.push(subscription);
-}
 
 function initializeEventSource() {
   if (!!eventSource) {
@@ -64,30 +58,54 @@ function initializeEventSource() {
   eventSource = new EventSource(`http://${address}/sse/playback`);
 
   eventSource.addEventListener(playbackEvent, (event: Event & { data?: string }) => {
-    sseSubscribers.forEach(subscription => {
-      subscription.playbackEventHandler(JSON.parse(event.data || '') as Playback);
+    playbackStore.set({
+      playback: JSON.parse(event.data || '') as Playback,
+      error: false,
     });
   });
 
   eventSource.onerror = (ev: Event) => {
-    sseSubscribers.forEach(subscription => {
-      subscription.errorHandler(ev);
+    playbackStore.set({
+      error: true,
     });
+    eventSource!.close();
+    eventSource = undefined;
   };
 }
 
-apiAddress.subscribe(handleApiAddressChange);
+apiAddressStore.subscribe(handleApiAddressChange);
 
-function handleApiAddressChange(newAddress: { address: string }) {
-  address = newAddress.address;
+function handleApiAddressChange(apiAddressState: ApiAddressState) {
+  address = apiAddressState.address;
   initializeEventSource();
 }
 
-export async function getMovies(): Promise<Movie[]> {
-  const res = await fetch(`http://${address}/movies`);
-  const moviesResponse = await res.json();
+export async function getMovies() {
+  try {
+    const res = await fetch(`http://${address}/movies`);
+    const moviesResponse = await res.json();
 
-  return moviesResponse.movies || [];
+    moviesStore.set({
+      movies: moviesResponse.movies || [],
+    });
+  } catch(err) {
+      apiConnectionStore.set({
+        connected: false,
+      });
+  }
+}
+
+// TODO: change to store manipulation of api_connection
+export async function isApiAvailable(newAddress: string): Promise<boolean> {
+  try {
+    await fetch(`http://${newAddress}/movies`, {
+      method: 'HEAD',
+    });
+
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
 export type playMovieRequest = {
@@ -97,6 +115,7 @@ export type playMovieRequest = {
   subtitleId: string,
 };
 
+// TODO: change to store movie playback manipulation (error on playback?)
 export async function playMovie(request: playMovieRequest): Promise<Response> {
   const formData = new FormData();
   formData.set('path', request.path || '');

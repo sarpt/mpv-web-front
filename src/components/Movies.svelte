@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import type { MDCDialog } from '@material/dialog';
 
   import Paper, { Title, Content } from '@smui/paper';
@@ -10,7 +10,6 @@
   import {
     getMovies,
     playMovie,
-    subscribeToPlaybackChanges
   } from '../functions/api';
   import type {
     Movie,
@@ -20,7 +19,9 @@
     SubtitleStream
   } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
 
-  import { apiAddress } from '../stores/api_address';
+  import { apiAddressStore } from '../stores/api_address';
+  import { playbackStore } from '../stores/playback';
+  import { moviesStore } from '../stores/movies';
 
   import ApiAddress from './ApiAddress.svelte';
   import MovieDialog from './MovieDialog.svelte';
@@ -28,7 +29,8 @@
   let dialogOpened = false;
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
-  let movies: Promise<Movie[]> = Promise.resolve([]);
+  let movies: Movie[] = [];
+  let isMovieFetchInProgress = false;
 
   $: getColor = (movie: Movie, playback: Playback | undefined): string => {
     return !!playback && movie.Path === playback.Movie.Path ? 'primary' : 'none';
@@ -57,49 +59,54 @@
     }
   }
 
+  
   function handleAddressChange() {
-    movies = fetchMovies();
+    fetchMovies();
   }
 
-  async function fetchMovies() {
-    return await getMovies();
+  function fetchMovies() {
+    isMovieFetchInProgress = true;
+
+    getMovies();
   }
 
   async function handlePlay(req: playMovieRequest) {
     return await playMovie(req);
   }
 
-  function updatePlayback(updatedPlayback: Playback) {
+  function updatePlayback(updatedPlayback: Playback | undefined) {
     playback = updatedPlayback;
   }
 
-  const handleConnectionError = () => {
-    movies = Promise.reject();
-  }
-
-  const apiAddressUnsubscribe = apiAddress.subscribe(handleAddressChange);
-
-  onMount(() => {
-    subscribeToPlaybackChanges({ playbackEventHandler: updatePlayback, errorHandler: handleConnectionError });
+  const apiAddressUnsubscribe = apiAddressStore.subscribe(handleAddressChange);
+  const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
+    isMovieFetchInProgress = false;
+    playback = playbackState.playback;
+  });
+  const moviesUnsubscribe = moviesStore.subscribe(moviesState => {
+    movies = moviesState.movies;
   });
 
   onDestroy(() => {
     apiAddressUnsubscribe();
+    playbackUnsubscribe();
   });
 </script>
 
-{#await movies}
+{#if isMovieFetchInProgress}
   <Paper transition elevation={1}>
     <LinearProgress indeterminate />
   </Paper>
-{:then movies}
+{:else}
   {#if movies.length > 0}
       {#each movies as movie, idx}
         <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
           <Paper transition color={getColor(movie, playback)}>
-            <Title>
-              {getMovieName(movie)}
-            </Title>
+              <Title>
+                <div class="movie-title">
+                  {getMovieName(movie)}
+                </div>
+              </Title>
           </Paper>
         </div>
       {/each}
@@ -108,9 +115,7 @@
       Seems there are no movies :/
     </div>
   {/if}
-{:catch}
-  <ApiAddress></ApiAddress>
-{/await}
+{/if}
 
 <MovieDialog bind:opened={dialogOpened} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
 
@@ -118,5 +123,11 @@
   .movie-entry {
     margin-bottom: 5px;
     cursor: pointer;
+  }
+
+  .movie-title {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 </style>

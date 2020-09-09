@@ -1,16 +1,21 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import Button, {Label} from '@smui/button';
   import Paper, {Title, Content} from '@smui/paper';
   import Textfield from '@smui/textfield';
-  
-  import { apiAddress } from '../stores/api_address';
 
-  let currentApiAddress = $apiAddress;
+  import { isApiAvailable } from '../functions/api';
+  import { apiAddressStore } from '../stores/api_address';
+import { apiConnectionStore } from '../stores/api_connection';
 
-	function dispatchAddress() {
-    apiAddress.set({ address: currentApiAddress.address });
+  let currentApiAddress = $apiAddressStore;
+  let valid = true;
+	async function dispatchAddress() {
+    valid = await isApiAvailable(currentApiAddress.address);
+
+    if (valid) {
+      apiAddressStore.set({ address: currentApiAddress.address });
+      apiConnectionStore.set({ connected: true });
+    }
 	}
 </script>
 
@@ -19,7 +24,7 @@
   <Content>
     <span>Movie list could not be fetched from the provided address. Please input a new address:</span>
     <div>
-      <Textfield bind:value={currentApiAddress.address} label="New address"/>
+      <Textfield invalid={!valid} bind:value={currentApiAddress.address} label="New address"/>
     </div>
     <div class="retry-button">
       <Button on:click={dispatchAddress} variant="raised" >
