@@ -1,4 +1,4 @@
-import type { Movie } from './api';
+import type { Movie } from '../models/api';
 
 const defaultName = 'default';
 

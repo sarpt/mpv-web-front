@@ -3,14 +3,14 @@
   import Paper, {Title, Content} from '@smui/paper';
   import Textfield from '@smui/textfield';
 
-  import { isApiAvailable } from '../functions/api';
+  import { checkApiAvailability } from '../functions/api';
   import { apiAddressStore } from '../stores/api_address';
 import { apiConnectionStore } from '../stores/api_connection';
 
   let currentApiAddress = $apiAddressStore;
   let valid = true;
 	async function dispatchAddress() {
-    valid = await isApiAvailable(currentApiAddress.address);
+    valid = await checkApiAvailability(currentApiAddress.address);
 
     if (valid) {
       apiAddressStore.set({ address: currentApiAddress.address });

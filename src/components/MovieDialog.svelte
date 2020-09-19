@@ -3,13 +3,11 @@
   import Button, {Label, Icon as ButtonIcon} from '@smui/button';
   import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
-  import Radio from '@smui/radio';
   import Select, {Option} from '@smui/select';
-  import SelectIcon from '@smui/select/icon/index';
 
   import { getMovieName, getStreamName } from '../functions/movie';
 
-  import type { Movie, AudioStream, SubtitleStream } from '../functions/api';
+  import type { Movie } from '../models/api';
 
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
   export let movie: Movie | undefined;
@@ -36,18 +34,6 @@
 
   $: handleClose = (event: DialogClosedEvent) => {
     dialogCloseHandler(event.detail.action, fullscreen, selectedAudioId, selectedSubtitleId);
-  }
-
-  function invalidSelectedAudio(audio: AudioStream | undefined, movie: Movie | undefined): boolean {
-    if (!audio || !movie) return true;
-
-    return !movie.AudioStreams.some(audioStream => audioStream === audio);
-  }
-
-  function invalidSelectedSubtitle(subtitle: SubtitleStream | undefined, movie: Movie | undefined): boolean {
-    if (!subtitle || !movie) return true;
-
-    return !movie.SubtitleStreams.some(subtitleStream => subtitleStream === subtitle);
   }
 </script>
 

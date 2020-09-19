@@ -1,29 +1,26 @@
 <script lang="ts">
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import type { MDCDialog } from '@material/dialog';
+  import { onDestroy } from 'svelte';
 
-  import Paper, { Title, Content } from '@smui/paper';
+  import Paper, { Title } from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
 
-  import { secondsToHHMMSS } from '../functions/time';
   import { getMovieName } from '../functions/movie';
   import {
-    getMovies,
-    playMovie,
+    fetchAllMovies,
+    changeMovie,
+  } from '../functions/api';
+  import type {
+    playMovieArguments 
   } from '../functions/api';
   import type {
     Movie,
     Playback,
-    playMovieRequest,
-    AudioStream,
-    SubtitleStream
-  } from '../functions/api'; // neccessary 'import type', otherwise rollup will not find import value
+  } from '../models/api'; // neccessary 'import type', otherwise rollup will not find import value
 
   import { apiAddressStore } from '../stores/api_address';
   import { playbackStore } from '../stores/playback';
   import { moviesStore } from '../stores/movies';
 
-  import ApiAddress from './ApiAddress.svelte';
   import MovieDialog from './MovieDialog.svelte';
 
   let dialogOpened = false;
@@ -44,7 +41,7 @@
   function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
     switch (action) {
       case 'play':
-        const request: playMovieRequest = {
+        const request: playMovieArguments = {
           path: selectedMovie?.Path || '',
           fullscreen,
           audioId,
@@ -67,15 +64,11 @@
   function fetchMovies() {
     isMovieFetchInProgress = true;
 
-    getMovies();
+    fetchAllMovies();
   }
 
-  async function handlePlay(req: playMovieRequest) {
-    return await playMovie(req);
-  }
-
-  function updatePlayback(updatedPlayback: Playback | undefined) {
-    playback = updatedPlayback;
+  async function handlePlay(req: playMovieArguments) {
+    return await changeMovie(req);
   }
 
   const apiAddressUnsubscribe = apiAddressStore.subscribe(handleAddressChange);
@@ -90,6 +83,7 @@
   onDestroy(() => {
     apiAddressUnsubscribe();
     playbackUnsubscribe();
+    moviesUnsubscribe();
   });
 </script>
 
@@ -123,6 +117,18 @@
   .movie-entry {
     margin-bottom: 5px;
     cursor: pointer;
+  }
+
+  @media (max-width: 640px) {
+    :global(.smui-paper) {
+      padding: 9px 6px;
+    }
+
+    :global(.smui-paper .smui-paper__title) {
+      font-size: small;
+      line-height: 1em;
+      margin-bottom: 0;
+    }
   }
 
   .movie-title {

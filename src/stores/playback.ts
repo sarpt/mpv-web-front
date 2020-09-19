@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import type { Playback } from '../functions/api';
+import type { Playback } from '../models/api';
 
 export type PlaybackState = {
   playback?: Playback,

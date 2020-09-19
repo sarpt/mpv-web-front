@@ -1,15 +1,12 @@
 <script lang="ts">
 	import page from "page";
-	import { onDestroy, SvelteComponent } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	import { apiConnectionStore } from "../stores/api_connection";
 
 	import Movies from './Movies.svelte';
 	import Playback from './Playback.svelte';
 	import ApiAddress from './ApiAddress.svelte';
-
-	const title = 'MPV web'
-	const variant = 'standard';
 
 	let playbackContainer: HTMLElement;
 
@@ -61,7 +58,7 @@
 	}
 
 	.view-container {
-		padding: 0 0.5rem;
+		padding: 0 1rem;
 		flex-shrink: 1;
 		flex-grow: 1;
 		overflow-y: scroll;
@@ -69,16 +66,12 @@
 
 	.playback-container {
 		flex-shrink: 0;
-		height: 50px;
+		height: 80px;
 	}
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-
+	@media (max-width: 640px) {
 		.view-container {
-			padding: 0 1rem;
+			padding: 0 0.5rem;
 		}
 	}
 

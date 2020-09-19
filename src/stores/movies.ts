@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 
 import type {
   Movie,
-} from '../functions/api';
+} from '../models/api';
 
 export type MoviesState = {
   movies: Movie[],
