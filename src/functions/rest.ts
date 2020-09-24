@@ -32,13 +32,22 @@ export type playbackRequest = {
 
 export async function postPlayback(request: playbackRequest): Promise<Response> {
   const formData = new FormData();
-  formData.set('path', request.path || '');
-  formData.set('audioID', request.audioId || '');
-  formData.set('subtitleID', request.subtitleId || '');
+  if (!!request.path) {
+    formData.set('path', request.path);
+  }
+
+  if (!!request.audioId) {
+    formData.set('audioID', request.audioId);
+  }
+
+  if (!!request.subtitleId) {
+    formData.set('subtitleID', request.subtitleId);
+  }
 
   if (request.fullscreen !== undefined) {
     formData.set('fullscreen', `${request.fullscreen}`);
   }
+
   if (request.pause !== undefined) {
     formData.set('pause', `${request.pause}`);
   }

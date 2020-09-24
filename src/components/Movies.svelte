@@ -43,6 +43,7 @@
       case 'play':
         const request: playMovieArguments = {
           path: selectedMovie?.Path || '',
+          pause: false,
           fullscreen,
           audioId,
           subtitleId,

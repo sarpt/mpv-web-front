@@ -14,6 +14,7 @@ export async function checkApiAvailability(newAddress: string): Promise<boolean>
 
 export type playMovieArguments = {
   path: string,
+  pause: boolean,
   audioId?: string,
   subtitleId?: string,
   fullscreen: boolean,
