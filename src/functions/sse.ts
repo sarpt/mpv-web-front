@@ -2,7 +2,7 @@ import type { Playback } from '../models/api';
 import { playbackStore } from '../stores/playback';
 
 let eventSource: EventSource | undefined;
-const playbackEvent = 'playback';
+const playbackAllEvent = 'all';
 
 export function initializeEventSource(address: string) {
   if (!!eventSource) {
@@ -11,7 +11,7 @@ export function initializeEventSource(address: string) {
 
   eventSource = new EventSource(`http://${address}/sse/playback`);
 
-  eventSource.addEventListener(playbackEvent, (event: Event & { data?: string }) => {
+  eventSource.addEventListener(playbackAllEvent, (event: Event & { data?: string }) => {
     playbackStore.set({
       playback: JSON.parse(event.data || '') as Playback,
       error: false,
