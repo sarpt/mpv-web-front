@@ -7,6 +7,7 @@
 	import Movies from './Movies.svelte';
 	import Playback from './Playback.svelte';
 	import ApiAddress from './ApiAddress.svelte';
+	import { init as initSse } from "../functions/sse";
 
 	let playbackContainer: HTMLElement;
 
@@ -19,6 +20,8 @@
 	page('/api-address', () => pageComponent = ApiAddress);
 
 	page.start();
+
+  initSse();
 
 	function handleWindowResize() {
 		const vh = window.innerHeight * 0.01;

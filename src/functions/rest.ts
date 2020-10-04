@@ -1,15 +1,12 @@
 import { apiAddressStore } from '../stores/api_address';
 import type { ApiAddressState } from '../stores/api_address';
 
-import { initializeEventSource } from './sse';
-
 let address: string | undefined;
 
 apiAddressStore.subscribe(handleApiAddressChange);
 
 function handleApiAddressChange(apiAddressState: ApiAddressState) {
   address = apiAddressState.address;
-  initializeEventSource(address);
 }
 
 export async function getMovies(): Promise<Response> {

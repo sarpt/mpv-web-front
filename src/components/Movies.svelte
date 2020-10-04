@@ -6,7 +6,6 @@
 
   import { getMovieName } from '../functions/movie';
   import {
-    fetchAllMovies,
     changeMovie,
   } from '../functions/api';
   import type {
@@ -17,7 +16,6 @@
     Playback,
   } from '../models/api'; // neccessary 'import type', otherwise rollup will not find import value
 
-  import { apiAddressStore } from '../stores/api_address';
   import { playbackStore } from '../stores/playback';
   import { moviesStore } from '../stores/movies';
 
@@ -57,32 +55,19 @@
     }
   }
 
-  
-  function handleAddressChange() {
-    fetchMovies();
-  }
-
-  function fetchMovies() {
-    isMovieFetchInProgress = true;
-
-    fetchAllMovies();
-  }
-
   async function handlePlay(req: playMovieArguments) {
     return await changeMovie(req);
   }
 
-  const apiAddressUnsubscribe = apiAddressStore.subscribe(handleAddressChange);
   const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
-    isMovieFetchInProgress = false;
     playback = playbackState.playback;
   });
   const moviesUnsubscribe = moviesStore.subscribe(moviesState => {
-    movies = moviesState.movies;
+    movies = Object.values(moviesState.movies);
+    isMovieFetchInProgress = moviesState.isFetchingInProgress;
   });
 
   onDestroy(() => {
-    apiAddressUnsubscribe();
     playbackUnsubscribe();
     moviesUnsubscribe();
   });

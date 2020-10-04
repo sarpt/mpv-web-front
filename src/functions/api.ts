@@ -84,11 +84,17 @@ export async function fullscreen(enabled: boolean): Promise<boolean> {
 
 export async function fetchAllMovies() {
   try {
+    moviesStore.set({
+      movies: {},
+      isFetchingInProgress: true,
+    });
+
     const res = await getMovies();
     const moviesResponse = await res.json();
 
     moviesStore.set({
-      movies: moviesResponse.movies || [],
+      movies: moviesResponse.movies || {},
+      isFetchingInProgress: false,
     });
   } catch(err) {
       apiConnectionStore.set({

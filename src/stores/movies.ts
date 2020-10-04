@@ -4,12 +4,16 @@ import type {
   Movie,
 } from '../models/api';
 
+export type MoviesMap = { [key in string]: Movie };
+
 export type MoviesState = {
-  movies: Movie[],
+  movies: MoviesMap,
+  isFetchingInProgress: boolean,
 };
 
 const initialState: MoviesState = {
-  movies: [],
+  movies: {},
+  isFetchingInProgress: false,
 };
 
 export const moviesStore = writable(initialState);
