@@ -1,6 +1,5 @@
 import { moviesStore } from '../stores/movies';
-import { apiConnectionStore } from '../stores/api_connection';
-import { getMovies, headMovies, playbackRequest, postPlayback } from './rest';
+import { getMovies, headMovies, postPlayback } from './rest';
 
 export async function checkApiAvailability(newAddress: string): Promise<boolean> {
   try {
@@ -97,8 +96,9 @@ export async function fetchAllMovies() {
       isFetchingInProgress: false,
     });
   } catch(err) {
-      apiConnectionStore.set({
-        connected: false,
-      });
+    moviesStore.set({
+      movies: {},
+      isFetchingInProgress: false,
+    });
   }
 }

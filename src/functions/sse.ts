@@ -1,18 +1,16 @@
-import type { Movie, Playback } from '../models/api';
+import type { Playback } from '../models/api';
+import {
+  errorHandler,
+  eventSourceEventListener,
+  EventSourceVariant,
+  MoviesEvents,
+  PlaybackEvents,
+  StatusEvents,
+} from '../models/sse';
 import { ApiAddressState, apiAddressStore } from '../stores/api_address';
+import { apiConnectionStore } from '../stores/api_connection';
 import { MoviesMap, moviesStore } from '../stores/movies';
 import { playbackStore } from '../stores/playback';
-
-const playbackAllEvent = 'all';
-const moviesAddedEvent = 'added';
-
-type eventSourceEventListener = (event: Event & { data?: string }) => void;
-type errorHandler = (event: Event) => void;
-
-enum EventSourceVariant {
-  Playback = 'playback',
-  Movies = 'movies',
-}
 
 let address: string | undefined;
 let eventSources: Map<EventSourceVariant, EventSource>;
@@ -23,15 +21,37 @@ export function init() {
   apiAddressStore.subscribe(handleApiAddressChange);
 }
 
-function handleApiAddressChange(apiAddressState: ApiAddressState) {
-  address = apiAddressState.address;
-  initPlaybackEventSource();
-  initMoviesEventSource();
+export function initStatusEventSource() {
+  const eventListeners = new Map<string, eventSourceEventListener>();
+  const messageHandler = (event: Event & { data?: string }) => {
+    apiConnectionStore.update(state => {
+      if (state.connected) {
+        return state;
+      }
+
+      return {
+        connected: true,
+      };
+    });
+  };
+
+  eventListeners.set(StatusEvents.Replay, messageHandler);
+  eventListeners.set(StatusEvents.ClientObserverAdded, messageHandler);
+  eventListeners.set(StatusEvents.ClientObserverRemoved, messageHandler);
+  eventListeners.set(StatusEvents.MpvProcessChanged, messageHandler);
+
+  const onError = (ev: Event) => {
+    apiConnectionStore.set({
+      connected: false,
+    });
+  };
+
+  initEventSource(EventSourceVariant.Status, eventListeners, onError, true);
 }
 
 export function initPlaybackEventSource() {
   const eventListeners = new Map<string, eventSourceEventListener>();
-  eventListeners.set(playbackAllEvent, (event: Event & { data?: string }) => {
+  eventListeners.set(PlaybackEvents.All, (event: Event & { data?: string }) => {
     playbackStore.set({
       playback: JSON.parse(event.data || '') as Playback,
       error: false,
@@ -49,7 +69,7 @@ export function initPlaybackEventSource() {
 
 export function initMoviesEventSource() {
   const eventListeners = new Map<string, eventSourceEventListener>();
-  eventListeners.set(moviesAddedEvent, (event: Event & { data?: string }) => {
+  eventListeners.set(MoviesEvents.Added, (event: Event & { data?: string }) => {
     moviesStore.update((state) => {
       return {
         movies: {
@@ -95,6 +115,13 @@ export function initEventSource(
   });
 
   eventSource.onerror = createSseErrorHandler(eventSourceVariant, onError);
+}
+
+function handleApiAddressChange(apiAddressState: ApiAddressState) {
+  address = apiAddressState.address;
+  initStatusEventSource();
+  initPlaybackEventSource();
+  initMoviesEventSource();
 }
 
 function createSseErrorHandler(eventSourceVariant: EventSourceVariant, onError: errorHandler): errorHandler {
