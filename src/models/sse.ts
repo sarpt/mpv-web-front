@@ -13,7 +13,7 @@ export enum MoviesEvents {
   Added = 'added',
 }
 
-export enum EventSourceVariant {
+export enum SseChannelVariant {
   Playback = 'playback',
   Movies = 'movies',
   Status = 'status',

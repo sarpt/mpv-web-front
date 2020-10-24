@@ -2,9 +2,9 @@ import type { Playback } from '../models/api';
 import {
   errorHandler,
   eventSourceEventListener,
-  EventSourceVariant,
   MoviesEvents,
   PlaybackEvents,
+  SseChannelVariant,
   StatusEvents,
 } from '../models/sse';
 import { ApiAddressState, apiAddressStore } from '../stores/api_address';
@@ -12,16 +12,20 @@ import { apiConnectionStore } from '../stores/api_connection';
 import { MoviesMap, moviesStore } from '../stores/movies';
 import { playbackStore } from '../stores/playback';
 
+let eventSource: EventSource;
 let address: string | undefined;
-let eventSources: Map<EventSourceVariant, EventSource>;
 
 export function init() {
-  eventSources = new Map<EventSourceVariant, EventSource>();
-
   apiAddressStore.subscribe(handleApiAddressChange);
 }
 
-export function initStatusEventSource() {
+type sseChannel = {
+  variant: SseChannelVariant,
+  eventListeners: Map<string, eventSourceEventListener>,
+  onError: errorHandler,
+};
+
+export function getStatusSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
     apiConnectionStore.update(state => {
@@ -46,10 +50,14 @@ export function initStatusEventSource() {
     });
   };
 
-  initEventSource(EventSourceVariant.Status, eventListeners, onError, true);
+  return {
+    variant: SseChannelVariant.Status,
+    eventListeners,
+    onError,
+  };
 }
 
-export function initPlaybackEventSource() {
+export function getPlaybackSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   eventListeners.set(PlaybackEvents.All, (event: Event & { data?: string }) => {
     playbackStore.set({
@@ -64,10 +72,14 @@ export function initPlaybackEventSource() {
     });
   };
 
-  initEventSource(EventSourceVariant.Playback, eventListeners, onError, true);
+  return {
+    variant: SseChannelVariant.Playback,
+    eventListeners,
+    onError,
+  };
 }
 
-export function initMoviesEventSource() {
+export function getMoviesSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   eventListeners.set(MoviesEvents.Added, (event: Event & { data?: string }) => {
     moviesStore.update((state) => {
@@ -88,49 +100,71 @@ export function initMoviesEventSource() {
     });
   };
 
-  initEventSource(EventSourceVariant.Movies, eventListeners, onError, true);
+  return {
+    variant: SseChannelVariant.Movies,
+    eventListeners,
+    onError,
+  };
 }
 
 export function initEventSource(
-  eventSourceVariant: EventSourceVariant,
+  sseVariants: SseChannelVariant[],
   eventListeners: Map<string, eventSourceEventListener>,
-  onError: errorHandler,
+  errorHandlers: errorHandler[],
   replayState: boolean,
 ) {
-  let eventSource = eventSources.get(eventSourceVariant);
   if (!!eventSource) {
     eventSource.close();
   }
 
-  const url = new URL(`http://${address}/sse/${eventSourceVariant}`);
+  const url = new URL(`http://${address}/sse`);
+  sseVariants.forEach(variant => {
+    url.searchParams.append('channel', variant);
+  });
   if (replayState) {
     url.searchParams.append('replay', 'true');
   }
 
   eventSource = new EventSource(url.toString());
-  eventSources.set(eventSourceVariant, eventSource);
 
   eventListeners.forEach((eventListener, eventName) => {
     eventSource!.addEventListener(eventName, eventListener);
   });
 
-  eventSource.onerror = createSseErrorHandler(eventSourceVariant, onError);
+  eventSource.onerror = createSseErrorHandler(errorHandlers);
 }
 
 function handleApiAddressChange(apiAddressState: ApiAddressState) {
   address = apiAddressState.address;
-  initStatusEventSource();
-  initPlaybackEventSource();
-  initMoviesEventSource();
+
+  startSseChannels();
 }
 
-function createSseErrorHandler(eventSourceVariant: EventSourceVariant, onError: errorHandler): errorHandler {
+function startSseChannels() {
+  const sseChannels = [
+    getStatusSseChannel(),
+    getPlaybackSseChannel(),
+    getMoviesSseChannel(),
+  ];
+  const allEventListeners = new Map<string, eventSourceEventListener>();
+  const allErrorHandlers: errorHandler[] = [];
+  const allVariants: SseChannelVariant[] = [];
+
+  sseChannels.forEach(channel => {
+    allVariants.push(channel.variant);
+    allErrorHandlers.push(channel.onError);
+    channel.eventListeners.forEach((listener, eventName) => {
+      allEventListeners.set(eventName, listener);
+    });
+  });
+  initEventSource(allVariants, allEventListeners, allErrorHandlers, true);
+}
+
+function createSseErrorHandler(handlers: errorHandler[]): errorHandler {
   return (ev: Event) => {
-    const eventSource = eventSources.get(eventSourceVariant);
     if (!eventSource) return;
 
-    onError(ev);
+    handlers.forEach(handler => handler(ev));
     eventSource!.close();
-    eventSources.delete(eventSourceVariant);
   };
 }
