@@ -25,6 +25,7 @@ export type playbackRequest = {
   audioId?: string,
   subtitleId?: string,
   pause?: boolean,
+  loopFile?: boolean,
 };
 
 export async function postPlayback(request: playbackRequest): Promise<Response> {
@@ -47,6 +48,10 @@ export async function postPlayback(request: playbackRequest): Promise<Response> 
 
   if (request.pause !== undefined) {
     formData.set('pause', `${request.pause}`);
+  }
+
+  if (request.loopFile !== undefined) {
+    formData.set('loopFile', `${request.loopFile}`);
   }
 
   return await fetch(`http://${address}/playback`, {

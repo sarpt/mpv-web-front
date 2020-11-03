@@ -41,7 +41,7 @@ export async function pause(paused: boolean): Promise<boolean> {
   }
 }
 
-export async function changeAudio(audioId: string): Promise<boolean> {
+export async function changeAudio(audioId: string | undefined): Promise<boolean> {
   try {
     await postPlayback({
       audioId,
@@ -53,7 +53,7 @@ export async function changeAudio(audioId: string): Promise<boolean> {
   }
 }
 
-export async function changeSubtitles(subtitleId: string): Promise<boolean> {
+export async function changeSubtitles(subtitleId: string | undefined): Promise<boolean> {
   try {
     await postPlayback({
       subtitleId,
@@ -76,10 +76,6 @@ export async function fullscreen(enabled: boolean): Promise<boolean> {
     return false;
   }
 }
-
-// export async function loopFile(loopfile: boolean): Promise<boolean> {
-//
-// }
 
 export async function fetchAllMovies() {
   try {

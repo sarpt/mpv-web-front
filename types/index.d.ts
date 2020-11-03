@@ -9,3 +9,4 @@
 /// <reference path="smui/form_field.d.ts" />
 /// <reference path="smui/select.d.ts" /> 
 /// <reference path="smui/radio.d.ts" /> 
+/// <reference path="smui/menu_surface.d.ts" /> 

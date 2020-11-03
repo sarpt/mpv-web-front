@@ -5,14 +5,22 @@
   import IconButton from '@smui/icon-button';
 
   import { fullscreen, pause } from "../functions/api";
+  import { LoopVariant } from "../models/api";
   import type { Playback } from "../models/api";
   import { secondsToHHMMSS } from "../functions/time";
   import { getMovieName } from "../functions/movie";
   import { playbackStore } from '../stores/playback';
+  import { PlaybackSettingsDialogActions } from '../models/dialogs';
+
+  import PlaybackSettingsDialog from "./PlaybackSettingsDialog.svelte";
+  import PlaybackRepeatDialog from "./PlaybackRepeatDialog.svelte";
 
   import './Playback.scss';
+  import { postPlayback } from "../functions/rest";
 
   let playback: Playback | undefined;
+  let playbackSettingsOpened = false;
+  let repeatSettingsOpened = false;
 
   $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
@@ -23,6 +31,26 @@
   const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
     updatePlayback(playbackState.playback);
   });
+
+  const openPlaybackSettings = () => { playbackSettingsOpened = true }
+  const openRepeatSettings = () => { repeatSettingsOpened = true }
+
+  const handlePlaybackSettingsChanged = (action: string, audioId: string, subtitleId: string) => {
+    if (action === PlaybackSettingsDialogActions.Close) return;
+
+    postPlayback({
+      audioId,
+      subtitleId,
+    });
+  }
+
+  const handleRepeatSettingsChanged = (action: string, loopVariant: LoopVariant) => {
+    if (action === PlaybackSettingsDialogActions.Close) return;
+
+    postPlayback({
+      loopFile: loopVariant === LoopVariant.File,
+    });
+  }
 
   onDestroy(() => {
     playbackUnsubscribe();
@@ -48,9 +76,21 @@
         <IconButton class="material-icons" on:click={() => fullscreen(true)}>fullscreen</IconButton>
       {/if}
 
-      <IconButton class="material-icons" on:click={() => {}}>repeat</IconButton>
-      <IconButton class="material-icons" on:click={() => {}}>subtitles</IconButton>
-      <IconButton class="material-icons" on:click={() => {}}>audiotrack</IconButton>
+      <IconButton class="material-icons" on:click={openRepeatSettings}>repeat</IconButton>
+      <PlaybackRepeatDialog
+        bind:opened={repeatSettingsOpened}
+        initialLoopVariant={playback.Loop.Variant}
+        dialogCloseHandler={handleRepeatSettingsChanged}
+      >
+      </PlaybackRepeatDialog>
+
+      <IconButton class="material-icons" on:click={openPlaybackSettings}>video_settings</IconButton>
+      <PlaybackSettingsDialog
+        bind:opened={playbackSettingsOpened}
+        playback={playback}
+        dialogCloseHandler={handlePlaybackSettingsChanged}
+      >
+      </PlaybackSettingsDialog>
     </div>
   {:else}
     No playback

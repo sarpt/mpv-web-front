@@ -1,32 +1,29 @@
-<script lang="typescript">
+<script lang="ts">
   import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
   import type {DialogClosedEvent} from '@smui/dialog';
   import Button, {Label, Icon as ButtonIcon} from '@smui/button';
-  import Checkbox from '@smui/checkbox';
-  import FormField from '@smui/form-field';
   import Select, {Option} from '@smui/select';
 
   import { getMovieName, getStreamName } from '../functions/movie';
+  import type { Movie, Playback } from '../models/api';
+  import { PlaybackSettingsDialogActions } from '../models/dialogs';
 
-  import type { Movie } from '../models/api';
-
-  export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
-  export let movie: Movie | undefined;
   export let opened: boolean;
+  export let playback: Playback | undefined;
+  export let dialogCloseHandler: (action: string, audioId: string, subtitleId: string) => void;
 
-  let path: string;
   let eventDialog: Dialog;
-  let fullscreen: boolean = false;
   let selectedAudioId = '';
   let selectedSubtitleId = '';
+  let movie: Movie | undefined;
 
   $: {
-    const newPath = movie?.Path || '';
-    if (path !== newPath) {
-      selectedAudioId = movie?.AudioStreams[0]?.AudioID || '';
-      selectedSubtitleId = movie?.SubtitleStreams[0]?.SubtitleID || '';
-      path = newPath;
-    }
+    const previousMovie = movie;
+    movie = playback?.Movie;
+    if (previousMovie?.Path !== movie?.Path || !previousMovie) {
+      selectedAudioId = playback?.SelectedAudioID || '';
+      selectedSubtitleId = playback?.SelectedSubtitleID || '';
+    }   
   }
 
   $: if (opened && eventDialog && !eventDialog.isOpen()) {
@@ -35,9 +32,9 @@
     eventDialog.close();
   }
 
-  function handleClose(event: DialogClosedEvent) {
+  function handleCloseDialog(event: DialogClosedEvent) {
+    dialogCloseHandler(event.detail.action, selectedAudioId, selectedSubtitleId);
     opened = false;
-    dialogCloseHandler(event.detail.action, fullscreen, selectedAudioId, selectedSubtitleId);
   }
 </script>
 
@@ -45,18 +42,12 @@
   bind:this={eventDialog}
   aria-labelledby="movie-dialog-title"
   aria-describedby="movie-dialog-content"
-  on:MDCDialog:closed={handleClose}
+  on:MDCDialog:closed={handleCloseDialog}
 >
-  <DialogTitle id="movie-dialog-title">{!!movie && getMovieName(movie)}</DialogTitle>
+  <DialogTitle id="movie-dialog-title">{!!playback?.Movie && getMovieName(playback.Movie)}</DialogTitle>
   <DialogContent>
-    <div id="movie-dialog-content">
-      <div class="row">
-        <FormField>
-          <Checkbox bind:checked={fullscreen} />
-          <span slot="label">Fullscreen</span>
-        </FormField>
-      </div>
-      {#if !!movie}
+    <div id="playback-settings-dialog-content">
+      {#if !!movie && movie.AudioStreams && movie.SubtitleStreams}
         <div class="row">
           <Select
             bind:value={selectedAudioId}
@@ -83,19 +74,15 @@
     </div>
   </DialogContent>
   <Actions>
-    <Button action="play" default use={[InitialFocus]}>
-      <ButtonIcon class="material-icons">play_arrow</ButtonIcon>
-      <Label>Play</Label>
-    </Button>
-    <Button action="add">
-      <ButtonIcon class="material-icons">playlist_add</ButtonIcon>
-      <Label>Add to playlist</Label>
+    <Button action={PlaybackSettingsDialogActions.Apply} default use={[InitialFocus]}>
+      <ButtonIcon class="material-icons">check</ButtonIcon>
+      <Label>Apply</Label>
     </Button>
   </Actions>
 </Dialog>
 
 <style lang="scss">
-  #movie-dialog-content {
+  #playback-settings-dialog-content {
     display: flex;
     flex-direction: column;
   }

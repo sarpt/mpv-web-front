@@ -23,4 +23,10 @@ declare module '@smui/dialog' {
   export class InitialFocus {
     $$prop_def: any;
   }
-}
+
+  export type DialogClosedEvent = {
+    detail: {
+      action: string,
+    },
+  };
+} 
