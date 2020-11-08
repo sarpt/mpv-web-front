@@ -19,7 +19,7 @@
     eventDialog.close();
   }
 
-  $: handleCloseDialog = (ev: DialogClosedEvent) => {
+  const handleCloseDialog = (ev: DialogClosedEvent) => {
     opened = false;
     dialogCloseHandler(ev.detail.action, selectedLoopVariant);
   }

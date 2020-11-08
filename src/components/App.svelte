@@ -1,6 +1,6 @@
 <script lang="ts">
 	import page from "page";
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import { apiConnectionStore } from "../stores/api_connection";
 
@@ -9,10 +9,11 @@
 	import ApiAddress from './ApiAddress.svelte';
 	import { init as initSse } from "../functions/sse";
 
-	let playbackContainer: HTMLElement;
+	let mainElement: HTMLElement;
 
   let pageComponent: any;
-  let params: any;
+	let params: any;
+	let intersectionObserverTrigger: HTMLElement;
 
 	// TODO: move this part into some kind of function/module
 	page('/', () => pageComponent = Movies);
@@ -25,7 +26,7 @@
 
 	function handleWindowResize() {
 		const vh = window.innerHeight * 0.01;
-		playbackContainer.style.setProperty('--vh', `${vh}px`);
+		mainElement.style.setProperty('--vh', `${vh}px`);
 	}
 
 	const apiConnectionUnsubscribe = apiConnectionStore.subscribe(apiConnectionState => {
@@ -40,15 +41,34 @@
 		window.removeEventListener('resize', handleWindowResize);
 		apiConnectionUnsubscribe();
 	});
+
+	onMount(() => {
+		const intersectionCallback = () => {
+			handleWindowResize();
+		}
+
+		const options = {
+			root: null,
+			rootMargin: '0px',
+			threshold: 0
+		}
+		
+		// Observer catches every disappearance of an empty element below playback element,
+		// since 'resize' does not fire on an initial page paint and in case of a resize occuring sooner than necessary
+		// observer ensures repaint when trigger appears/disappears additionally to every resize.
+		const observer = new IntersectionObserver(intersectionCallback, options);
+		observer.observe(intersectionObserverTrigger);
+	});
 </script>
 
-<main>
+<main bind:this={mainElement}>
 	<div class="view-container">
 		<svelte:component this={pageComponent} params={params}></svelte:component>
 	</div>
-	<div bind:this={playbackContainer} class="playback-container smui-paper smui-paper--color-primary">
+	<div class="playback-container smui-paper smui-paper--color-primary">
 		<Playback></Playback>
 	</div>
+	<div bind:this={intersectionObserverTrigger}></div>
 </main>
 
 <style lang="scss">
