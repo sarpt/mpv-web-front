@@ -6,7 +6,14 @@ export enum StatusEvents {
 }
 
 export enum PlaybackEvents {
-  All = 'all',
+  FullscreenChange = 'fullscreenChange',
+  LoopFileChange =  'loopFileChange',
+  PauseChange =  'pauseChange',
+  AudioIdChange =  'audioIdChange',
+  SubtitleIdChange =  'subtitleIdChange',
+  CurrentChapterIndexChange =  'currentChapterIndexChange',
+  MovieChange =  'movieChange',
+  PlaybackTimeChange =  'playbackTimeChange',
 }
 
 export enum MoviesEvents {

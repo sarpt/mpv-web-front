@@ -39,10 +39,16 @@ export function getStatusSseChannel(): sseChannel {
     });
   };
 
-  eventListeners.set(StatusEvents.Replay, messageHandler);
-  eventListeners.set(StatusEvents.ClientObserverAdded, messageHandler);
-  eventListeners.set(StatusEvents.ClientObserverRemoved, messageHandler);
-  eventListeners.set(StatusEvents.MpvProcessChanged, messageHandler);
+  const statusEvents = [
+    StatusEvents.Replay,
+    StatusEvents.ClientObserverAdded,
+    StatusEvents.ClientObserverRemoved,
+    StatusEvents.MpvProcessChanged,
+  ];
+  statusEvents.forEach(event => {
+    const channelEvent = `${SseChannelVariant.Status}.${event}`;
+    eventListeners.set(channelEvent, messageHandler);
+  });
 
   const onError = (ev: Event) => {
     apiConnectionStore.set({
@@ -59,11 +65,26 @@ export function getStatusSseChannel(): sseChannel {
 
 export function getPlaybackSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
-  eventListeners.set(PlaybackEvents.All, (event: Event & { data?: string }) => {
+  const messageHandler = (event: Event & { data?: string }) => {
     playbackStore.set({
       playback: JSON.parse(event.data || '') as Playback,
       error: false,
     });
+  };
+
+  const playbackEvents = [
+    PlaybackEvents.FullscreenChange,
+    PlaybackEvents.LoopFileChange,
+    PlaybackEvents.PauseChange,
+    PlaybackEvents.AudioIdChange,
+    PlaybackEvents.SubtitleIdChange,
+    PlaybackEvents.CurrentChapterIndexChange,
+    PlaybackEvents.MovieChange,
+    PlaybackEvents.PlaybackTimeChange,
+  ];
+  playbackEvents.forEach(event => {
+    const channelEvent = `${SseChannelVariant.Playback}.${event}`;
+    eventListeners.set(channelEvent, messageHandler);
   });
 
   const onError = (ev: Event) => {
@@ -81,7 +102,7 @@ export function getPlaybackSseChannel(): sseChannel {
 
 export function getMoviesSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
-  eventListeners.set(MoviesEvents.Added, (event: Event & { data?: string }) => {
+  eventListeners.set(`${SseChannelVariant.Movies}.${MoviesEvents.Added}`, (event: Event & { data?: string }) => {
     moviesStore.update((state) => {
       return {
         movies: {
