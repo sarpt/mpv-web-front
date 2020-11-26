@@ -1,10 +1,8 @@
 import { writable } from 'svelte/store';
 
 import type {
-  Movie,
+  MoviesMap,
 } from '../models/api';
-
-export type MoviesMap = { [key in string]: Movie };
 
 export type MoviesState = {
   movies: MoviesMap,

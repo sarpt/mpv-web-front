@@ -1,4 +1,5 @@
-import type { Playback } from '../models/api';
+import { Observable, Subject } from 'rxjs';
+import type { MoviesMap, Playback, Status } from '../models/api';
 import {
   errorHandler,
   eventSourceEventListener,
@@ -8,12 +9,25 @@ import {
   StatusEvents,
 } from '../models/sse';
 import { ApiAddressState, apiAddressStore } from '../stores/api_address';
-import { apiConnectionStore } from '../stores/api_connection';
-import { MoviesMap, moviesStore } from '../stores/movies';
-import { playbackStore } from '../stores/playback';
 
 let eventSource: EventSource;
 let address: string | undefined;
+
+const playbackSse = new Subject<Playback>();
+const moviesSse = new Subject<MoviesMap>();
+const statusSse = new Subject<Status>();
+
+export function getPlaybackSse(): Observable<Playback> {
+  return playbackSse.asObservable();
+}
+
+export function getMoviesSse(): Observable<MoviesMap> {
+  return moviesSse.asObservable();
+}
+
+export function getStatusSse(): Observable<Status> {
+  return statusSse.asObservable();
+}
 
 export function init() {
   apiAddressStore.subscribe(handleApiAddressChange);
@@ -28,15 +42,7 @@ type sseChannel = {
 export function getStatusSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
-    apiConnectionStore.update(state => {
-      if (state.connected) {
-        return state;
-      }
-
-      return {
-        connected: true,
-      };
-    });
+    statusSse.next(JSON.parse(event.data || '') as Status);
   };
 
   const statusEvents = [
@@ -51,9 +57,7 @@ export function getStatusSseChannel(): sseChannel {
   });
 
   const onError = (ev: Event) => {
-    apiConnectionStore.set({
-      connected: false,
-    });
+    statusSse.error(ev);
   };
 
   return {
@@ -66,10 +70,7 @@ export function getStatusSseChannel(): sseChannel {
 export function getPlaybackSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
-    playbackStore.set({
-      playback: JSON.parse(event.data || '') as Playback,
-      error: false,
-    });
+    playbackSse.next(JSON.parse(event.data || '') as Playback);
   };
 
   const playbackEvents = [
@@ -88,9 +89,7 @@ export function getPlaybackSseChannel(): sseChannel {
   });
 
   const onError = (ev: Event) => {
-    playbackStore.set({
-      error: true,
-    });
+    playbackSse.error(ev);
   };
 
   return {
@@ -102,23 +101,14 @@ export function getPlaybackSseChannel(): sseChannel {
 
 export function getMoviesSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
-  eventListeners.set(`${SseChannelVariant.Movies}.${MoviesEvents.Added}`, (event: Event & { data?: string }) => {
-    moviesStore.update((state) => {
-      return {
-        movies: {
-          ...state.movies,
-          ...JSON.parse(event.data || '') as MoviesMap,
-        },
-        isFetchingInProgress: false,
-      };
-    });
-  });
+  const messageHandler = (event: Event & { data?: string }) => {
+    moviesSse.next(JSON.parse(event.data || '') as MoviesMap);
+  };
+
+  eventListeners.set(`${SseChannelVariant.Movies}.${MoviesEvents.Added}`, messageHandler);
 
   const onError = (ev: Event) => {
-    moviesStore.set({
-      movies: {},
-      isFetchingInProgress: false,
-    });
+    moviesSse.error(ev);
   };
 
   return {

@@ -56,3 +56,9 @@ export type Movie = {
   SubtitleStreams: SubtitleStream[],
   Chapters: Chapter[],
 };
+
+export type MoviesMap = { [key in string]: Movie };
+
+export type Status = {
+  ObservingAddresses: { [k in string]: string },
+};
