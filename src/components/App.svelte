@@ -7,6 +7,8 @@
 	import Movies from './Movies.svelte';
 	import Playback from './Playback.svelte';
 	import ApiAddress from './ApiAddress.svelte';
+	import PlaybackHistory from "./PlaybackHistory.svelte";
+
 	import { appInit } from "../functions/app_init";
 
 	let mainElement: HTMLElement;
@@ -19,6 +21,7 @@
 	page('/', () => pageComponent = Movies);
 	page('/movies', () => pageComponent = Movies);
 	page('/api-address', () => pageComponent = ApiAddress);
+	page('/playback-history', () => pageComponent = PlaybackHistory)
 
 	page.start();
 	appInit();
@@ -65,7 +68,7 @@
 		<svelte:component this={pageComponent} params={params}></svelte:component>
 	</div>
 	<div class="playback-container smui-paper smui-paper--color-primary">
-		<Playback></Playback>
+		<Playback onHistoryClick={() => pageComponent = PlaybackHistory}></Playback>
 	</div>
 	<div bind:this={intersectionObserverTrigger}></div>
 </main>
@@ -95,6 +98,15 @@
 		.view-container {
 			padding: 0 0.5rem;
 		}
-	}
 
+    :global(.smui-paper) {
+      padding: 9px 6px;
+    }
+
+    :global(.smui-paper .smui-paper__title) {
+      font-size: small;
+      line-height: 1em;
+      margin-bottom: 0;
+    }
+	}
 </style>

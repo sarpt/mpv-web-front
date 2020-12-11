@@ -2,7 +2,8 @@ import type { Movie } from '../models/api';
 
 const defaultName = 'default';
 
-export function getMovieName(movie: Movie): string {
+type MovieDescription = Pick<Movie, 'Path' | 'Title'>;
+export function getMovieName(movie: MovieDescription): string {
   const title = movie.Title;
   const pathParts = movie.Path.split('/');
   const filename = pathParts[pathParts.length - 1];

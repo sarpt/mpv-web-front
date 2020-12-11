@@ -21,6 +21,7 @@
   let playback: Playback | undefined;
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
+  export let onHistoryClick: () => void;
 
   $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
@@ -91,6 +92,8 @@
         dialogCloseHandler={handlePlaybackSettingsChanged}
       >
       </PlaybackSettingsDialog>
+
+      <IconButton class="material-icons" on:click={onHistoryClick}>history</IconButton>
     </div>
   {:else}
     No playback

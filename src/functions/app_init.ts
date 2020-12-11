@@ -3,17 +3,17 @@ import { moviesStore } from '../stores/movies';
 import { playbackStore } from '../stores/playback';
 import { apiConnectionStore } from '../stores/api_connection';
 
+import { initDB } from './db';
+import { initPlaybackHistoryWatch } from './playback_history';
+
 export function appInit() {
+  initDB();
+  initPlaybackHistoryWatch();
+
   getPlaybackSse().subscribe(
     playback => {
       playbackStore.set({
         playback,
-        error: false,
-      });
-    },
-    () => {
-      playbackStore.set({
-        error: true,
       });
     },
   );
@@ -47,11 +47,6 @@ export function appInit() {
           },
           isFetchingInProgress: false,
         };
-      });
-    }, () => {
-      moviesStore.set({
-        movies: {},
-        isFetchingInProgress: false,
       });
     },
   );

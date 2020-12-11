@@ -5,7 +5,7 @@
 
   import { checkApiAvailability } from '../functions/api';
   import { apiAddressStore } from '../stores/api_address';
-import { apiConnectionStore } from '../stores/api_connection';
+  import { apiConnectionStore } from '../stores/api_connection';
 
   let currentApiAddress = $apiAddressStore;
   let valid = true;
