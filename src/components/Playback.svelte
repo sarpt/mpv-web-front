@@ -17,11 +17,11 @@
 
   import './Playback.scss';
   import { postPlayback } from "../functions/rest";
+import { navigateToPlaybackHistory } from "../functions/routing";
 
   let playback: Playback | undefined;
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
-  export let onHistoryClick: () => void;
 
   $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
 
@@ -52,6 +52,8 @@
       loopFile: loopVariant === LoopVariant.File,
     });
   }
+
+  const handleHistoryClick = () => navigateToPlaybackHistory()
 
   onDestroy(() => {
     playbackUnsubscribe();
@@ -93,7 +95,7 @@
       >
       </PlaybackSettingsDialog>
 
-      <IconButton class="material-icons" on:click={onHistoryClick}>history</IconButton>
+      <IconButton class="material-icons" on:click={handleHistoryClick}>history</IconButton>
     </div>
   {:else}
     No playback

@@ -1,29 +1,16 @@
 <script lang="ts">
-	import page from "page";
 	import { onDestroy, onMount } from 'svelte';
 
 	import { apiConnectionStore } from "../stores/api_connection";
-
-	import Movies from './Movies.svelte';
-	import Playback from './Playback.svelte';
-	import ApiAddress from './ApiAddress.svelte';
-	import PlaybackHistory from "./PlaybackHistory.svelte";
-
 	import { appInit } from "../functions/app_init";
+	import { navigateToApiAddress, navigateToRoot } from '../functions/routing';
+
+	import Playback from './Playback.svelte';
+	import Router from "./Router.svelte";
 
 	let mainElement: HTMLElement;
-
-  let pageComponent: any;
-	let params: any;
 	let intersectionObserverTrigger: HTMLElement;
 
-	// TODO: move this part into some kind of function/module
-	page('/', () => pageComponent = Movies);
-	page('/movies', () => pageComponent = Movies);
-	page('/api-address', () => pageComponent = ApiAddress);
-	page('/playback-history', () => pageComponent = PlaybackHistory)
-
-	page.start();
 	appInit();
 
 	function handleWindowResize() {
@@ -31,20 +18,21 @@
 		mainElement.style.setProperty('--vh', `${vh}px`);
 	}
 
-	const apiConnectionUnsubscribe = apiConnectionStore.subscribe(apiConnectionState => {
-		apiConnectionState.connected ? page('/') : page('/api-address');
-	});
-
 	// workaround for mobile browsers changing window size (adding address bar) without repainting.
 	// works better than setting heights to 100vh
 	window.addEventListener('resize', handleWindowResize);
 
+	let apiConnectionUnsubscribe: (() => void) | undefined;
 	onDestroy(() => {
 		window.removeEventListener('resize', handleWindowResize);
-		apiConnectionUnsubscribe();
+		!!apiConnectionUnsubscribe && apiConnectionUnsubscribe(); // cursed  
 	});
 
 	onMount(() => {
+		apiConnectionUnsubscribe = apiConnectionStore.subscribe(apiConnectionState => {
+			apiConnectionState.connected ? navigateToRoot() : navigateToApiAddress();
+		});
+
 		const intersectionCallback = () => {
 			handleWindowResize();
 		}
@@ -65,10 +53,10 @@
 
 <main bind:this={mainElement}>
 	<div class="view-container">
-		<svelte:component this={pageComponent} params={params}></svelte:component>
+		<Router></Router>
 	</div>
 	<div class="playback-container smui-paper smui-paper--color-primary">
-		<Playback onHistoryClick={() => pageComponent = PlaybackHistory}></Playback>
+		<Playback></Playback>
 	</div>
 	<div bind:this={intersectionObserverTrigger}></div>
 </main>

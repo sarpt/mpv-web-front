@@ -13,7 +13,6 @@ export function initPlaybackHistoryWatch() {
     .subscribe(addPlaybackToHistory);
 }
 
-
 function shouldOmitPlaybackChange(prevPlayback: Playback, newPlayback: Playback): boolean {
   const playbackEntriesEqual = prevPlayback.Movie.Path === newPlayback.Movie.Path
     && prevPlayback.SelectedAudioID === newPlayback.SelectedAudioID
