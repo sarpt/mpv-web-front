@@ -17,7 +17,7 @@
 
   import './Playback.scss';
   import { postPlayback } from "../functions/rest";
-import { navigateToPlaybackHistory } from "../functions/routing";
+  import { drawerStore } from "../stores/drawer";
 
   let playback: Playback | undefined;
   let playbackSettingsOpened = false;
@@ -53,7 +53,7 @@ import { navigateToPlaybackHistory } from "../functions/routing";
     });
   }
 
-  const handleHistoryClick = () => navigateToPlaybackHistory()
+  const handleMenuClick = () => drawerStore.set({ open: true });
 
   onDestroy(() => {
     playbackUnsubscribe();
@@ -67,39 +67,43 @@ import { navigateToPlaybackHistory } from "../functions/routing";
       <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(playback.Movie.Duration)}</span>
       <LinearProgress class="playback-progress" progress={playingMovieProgress} />
     </div>
-    <div class="actions">
+  {:else}
+    No playback
+  {/if}
+  <div class="actions">
+    <div>
+      <IconButton class="material-icons" on:click={handleMenuClick}>menu_open</IconButton>
+    </div>
+    <div>
       {#if playback?.Paused}
-        <IconButton class="material-icons" on:click={() => pause(false)}>play_arrow</IconButton>
+        <IconButton class="material-icons" on:click={() => pause(false)} disabled={!playback}>play_arrow</IconButton>
       {:else}
-        <IconButton class="material-icons" on:click={() => pause(true)}>pause</IconButton>
+        <IconButton class="material-icons" on:click={() => pause(true)} disabled={!playback}>pause</IconButton>
       {/if}
       {#if playback?.Fullscreen}
-        <IconButton class="material-icons" on:click={() => fullscreen(false)}>fullscreen_exit</IconButton>
+        <IconButton class="material-icons" on:click={() => fullscreen(false)} disabled={!playback}>fullscreen_exit</IconButton>
       {:else}
-        <IconButton class="material-icons" on:click={() => fullscreen(true)}>fullscreen</IconButton>
+        <IconButton class="material-icons" on:click={() => fullscreen(true)} disabled={!playback}>fullscreen</IconButton>
       {/if}
 
-      <IconButton class="material-icons" on:click={openRepeatSettings}>repeat</IconButton>
+      <IconButton class="material-icons" on:click={openRepeatSettings} disabled={!playback}>repeat</IconButton>
       <PlaybackRepeatDialog
         bind:opened={repeatSettingsOpened}
-        initialLoopVariant={playback.Loop.Variant}
+        initialLoopVariant={playback?.Loop.Variant || LoopVariant.File}
         dialogCloseHandler={handleRepeatSettingsChanged}
       >
       </PlaybackRepeatDialog>
 
-      <IconButton class="material-icons" on:click={openPlaybackSettings}>video_settings</IconButton>
+      <IconButton class="material-icons" on:click={openPlaybackSettings} disabled={!playback}>video_settings</IconButton>
       <PlaybackSettingsDialog
         bind:opened={playbackSettingsOpened}
         playback={playback}
         dialogCloseHandler={handlePlaybackSettingsChanged}
       >
       </PlaybackSettingsDialog>
-
-      <IconButton class="material-icons" on:click={handleHistoryClick}>history</IconButton>
     </div>
-  {:else}
-    No playback
-  {/if}
+    <div></div>
+  </div>
 </div>
 
 <style lang="scss">
@@ -116,7 +120,9 @@ import { navigateToPlaybackHistory } from "../functions/routing";
   }
 
   .actions {
-    align-self: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 
   .progress-container {

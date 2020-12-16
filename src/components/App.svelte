@@ -7,6 +7,7 @@
 
 	import Playback from './Playback.svelte';
 	import Router from "./Router.svelte";
+	import Drawer from './Drawer.svelte';
 
 	let mainElement: HTMLElement;
 	let intersectionObserverTrigger: HTMLElement;
@@ -52,6 +53,7 @@
 </script>
 
 <main bind:this={mainElement}>
+	<Drawer></Drawer>
 	<div class="view-container">
 		<Router></Router>
 	</div>
