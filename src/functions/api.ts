@@ -12,11 +12,12 @@ export async function checkApiAvailability(newAddress: string): Promise<boolean>
 }
 
 export type playMovieArguments = {
+  append: boolean,
+  audioId?: string,
+  fullscreen: boolean,
   path: string,
   pause: boolean,
-  audioId?: string,
   subtitleId?: string,
-  fullscreen: boolean,
 };
 
 export async function changeMovie(movie: playMovieArguments): Promise<boolean> {

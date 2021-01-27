@@ -1,4 +1,4 @@
-import page from "page";
+import page from 'page';
 
 export enum Routes {
   Root = '/',
@@ -18,10 +18,10 @@ type Routing = {
 
 export function initRouter(routes: Routing) {
   for (const [path, handler] of Object.entries(routes)) {
-	  page(path, handler);
+    page(path, handler);
   }
 
-	page.start();
+  page.start();
 }
 
 export function navigateToRoot() {
@@ -37,5 +37,5 @@ export function navigateToPlaybackHistory() {
 }
 
 export function navigateToApiAddress() {
-  page(Routes.ApiAddress)
+  page(Routes.ApiAddress);
 }

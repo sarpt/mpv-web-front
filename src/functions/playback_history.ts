@@ -16,7 +16,7 @@ export function initPlaybackHistoryWatch() {
 function shouldOmitPlaybackChange(prevPlayback: Playback, newPlayback: Playback): boolean {
   const playbackEntriesEqual = prevPlayback.Movie.Path === newPlayback.Movie.Path
     && prevPlayback.SelectedAudioID === newPlayback.SelectedAudioID
-    && prevPlayback.SelectedSubtitleID === newPlayback.SelectedSubtitleID
+    && prevPlayback.SelectedSubtitleID === newPlayback.SelectedSubtitleID;
 
   return !newPlayback.Movie.Path || playbackEntriesEqual;
 }

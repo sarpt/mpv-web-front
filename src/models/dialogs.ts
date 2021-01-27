@@ -1,14 +1,15 @@
 export enum MovieDialogActions {
-  Close = 'close',
   Added = 'added',
+  Close = 'close',
+  Play = 'play',
 }
 
 export enum PlaybackSettingsDialogActions {
-  Close = 'close',
   Apply = 'apply',
+  Close = 'close',
 }
 
 export enum PlaybackRepeatDialogActions {
-  Close = 'close',
   Apply = 'apply',
+  Close = 'close',
 }

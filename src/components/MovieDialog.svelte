@@ -9,6 +9,7 @@
   import { getMovieName, getStreamName } from '../functions/movie';
 
   import type { Movie } from '../models/api';
+  import { MovieDialogActions } from '../models/dialogs';
 
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
   export let movie: Movie | undefined;
@@ -83,11 +84,11 @@
     </div>
   </DialogContent>
   <Actions>
-    <Button action="play" default use={[InitialFocus]}>
+    <Button action={MovieDialogActions.Play} default use={[InitialFocus]}>
       <ButtonIcon class="material-icons">play_arrow</ButtonIcon>
       <Label>Play</Label>
     </Button>
-    <Button action="add">
+    <Button action={MovieDialogActions.Added}>
       <ButtonIcon class="material-icons">playlist_add</ButtonIcon>
       <Label>Add to playlist</Label>
     </Button>

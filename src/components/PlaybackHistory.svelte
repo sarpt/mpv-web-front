@@ -35,7 +35,8 @@
 
   .movie-title {
     overflow-x: hidden;
-    white-space: nowrap;
+    overflow-y: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>

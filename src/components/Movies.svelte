@@ -15,6 +15,7 @@
     Movie,
     Playback,
   } from '../models/api'; // neccessary 'import type', otherwise rollup will not find import value
+  import { MovieDialogActions } from '../models/dialogs';
 
   import { playbackStore } from '../stores/playback';
   import { moviesStore } from '../stores/movies';
@@ -37,19 +38,24 @@
   }
 
   function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
+    const request: playMovieArguments = {
+      append: false,
+      path: selectedMovie?.Path || '',
+      pause: false,
+      fullscreen,
+      audioId,
+      subtitleId,
+    }
+
     switch (action) {
-      case 'play':
-        const request: playMovieArguments = {
-          path: selectedMovie?.Path || '',
-          pause: false,
-          fullscreen,
-          audioId,
-          subtitleId,
-        }
+      case MovieDialogActions.Added:
+        request.append = true;
         handlePlay(request);
         break;
-      case 'add':
-        // TODO: to be implemented
+      case MovieDialogActions.Close:
+        return;
+      case MovieDialogActions.Play:
+        handlePlay(request);
         break;
       default:
     }
@@ -119,6 +125,7 @@
 
   .movie-title {
     overflow-x: hidden;
+    overflow-y: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }

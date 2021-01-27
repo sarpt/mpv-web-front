@@ -20,16 +20,21 @@ export async function headMovies(newAddress: string): Promise<Response> {
 }
 
 export type playbackRequest = {
-  path?: string,
-  fullscreen?: boolean,
+  append?: boolean,
   audioId?: string,
-  subtitleId?: string,
-  pause?: boolean,
+  fullscreen?: boolean,
   loopFile?: boolean,
+  path?: string,
+  pause?: boolean,
+  subtitleId?: string,
 };
 
 export async function postPlayback(request: playbackRequest): Promise<Response> {
   const formData = new FormData();
+  if (request.append !== undefined) {
+    formData.set('append', `${request.append}`);
+  }
+
   if (!!request.path) {
     formData.set('path', request.path);
   }
