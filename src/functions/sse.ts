@@ -128,7 +128,7 @@ export function initEventSource(
     eventSource.close();
   }
 
-  const url = new URL(`http://${address}/sse`);
+  const url = new URL(`http://${address}/sse/register`);
   sseVariants.forEach(variant => {
     url.searchParams.append('channel', variant);
   });

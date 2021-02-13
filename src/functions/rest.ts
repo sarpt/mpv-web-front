@@ -10,11 +10,11 @@ function handleApiAddressChange(apiAddressState: ApiAddressState) {
 }
 
 export async function getMovies(): Promise<Response> {
-  return await fetch(`http://${address}/movies`);
+  return await fetch(`http://${address}/rest/movies`);
 }
 
 export async function headMovies(newAddress: string): Promise<Response> {
-  return await fetch(`http://${newAddress}/movies`, {
+  return await fetch(`http://${newAddress}/rest/movies`, {
     method: 'HEAD',
   });
 }
@@ -59,7 +59,7 @@ export async function postPlayback(request: playbackRequest): Promise<Response> 
     formData.set('loopFile', `${request.loopFile}`);
   }
 
-  return await fetch(`http://${address}/playback`, {
+  return await fetch(`http://${address}/rest/playback`, {
     method: 'POST',
     body: formData,
   });
