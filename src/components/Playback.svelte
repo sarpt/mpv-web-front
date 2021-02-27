@@ -8,7 +8,7 @@
   import { secondsToHHMMSS } from "../functions/time";
   import { getMovieName } from "../functions/movie";
   import { playbackStore } from '../stores/playback';
-  import { PlaybackSettingsDialogActions } from '../models/dialogs';
+  import { PlaybackRepeatDialogActions, PlaybackSettingsDialogActions } from '../models/dialogs';
 
   import PlaybackSettingsDialog from "./PlaybackSettingsDialog.svelte";
   import PlaybackRepeatDialog from "./PlaybackRepeatDialog.svelte";
@@ -27,7 +27,7 @@
   const openRepeatSettings = () => { repeatSettingsOpened = true }
 
   const handlePlaybackSettingsChanged = (action: string, audioId: string, subtitleId: string) => {
-    if (action === PlaybackSettingsDialogActions.Close) return;
+    if (action === PlaybackRepeatDialogActions.Close) return;
 
     postPlayback({
       audioId,

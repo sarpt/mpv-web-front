@@ -5,6 +5,7 @@
   import Radio from '@smui/radio';
   import FormField from '@smui/form-field';
   import { LoopVariant } from '../models/api';
+  import { PlaybackRepeatDialogActions } from '../models/dialogs';
 
   export let opened: boolean;
   export let initialLoopVariant: LoopVariant;
@@ -21,6 +22,8 @@
   }
 
   const handleCloseDialog = (ev: DialogClosedEvent) => {
+    if (ev.detail.action === PlaybackRepeatDialogActions.Close) selectedLoopVariant = initialLoopVariant;
+
     opened = false;
     dialogCloseHandler(ev.detail.action, selectedLoopVariant);
   }
@@ -62,9 +65,9 @@
     </div>
   </DialogContent>
   <Actions>
-    <Button action="play" default use={[InitialFocus]}>
-      <ButtonIcon class="material-icons">play_arrow</ButtonIcon>
-      <Label>Play</Label>
+    <Button action={PlaybackRepeatDialogActions.Apply} default use={[InitialFocus]} disabled={initialLoopVariant === selectedLoopVariant}>
+      <ButtonIcon class="material-icons">check</ButtonIcon>
+      <Label>Apply</Label>
     </Button>
   </Actions>
 </Dialog>
