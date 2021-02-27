@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-
   import LinearProgress from '@smui/linear-progress';
   import IconButton from '@smui/icon-button';
 
@@ -19,19 +17,11 @@
   import { postPlayback } from "../functions/rest";
   import { drawerStore } from "../stores/drawer";
 
-  let playback: Playback | undefined;
+  $: playback = $playbackStore.playback;
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
 
   $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
-
-  function updatePlayback(updatedPlayback: Playback | undefined) {
-    playback = updatedPlayback;
-  }
-
-  const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
-    updatePlayback(playbackState.playback);
-  });
 
   const openPlaybackSettings = () => { playbackSettingsOpened = true }
   const openRepeatSettings = () => { repeatSettingsOpened = true }
@@ -54,10 +44,6 @@
   }
 
   const handleMenuClick = () => drawerStore.set({ open: true });
-
-  onDestroy(() => {
-    playbackUnsubscribe();
-  });
 </script>
 
 <div class="playback">
@@ -89,7 +75,7 @@
       <IconButton class="material-icons" on:click={openRepeatSettings} disabled={!playback}>repeat</IconButton>
       <PlaybackRepeatDialog
         bind:opened={repeatSettingsOpened}
-        initialLoopVariant={playback?.Loop.Variant || LoopVariant.File}
+        initialLoopVariant={playback?.Loop.Variant ?? LoopVariant.File}
         dialogCloseHandler={handleRepeatSettingsChanged}
       >
       </PlaybackRepeatDialog>

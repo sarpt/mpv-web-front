@@ -11,7 +11,8 @@
   export let dialogCloseHandler: (action: string, loopVariant: LoopVariant) => void;
 
   let eventDialog: Dialog;
-  let selectedLoopVariant: LoopVariant = initialLoopVariant;
+  let selectedLoopVariant: LoopVariant;
+  $: selectedLoopVariant = initialLoopVariant;
 
   $: if (opened && eventDialog && !eventDialog.isOpen()) {
     eventDialog.open();
