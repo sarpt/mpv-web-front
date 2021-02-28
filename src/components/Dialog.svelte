@@ -1,6 +1,7 @@
 <script lang="ts">
   import SmuiDialog, {Title as DialogTitle, Content as DialogContent, Actions} from '@smui/dialog';
   import type {DialogClosedEvent} from '@smui/dialog';
+  import { CommonDialogActions } from '../models/dialogs';
 
   export let name: string;
   export let opened: boolean;
@@ -17,8 +18,8 @@
 
   function handleClose(event: DialogClosedEvent) {
     opened = false;
-    if (event.detail.action === 'close' && !!dialogCloseHandler) {
-      dialogCloseHandler();
+    if (event.detail.action === CommonDialogActions.Close) {
+      !!dialogCloseHandler && dialogCloseHandler();
     } else {
       dialogActionHandler(event.detail.action);
     } 

@@ -52,12 +52,11 @@
         request.append = true;
         handlePlay(request);
         break;
-      case MovieDialogActions.Close:
-        return;
       case MovieDialogActions.Play:
         handlePlay(request);
         break;
       default:
+        return;
     }
   }
 

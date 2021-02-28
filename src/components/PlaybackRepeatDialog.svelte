@@ -1,79 +1,71 @@
 <script lang="ts">
-  import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
-  import type {DialogClosedEvent} from '@smui/dialog';
+  import {InitialFocus} from '@smui/dialog';
   import Button, {Label, Icon as ButtonIcon} from '@smui/button';
   import Radio from '@smui/radio';
   import FormField from '@smui/form-field';
   import { LoopVariant } from '../models/api';
   import { PlaybackRepeatDialogActions } from '../models/dialogs';
+  import Dialog from './Dialog.svelte';
 
   export let opened: boolean;
   export let initialLoopVariant: LoopVariant;
   export let dialogCloseHandler: (action: string, loopVariant: LoopVariant) => void;
 
-  let eventDialog: Dialog;
   let selectedLoopVariant: LoopVariant;
   $: selectedLoopVariant = initialLoopVariant;
 
-  $: if (opened && eventDialog && !eventDialog.isOpen()) {
-    eventDialog.open();
-  } else if (!opened && eventDialog && eventDialog.isOpen()) {
-    eventDialog.close();
+  const handleActions = (action: string) => {
+    dialogCloseHandler(action, selectedLoopVariant);
   }
 
-  const handleCloseDialog = (ev: DialogClosedEvent) => {
-    if (ev.detail.action === PlaybackRepeatDialogActions.Close) selectedLoopVariant = initialLoopVariant;
-
-    opened = false;
-    dialogCloseHandler(ev.detail.action, selectedLoopVariant);
+  const handleClose = () => {
+    selectedLoopVariant = initialLoopVariant;
   }
 </script>
 
 <Dialog
-  bind:this={eventDialog}
-  aria-labelledby="repeat-dialog-title"
-  aria-describedby="repeat-dialog-content"
-  on:MDCDialog:closed={handleCloseDialog}
+  name="repeat-dialog"
+  bind:opened={opened}
+  title="Repeat options"
+  dialogActionHandler={handleActions}
+  dialogCloseHandler={handleClose}
 >
-  <DialogTitle id="repeat-dialog-title">Repeat options</DialogTitle>
-  <DialogContent>
-    <div id="repeat-dialog-content">
-      <FormField>
-        <Radio bind:group={selectedLoopVariant} value={LoopVariant.File} />
-        <span slot="label">
-          Currently playing
-        </span>
-      </FormField>
-      <FormField>
-        <Radio bind:group={selectedLoopVariant} value={LoopVariant.Playlist} disabled={true}/>
-        <span slot="label">
-          Playlist
-        </span>
-      </FormField>
-      <FormField>
-        <Radio bind:group={selectedLoopVariant} value={LoopVariant.AB} disabled={true}/>
-        <span slot="label">
-          A-B
-        </span>
-      </FormField>
-      <FormField>
-        <Radio bind:group={selectedLoopVariant} value={LoopVariant.Off} />
-        <span slot="label">
-          Off
-        </span>
-      </FormField>
-    </div>
-  </DialogContent>
-  <Actions>
+  <div slot="content" class="content">
+    <FormField>
+      <Radio bind:group={selectedLoopVariant} value={LoopVariant.File} />
+      <span slot="label">
+        Currently playing
+      </span>
+    </FormField>
+    <FormField>
+      <Radio bind:group={selectedLoopVariant} value={LoopVariant.Playlist} disabled={true}/>
+      <span slot="label">
+        Playlist
+      </span>
+    </FormField>
+    <FormField>
+      <Radio bind:group={selectedLoopVariant} value={LoopVariant.AB} disabled={true}/>
+      <span slot="label">
+        A-B
+      </span>
+    </FormField>
+    <FormField>
+      <Radio bind:group={selectedLoopVariant} value={LoopVariant.Off} />
+      <span slot="label">
+        Off
+      </span>
+    </FormField>
+  </div>
+  <div slot="actions">
     <Button action={PlaybackRepeatDialogActions.Apply} default use={[InitialFocus]} disabled={initialLoopVariant === selectedLoopVariant}>
       <ButtonIcon class="material-icons">check</ButtonIcon>
       <Label>Apply</Label>
     </Button>
-  </Actions>
+  </div>
 </Dialog>
 
 <style lang="scss">
-  #repeat-dialog-content {
+  .content {
     display: flex;
     flex-direction: column;
   }

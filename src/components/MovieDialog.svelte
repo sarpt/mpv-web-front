@@ -29,7 +29,7 @@
     }
   }
 
-  function handleClose(action: string) {
+  function handleAction(action: string) {
     dialogCloseHandler(action, fullscreen, selectedAudioId, selectedSubtitleId);
   }
 </script>
@@ -38,7 +38,7 @@
   name='movie-dialog'
   bind:opened={opened}
   title={!!movie ? getMovieName(movie) : ''}
-  dialogActionHandler={handleClose}
+  dialogActionHandler={handleAction}
 >
   <div class="content" slot="content">
     <div class="row">
