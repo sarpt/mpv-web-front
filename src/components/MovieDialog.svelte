@@ -1,6 +1,5 @@
 <script lang="typescript">
-  import Dialog, {Title as DialogTitle, Content as DialogContent, Actions, InitialFocus} from '@smui/dialog';
-  import type {DialogClosedEvent} from '@smui/dialog';
+  import {InitialFocus} from '@smui/dialog';
   import Button, {Label, Icon as ButtonIcon} from '@smui/button';
   import Checkbox from '@smui/checkbox';
   import FormField from '@smui/form-field';
@@ -10,13 +9,13 @@
 
   import type { Movie } from '../models/api';
   import { MovieDialogActions } from '../models/dialogs';
+  import Dialog from './Dialog.svelte';
 
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
   export let movie: Movie | undefined;
   export let opened: boolean;
 
   let path: string;
-  let eventDialog: Dialog;
   let fullscreen: boolean = false;
   let selectedAudioId = '';
   let selectedSubtitleId = '';
@@ -30,60 +29,50 @@
     }
   }
 
-  $: if (opened && eventDialog && !eventDialog.isOpen()) {
-    eventDialog.open();
-  } else if (!opened && eventDialog && eventDialog.isOpen()) {
-    eventDialog.close();
-  }
-
-  function handleClose(event: DialogClosedEvent) {
-    opened = false;
-    dialogCloseHandler(event.detail.action, fullscreen, selectedAudioId, selectedSubtitleId);
+  function handleClose(action: string) {
+    dialogCloseHandler(action, fullscreen, selectedAudioId, selectedSubtitleId);
   }
 </script>
 
 <Dialog
-  bind:this={eventDialog}
-  aria-labelledby="movie-dialog-title"
-  aria-describedby="movie-dialog-content"
-  on:MDCDialog:closed={handleClose}
+  name='movie-dialog'
+  bind:opened={opened}
+  title={!!movie ? getMovieName(movie) : ''}
+  dialogActionHandler={handleClose}
 >
-  <DialogTitle id="movie-dialog-title">{!!movie && getMovieName(movie)}</DialogTitle>
-  <DialogContent>
-    <div id="movie-dialog-content">
-      <div class="row">
-        <FormField>
-          <Checkbox bind:checked={fullscreen} />
-          <span slot="label">Fullscreen</span>
-        </FormField>
-      </div>
-      {#if !!movie}
-        <div class="row">
-          <Select
-            bind:value={selectedAudioId}
-            label="Audio track"
-            disabled={!movie || movie.AudioStreams.length <= 1}
-          >
-            {#each movie.AudioStreams as audioStream}
-              <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
-            {/each}
-          </Select>
-        </div>
-        <div class="row">
-          <Select
-            bind:value={selectedSubtitleId}
-            label="Subtitle track"
-            disabled={!movie || movie.SubtitleStreams.length <= 1}
-          >
-            {#each movie.SubtitleStreams as subtitleStream}
-              <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
-            {/each}
-          </Select>
-        </div>
-      {/if}
+  <div class="content" slot="content">
+    <div class="row">
+      <FormField>
+        <Checkbox bind:checked={fullscreen} />
+        <span slot="label">Fullscreen</span>
+      </FormField>
     </div>
-  </DialogContent>
-  <Actions>
+    {#if !!movie}
+      <div class="row">
+        <Select
+          bind:value={selectedAudioId}
+          label="Audio track"
+          disabled={!movie || movie.AudioStreams.length <= 1}
+        >
+          {#each movie.AudioStreams as audioStream}
+            <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
+          {/each}
+        </Select>
+      </div>
+      <div class="row">
+        <Select
+          bind:value={selectedSubtitleId}
+          label="Subtitle track"
+          disabled={!movie || movie.SubtitleStreams.length <= 1}
+        >
+          {#each movie.SubtitleStreams as subtitleStream}
+            <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
+          {/each}
+        </Select>
+      </div>
+    {/if}
+  </div>
+  <div slot="actions">
     <Button action={MovieDialogActions.Play} default use={[InitialFocus]}>
       <ButtonIcon class="material-icons">play_arrow</ButtonIcon>
       <Label>Play</Label>
@@ -92,16 +81,11 @@
       <ButtonIcon class="material-icons">playlist_add</ButtonIcon>
       <Label>Add to playlist</Label>
     </Button>
-  </Actions>
+  </div>
 </Dialog>
 
 <style lang="scss">
-  #movie-dialog-content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .row {
+  .content, .row {
     display: flex;
     flex-direction: column;
   }

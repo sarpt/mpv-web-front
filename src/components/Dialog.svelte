@@ -1,0 +1,45 @@
+<script lang="ts">
+  import SmuiDialog, {Title as DialogTitle, Content as DialogContent, Actions} from '@smui/dialog';
+  import type {DialogClosedEvent} from '@smui/dialog';
+
+  export let name: string;
+  export let opened: boolean;
+  export let title: string;
+  export let dialogCloseHandler: (() => void) | undefined = undefined;
+  export let dialogActionHandler: (action: string) => void;
+  let eventDialog: SmuiDialog;
+
+  $: if (opened && eventDialog && !eventDialog.isOpen()) {
+    eventDialog.open();
+  } else if (!opened && eventDialog && eventDialog.isOpen()) {
+    eventDialog.close();
+  }
+
+  function handleClose(event: DialogClosedEvent) {
+    opened = false;
+    if (event.detail.action === 'close' && !!dialogCloseHandler) {
+      dialogCloseHandler();
+    } else {
+      dialogActionHandler(event.detail.action);
+    } 
+  }
+</script>
+
+<SmuiDialog
+  bind:this={eventDialog}
+  aria-labelledby={`${name}-title`}
+  aria-describedby={`${name}-content`}
+  on:MDCDialog:closed={handleClose}
+>
+  <DialogTitle id={`${name}-title`}>{title}</DialogTitle>
+  <DialogContent>
+    <div id={`${name}-content`}>
+      <slot name="content"></slot>
+    </div>
+  </DialogContent>
+  <Actions>
+    <div id={`${name}-actions`}>
+      <slot name="actions"></slot>
+    </div>
+  </Actions>
+</SmuiDialog>

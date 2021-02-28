@@ -4,7 +4,6 @@
 
   import { fullscreen, pause } from "../functions/api";
   import { LoopVariant } from "../models/api";
-  import type { Playback } from "../models/api";
   import { secondsToHHMMSS } from "../functions/time";
   import { getMovieName } from "../functions/movie";
   import { playbackStore } from '../stores/playback';
