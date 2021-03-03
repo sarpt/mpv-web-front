@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-
   import Paper, { Title } from '@smui/paper';
-  import LinearProgress from '@smui/linear-progress';
 
   import { getMovieName } from '../functions/movie';
   import {
@@ -26,7 +23,6 @@
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
   let movies: Movie[] = [];
-  let isMovieFetchInProgress = false;
 
   $: getColor = (movie: Movie, playback: Playback | undefined): string => {
     return !!playback && movie.Path === playback.Movie.Path ? 'primary' : 'none';
@@ -64,42 +60,26 @@
     return await changeMovie(req);
   }
 
-  const playbackUnsubscribe = playbackStore.subscribe(playbackState => {
-    playback = playbackState.playback;
-  });
-  const moviesUnsubscribe = moviesStore.subscribe(moviesState => {
-    movies = Object.values(moviesState.movies);
-    isMovieFetchInProgress = moviesState.isFetchingInProgress;
-  });
-
-  onDestroy(() => {
-    playbackUnsubscribe();
-    moviesUnsubscribe();
-  });
+  $: playback = $playbackStore.playback;
+  $: movies = Object.values($moviesStore.movies);
 </script>
 
-{#if isMovieFetchInProgress}
-  <Paper transition elevation={1}>
-    <LinearProgress indeterminate />
-  </Paper>
+{#if movies.length > 0}
+    {#each movies as movie, idx}
+      <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
+        <Paper transition color={getColor(movie, playback)}>
+            <Title>
+              <div class="movie-title">
+                {getMovieName(movie)}
+              </div>
+            </Title>
+        </Paper>
+      </div>
+    {/each}
 {:else}
-  {#if movies.length > 0}
-      {#each movies as movie, idx}
-        <div class="movie-entry" on:click={() => handleMovieEntryClick(movie, idx)}>
-          <Paper transition color={getColor(movie, playback)}>
-              <Title>
-                <div class="movie-title">
-                  {getMovieName(movie)}
-                </div>
-              </Title>
-          </Paper>
-        </div>
-      {/each}
-  {:else}
-    <div>
-      Seems there are no movies :/
-    </div>
-  {/if}
+  <div>
+    Seems there are no movies :/
+  </div>
 {/if}
 
 <MovieDialog bind:opened={dialogOpened} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
