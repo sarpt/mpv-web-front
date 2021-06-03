@@ -3,14 +3,15 @@
 
 	import { apiConnectionStore } from "../stores/api_connection";
 	import { appInit } from "../functions/app_init";
-	import { navigateToApiAddress, navigateToRoot } from '../functions/routing';
 
+	import ApiAddressDialog from './ApiAddressDialog.svelte';
+	import Drawer from './Drawer.svelte';
 	import Playback from './Playback.svelte';
 	import Router from "./Router.svelte";
-	import Drawer from './Drawer.svelte';
 
 	let mainElement: HTMLElement;
 	let intersectionObserverTrigger: HTMLElement;
+	let apiAddressDialogOpened = false;
 
 	appInit();
 
@@ -31,7 +32,7 @@
 
 	onMount(() => {
 		apiConnectionUnsubscribe = apiConnectionStore.subscribe(apiConnectionState => {
-			apiConnectionState.connected ? navigateToRoot() : navigateToApiAddress();
+			apiAddressDialogOpened = !apiConnectionState.connected;
 		});
 
 		const intersectionCallback = () => {
@@ -53,6 +54,7 @@
 </script>
 
 <main bind:this={mainElement}>
+	<ApiAddressDialog opened={apiAddressDialogOpened}></ApiAddressDialog>
 	<Drawer></Drawer>
 	<div class="view-container">
 		<Router></Router>

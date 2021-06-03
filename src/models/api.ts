@@ -18,7 +18,7 @@ export type SubtitleStream = {
 };
 
 export type Playback = {
-  Movie: Movie,
+  MoviePath: string,
   CurrentChapterIdx: number,
   Fullscreen: boolean,
   CurrentTime: number,

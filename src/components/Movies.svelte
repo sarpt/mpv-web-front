@@ -25,7 +25,7 @@
   let movies: Movie[] = [];
 
   $: getColor = (movie: Movie, playback: Playback | undefined): string => {
-    return !!playback && movie.Path === playback.Movie.Path ? 'primary' : 'none';
+    return !!playback && movie.Path === playback.MoviePath ? 'primary' : 'none';
   }
 
   function handleMovieEntryClick(movie: Movie, idx: number) {

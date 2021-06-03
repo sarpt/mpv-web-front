@@ -11,7 +11,6 @@ type Handler = () => void;
 
 type Routing = {
   [Routes.Root]: Handler,
-  [Routes.ApiAddress]: Handler,
   [Routes.Movies]: Handler,
   [Routes.PlaybackHistory]: Handler,
 };

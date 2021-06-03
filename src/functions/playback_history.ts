@@ -1,32 +1,35 @@
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, withLatestFrom } from 'rxjs/operators';
 
-import type { Playback } from '../models/api';
+import type { MoviesMap, Playback } from '../models/api';
 import { getDB } from './db';
 
-import { getPlaybackSse } from './sse';
+import { getPlaybackSse, getMoviesSse } from './sse';
 
 export function initPlaybackHistoryWatch() {
   getPlaybackSse()
     .pipe(
       distinctUntilChanged(shouldOmitPlaybackChange),
+      withLatestFrom(getMoviesSse())
     )
     .subscribe(addPlaybackToHistory);
 }
 
 function shouldOmitPlaybackChange(prevPlayback: Playback, newPlayback: Playback): boolean {
-  const playbackEntriesEqual = prevPlayback.Movie.Path === newPlayback.Movie.Path
+  const playbackEntriesEqual = prevPlayback.MoviePath === newPlayback.MoviePath
     && prevPlayback.SelectedAudioID === newPlayback.SelectedAudioID
     && prevPlayback.SelectedSubtitleID === newPlayback.SelectedSubtitleID;
 
-  return !newPlayback.Movie.Path || playbackEntriesEqual;
+  return !newPlayback.MoviePath || playbackEntriesEqual;
 }
 
-function addPlaybackToHistory(playback: Playback) {
+function addPlaybackToHistory([playback, movies]: [playback: Playback, movies: MoviesMap]) {
+  const movie = movies[playback.MoviePath];
+
   getDB()
     .playbackHistory
     .put({
-      Path: playback.Movie.Path,
-      Title: playback.Movie.Title,
+      Path: movie.Path,
+      Title: movie.Title,
       AudioID: playback.SelectedAudioID,
       SubtitleID: playback.SelectedSubtitleID,
     });

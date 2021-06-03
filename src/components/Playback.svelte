@@ -4,6 +4,7 @@
 
   import { fullscreen, pause } from "../functions/api";
   import { LoopVariant } from "../models/api";
+  import type { Movie, MoviesMap, Playback} from "../models/api";
   import { secondsToHHMMSS } from "../functions/time";
   import { getMovieName } from "../functions/movie";
   import { playbackStore } from '../stores/playback';
@@ -14,12 +15,21 @@
   import './Playback.scss';
   import { postPlayback } from "../functions/rest";
   import { drawerStore } from "../stores/drawer";
+  import { moviesStore } from "../stores/movies";
 
+  function getCurrentMovie(playback: Playback | undefined, movies: MoviesMap): Movie | undefined {
+    if (!playback) return;
+
+    return movies[playback.MoviePath];
+  }
+
+  $: moviesState = $moviesStore;
   $: playback = $playbackStore.playback;
+  $: currentMovie = getCurrentMovie(playback, moviesState.movies);
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
 
-  $: playingMovieProgress = (!!playback && playback.Movie.Duration > 0) ? (playback.CurrentTime / playback.Movie.Duration) : 0;
+  $: playingMovieProgress = (!!playback && !!currentMovie && currentMovie.Duration > 0) ? (playback.CurrentTime / currentMovie.Duration) : 0;
 
   const openPlaybackSettings = () => { playbackSettingsOpened = true }
   const openRepeatSettings = () => { repeatSettingsOpened = true }
@@ -41,10 +51,10 @@
 </script>
 
 <div class="playback">
-  {#if !!playback}
-    <div class="name">{getMovieName(playback.Movie)}</div>
+  {#if !!playback && !!currentMovie}
+    <div class="name">{getMovieName(currentMovie)}</div>
     <div class="progress-container">
-      <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(playback.Movie.Duration)}</span>
+      <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(currentMovie.Duration)}</span>
       <LinearProgress class="playback-progress" progress={playingMovieProgress} />
     </div>
   {:else}
@@ -78,6 +88,7 @@
       <PlaybackSettingsDialog
         bind:opened={playbackSettingsOpened}
         playback={playback}
+        currentMovie={currentMovie}
         dialogCloseHandler={handlePlaybackSettingsChanged}
       >
       </PlaybackSettingsDialog>

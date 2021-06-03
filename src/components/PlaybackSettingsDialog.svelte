@@ -10,19 +10,17 @@
 
   export let opened: boolean;
   export let playback: Playback | undefined;
+  export let currentMovie: Movie | undefined;
   export let dialogCloseHandler: (action: string, audioId: string, subtitleId: string) => void;
 
   let selectedAudioId = '';
   let selectedSubtitleId = '';
-  let movie: Movie | undefined;
 
   $: {
-    const previousMovie = movie;
-    movie = playback?.Movie;
-    if (previousMovie?.Path !== movie?.Path || !previousMovie) {
+    if (!opened) {
       selectedAudioId = playback?.SelectedAudioID || '';
       selectedSubtitleId = playback?.SelectedSubtitleID || '';
-    }   
+    }
   }
 
   function handleCloseDialog(action: string) {
@@ -32,19 +30,19 @@
 
 <Dialog
   name="playback-settings-dialog"
-  title={!!movie ? getMovieName(movie) : ''}
+  title={!!currentMovie ? getMovieName(currentMovie) : ''}
   bind:opened={opened}
   dialogActionHandler={handleCloseDialog}
 >
   <div slot="content" class="content">
-    {#if !!movie && movie.AudioStreams && movie.SubtitleStreams}
+    {#if !!currentMovie && currentMovie.AudioStreams && currentMovie.SubtitleStreams}
       <div class="row">
         <Select
           bind:value={selectedAudioId}
           label="Audio track"
-          disabled={!movie || movie.AudioStreams.length <= 1}
+          disabled={!currentMovie || currentMovie.AudioStreams.length <= 1}
         >
-          {#each movie.AudioStreams as audioStream}
+          {#each currentMovie.AudioStreams as audioStream}
             <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
           {/each}
         </Select>
@@ -53,9 +51,9 @@
         <Select
           bind:value={selectedSubtitleId}
           label="Subtitle track"
-          disabled={!movie || movie.SubtitleStreams.length <= 1}
+          disabled={!currentMovie || currentMovie.SubtitleStreams.length <= 1}
         >
-          {#each movie.SubtitleStreams as subtitleStream}
+          {#each currentMovie.SubtitleStreams as subtitleStream}
             <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
           {/each}
         </Select>
