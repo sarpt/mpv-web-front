@@ -1,38 +1,53 @@
-import { distinctUntilChanged, withLatestFrom } from 'rxjs/operators';
+import { pairwise, withLatestFrom } from 'rxjs/operators';
 
 import type { MoviesMap, Playback } from '../models/api';
-import { getDB } from './db';
+import { getDB, PlaybackHistory } from './db';
 
 import { getPlaybackSse, getMoviesSse } from './sse';
 
 export function initPlaybackHistoryWatch() {
   getPlaybackSse()
     .pipe(
-      distinctUntilChanged(shouldOmitPlaybackChange),
-      withLatestFrom(getMoviesSse())
+      pairwise(),
+      withLatestFrom(getMoviesSse()),
     )
-    .subscribe(addPlaybackToHistory);
+    .subscribe(updatePlaybackHistory);
 }
 
-function shouldOmitPlaybackChange(prevPlayback: Playback, newPlayback: Playback): boolean {
-  const playbackEntriesEqual = prevPlayback.MoviePath === newPlayback.MoviePath
-    && prevPlayback.SelectedAudioID === newPlayback.SelectedAudioID
-    && prevPlayback.SelectedSubtitleID === newPlayback.SelectedSubtitleID;
+function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback | undefined, Playback | undefined],  MoviesMap]) {
+  if (!newPlayback) return;
 
-  return !newPlayback.MoviePath || playbackEntriesEqual;
+  const newEntry = !prevPlayback ||prevPlayback.MoviePath !== newPlayback.MoviePath;
+  if (newEntry) {
+    const newMovie = movies[newPlayback.MoviePath];
+    addEntryToHistory({
+      Path: newMovie.Path,
+      Title: newMovie.Title,
+      AudioID: newPlayback.SelectedAudioID,
+      SubtitleID: newPlayback.SelectedSubtitleID,
+    });
+
+    return;
+  }
+
+  updateEntryInHistory(newPlayback.MoviePath, {
+    AudioID: newPlayback.SelectedAudioID,
+    SubtitleID: newPlayback.SelectedSubtitleID,
+  });
 }
 
-function addPlaybackToHistory([playback, movies]: [playback: Playback, movies: MoviesMap]) {
-  const movie = movies[playback.MoviePath];
-
+function addEntryToHistory(entry: PlaybackHistory) {
   getDB()
     .playbackHistory
-    .put({
-      Path: movie.Path,
-      Title: movie.Title,
-      AudioID: playback.SelectedAudioID,
-      SubtitleID: playback.SelectedSubtitleID,
-    });
+    .put(entry);
+}
+
+function updateEntryInHistory(path: string, changes: Partial<PlaybackHistory>) {
+  getDB()
+    .playbackHistory
+    .where('Path')
+    .equals(path)
+    .modify(changes);
 }
 
 export async function getPlaybackHistory() {

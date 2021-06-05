@@ -9,8 +9,15 @@
 
   let menuDrawer: Drawer;
 
-  const onMoviesClick = () => navigateToMovies();
-  const onHistoryClick = () => navigateToPlaybackHistory();
+  const createNavigateHandler = (routingHandler: () => void) => {
+    return () => {
+      routingHandler();
+      drawerStore.set({ open: false });
+    };
+  };
+
+  const onMoviesClick = createNavigateHandler(navigateToMovies);
+  const onHistoryClick = createNavigateHandler(navigateToPlaybackHistory);
 
   const menuItems: MenuItem[] = [
     {

@@ -1,4 +1,5 @@
 import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import type { MoviesMap, Playback, Status } from '../models/api';
 import {
   errorHandler,
@@ -17,8 +18,18 @@ const playbackSse = new Subject<Playback>();
 const moviesSse = new Subject<MoviesMap>();
 const statusSse = new Subject<Status>();
 
-export function getPlaybackSse(): Observable<Playback> {
-  return playbackSse.asObservable();
+export function getPlaybackSse(): Observable<Playback | undefined> {
+  return playbackSse.asObservable()
+    .pipe(
+      // TODO: below code is a workaround - on the backend side, the SSE should send empty data/undefined instead of empty playback object
+      map(playback => {
+        if (!playback || !playback.MoviePath || playback.MoviePath === '') {
+          return;
+        }
+
+        return playback;
+      }),
+    );
 }
 
 export function getMoviesSse(): Observable<MoviesMap> {
