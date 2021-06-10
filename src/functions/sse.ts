@@ -14,22 +14,12 @@ import { ApiAddressState, apiAddressStore } from '../stores/api_address';
 let eventSource: EventSource;
 let address: string | undefined;
 
-const playbackSse = new Subject<Playback>();
+const playbackSse = new Subject<Playback | undefined>();
 const moviesSse = new Subject<MoviesMap>();
 const statusSse = new Subject<Status>();
 
 export function getPlaybackSse(): Observable<Playback | undefined> {
-  return playbackSse.asObservable()
-    .pipe(
-      // TODO: below code is a workaround - on the backend side, the SSE should send empty data/undefined instead of empty playback object
-      map(playback => {
-        if (!playback || !playback.MoviePath || playback.MoviePath === '') {
-          return;
-        }
-
-        return playback;
-      }),
-    );
+  return playbackSse.asObservable();
 }
 
 export function getMoviesSse(): Observable<MoviesMap> {
@@ -81,7 +71,9 @@ export function getStatusSseChannel(): sseChannel {
 export function getPlaybackSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
-    playbackSse.next(JSON.parse(event.data || '') as Playback);
+    const playbackPayload = event.data ? JSON.parse(event.data) as Playback : undefined;
+
+    playbackSse.next(playbackPayload);
   };
 
   const playbackEvents = [
