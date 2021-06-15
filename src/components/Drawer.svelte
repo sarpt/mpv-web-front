@@ -2,7 +2,7 @@
   import Drawer, { Content, Header, Title, Scrim } from '@smui/drawer';
   import List, { Item, Text, Graphic } from '@smui/list';
 
-  import { navigateToMovies, navigateToPlaybackHistory, Routes } from '../functions/routing';
+  import { navigateToMovies, navigateToPlaybackHistory, navigateToPlaylist, Routes } from '../functions/routing';
   import type { MenuItem } from '../models/drawer';
   import { drawerStore } from '../stores/drawer';
   import { routingStore } from '../stores/routing';
@@ -16,21 +16,24 @@
     };
   };
 
-  const onMoviesClick = createNavigateHandler(navigateToMovies);
-  const onHistoryClick = createNavigateHandler(navigateToPlaybackHistory);
-
   const menuItems: MenuItem[] = [
     {
       route: Routes.Movies,
       text: 'Movies',
       graphic: 'movie',
-      handler: onMoviesClick,
+      handler: createNavigateHandler(navigateToMovies),
     },
     {
       route: Routes.PlaybackHistory,
       text: 'Playback history',
       graphic: 'history',
-      handler: onHistoryClick,
+      handler: createNavigateHandler(navigateToPlaybackHistory),
+    },
+    {
+      route: Routes.Playlist,
+      text: 'Playlist',
+      graphic: 'playlist-play',
+      handler: createNavigateHandler(navigateToPlaylist),
     }
   ];
 

@@ -2,17 +2,15 @@ import page from 'page';
 
 export enum Routes {
   Root = '/',
-  ApiAddress = '/api-address',
   Movies = '/movies',
   PlaybackHistory = '/playback-history',
+  Playlist = '/playlist',
 }
 
 type Handler = () => void;
 
 type Routing = {
-  [Routes.Root]: Handler,
-  [Routes.Movies]: Handler,
-  [Routes.PlaybackHistory]: Handler,
+  [key in Routes]: Handler
 };
 
 export function initRouter(routes: Routing) {
@@ -35,6 +33,6 @@ export function navigateToPlaybackHistory() {
   page(Routes.PlaybackHistory);
 }
 
-export function navigateToApiAddress() {
-  page(Routes.ApiAddress);
+export function navigateToPlaylist() {
+  page(Routes.Playlist);
 }

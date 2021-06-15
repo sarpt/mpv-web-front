@@ -1,19 +1,25 @@
 export enum StatusEvents {
-  Replay = 'replay',
   ClientObserverAdded = 'client-observer-added',
   ClientObserverRemoved = 'client-observer-removed',
   MpvProcessChanged = 'mpv-process-changed',
+  Replay = 'replay',
 }
 
 export enum PlaybackEvents {
+  AudioIdChange =  'audioIdChange',
+  CurrentChapterIndexChange =  'currentChapterIndexChange',
   FullscreenChange = 'fullscreenChange',
   LoopFileChange =  'loopFileChange',
-  PauseChange =  'pauseChange',
-  AudioIdChange =  'audioIdChange',
-  SubtitleIdChange =  'subtitleIdChange',
-  CurrentChapterIndexChange =  'currentChapterIndexChange',
   MovieChange =  'movieChange',
+  PauseChange =  'pauseChange',
   PlaybackTimeChange =  'playbackTimeChange',
+  SubtitleIdChange =  'subtitleIdChange',
+}
+
+export enum PlaylistEvents {
+  CurrentIdxChange = 'currentIdxChange',
+  ItemsChange =  'playlistItemsChange',
+  Replay =  'replay',
 }
 
 export enum MoviesEvents {
@@ -21,8 +27,9 @@ export enum MoviesEvents {
 }
 
 export enum SseChannelVariant {
-  Playback = 'playback',
   Movies = 'movies',
+  Playback = 'playback',
+  Playlist = 'playlist',
   Status = 'status',
 }
 

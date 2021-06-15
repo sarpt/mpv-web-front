@@ -28,6 +28,12 @@ export type Playback = {
   Loop: Loop,
 };
 
+export type Playlist = {
+  CurrentIdx: number,
+  Items: string[],
+  Name: string,
+};
+
 export enum LoopVariant {
   File = 'file',
   Playlist = 'playlist',

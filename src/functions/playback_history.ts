@@ -1,4 +1,4 @@
-import { pairwise, withLatestFrom } from 'rxjs/operators';
+import { pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
 import type { MoviesMap, Playback } from '../models/api';
 import { getDB, PlaybackHistory } from './db';
@@ -8,6 +8,7 @@ import { getPlaybackSse, getMoviesSse } from './sse';
 export function initPlaybackHistoryWatch() {
   getPlaybackSse()
     .pipe(
+      startWith(undefined),
       pairwise(),
       withLatestFrom(getMoviesSse()),
     )
@@ -15,28 +16,27 @@ export function initPlaybackHistoryWatch() {
 }
 
 function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback | undefined, Playback | undefined],  MoviesMap]) {
-  if (!newPlayback) return;
+  if (!newEntry(prevPlayback, newPlayback)) return;
 
-  const newEntry = !prevPlayback ||prevPlayback.MoviePath !== newPlayback.MoviePath;
-  if (newEntry) {
-    const newMovie = movies[newPlayback.MoviePath];
-    addEntryToHistory({
-      Path: newMovie.Path,
-      Title: newMovie.Title,
-      AudioID: newPlayback.SelectedAudioID,
-      SubtitleID: newPlayback.SelectedSubtitleID,
-    });
+  const newMovie = movies[newPlayback!.MoviePath];
+  putEntryInHistory({
+    Path: newMovie.Path,
+    Title: newMovie.Title,
+    AudioID: newPlayback!.SelectedAudioID,
+    SubtitleID: newPlayback!.SelectedSubtitleID,
+  });
 
-    return;
-  }
+  // TODO: currently the playback history only refreshes mid-playback changes on the change on entry.
+  // To add some diffing mechanism.
+  if (!prevPlayback) return;
 
-  updateEntryInHistory(newPlayback.MoviePath, {
-    AudioID: newPlayback.SelectedAudioID,
-    SubtitleID: newPlayback.SelectedSubtitleID,
+  updateEntryInHistory(prevPlayback.MoviePath, {
+    AudioID: prevPlayback.SelectedAudioID,
+    SubtitleID: prevPlayback.SelectedSubtitleID,
   });
 }
 
-function addEntryToHistory(entry: PlaybackHistory) {
+function putEntryInHistory(entry: PlaybackHistory) {
   getDB()
     .playbackHistory
     .put(entry);
@@ -50,6 +50,14 @@ function updateEntryInHistory(path: string, changes: Partial<PlaybackHistory>) {
     .modify(changes);
 }
 
+function newEntry(prevPlayback: Playback | undefined, newPlayback: Playback | undefined): boolean {
+  if (prevPlayback && newPlayback) return prevPlayback.MoviePath !== newPlayback.MoviePath;
+
+  return !!newPlayback;
+}
+
+// TODO: currently PlaybackHistory does not refresh on new entries.
+// To add some observable/svelte store mechanism to inform Svelte components on changes.
 export async function getPlaybackHistory() {
   return getDB().playbackHistory.reverse().toArray();
 }

@@ -1,11 +1,11 @@
 import { Observable, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import type { MoviesMap, Playback, Status } from '../models/api';
+import type { MoviesMap, Playback, Playlist, Status } from '../models/api';
 import {
   errorHandler,
   eventSourceEventListener,
   MoviesEvents,
   PlaybackEvents,
+  PlaylistEvents,
   SseChannelVariant,
   StatusEvents,
 } from '../models/sse';
@@ -15,11 +15,16 @@ let eventSource: EventSource;
 let address: string | undefined;
 
 const playbackSse = new Subject<Playback | undefined>();
+const playlistSse = new Subject<Playlist | undefined>();
 const moviesSse = new Subject<MoviesMap>();
 const statusSse = new Subject<Status>();
 
 export function getPlaybackSse(): Observable<Playback | undefined> {
   return playbackSse.asObservable();
+}
+
+export function getPlaylistSse(): Observable<Playlist | undefined> {
+  return playlistSse.asObservable();
 }
 
 export function getMoviesSse(): Observable<MoviesMap> {
@@ -102,6 +107,35 @@ export function getPlaybackSseChannel(): sseChannel {
   };
 }
 
+export function getPlaylistSseChannel(): sseChannel {
+  const eventListeners = new Map<string, eventSourceEventListener>();
+  const messageHandler = (event: Event & { data?: string }) => {
+    const playlistPayload = event.data ? JSON.parse(event.data) as Playlist : undefined;
+
+    playlistSse.next(playlistPayload);
+  };
+
+  const playbackEvents = [
+    PlaylistEvents.CurrentIdxChange,
+    PlaylistEvents.ItemsChange,
+    PlaylistEvents.Replay,
+  ];
+  playbackEvents.forEach(event => {
+    const channelEvent = `${SseChannelVariant.Playlist}.${event}`;
+    eventListeners.set(channelEvent, messageHandler);
+  });
+
+  const onError = (ev: Event) => {
+    playlistSse.error(ev);
+  };
+
+  return {
+    variant: SseChannelVariant.Playlist,
+    eventListeners,
+    onError,
+  };
+}
+
 export function getMoviesSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
@@ -156,9 +190,10 @@ function handleApiAddressChange(apiAddressState: ApiAddressState) {
 
 function startSseChannels() {
   const sseChannels = [
-    getStatusSseChannel(),
-    getPlaybackSseChannel(),
     getMoviesSseChannel(),
+    getPlaybackSseChannel(),
+    getPlaylistSseChannel(),
+    getStatusSseChannel(),
   ];
   const allEventListeners = new Map<string, eventSourceEventListener>();
   const allErrorHandlers: errorHandler[] = [];

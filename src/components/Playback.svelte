@@ -23,9 +23,9 @@
     return movies[playback.MoviePath];
   }
 
-  $: moviesState = $moviesStore;
+  $: movies = $moviesStore.movies;
   $: playback = $playbackStore.playback;
-  $: currentMovie = getCurrentMovie(playback, moviesState.movies);
+  $: currentMovie = getCurrentMovie(playback, movies);
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
 

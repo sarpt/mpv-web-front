@@ -7,7 +7,7 @@ export class AppDatabase extends Dexie {
     super('mpv-web-front-db');
 
     this.version(1).stores({
-      playbackHistory: '++id, path, title, audioID, subtitleID',
+      playbackHistory: '++id,Path',
     });
 
     this.playbackHistory = this.table('playbackHistory');
