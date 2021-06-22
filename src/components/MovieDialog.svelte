@@ -55,7 +55,7 @@
           disabled={!movie || movie.AudioStreams.length <= 1}
         >
           {#each movie.AudioStreams as audioStream}
-            <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
+            <Option value={audioStream.AudioID}>{getStreamName(audioStream)}</Option>
           {/each}
         </Select>
       </div>
@@ -66,7 +66,7 @@
           disabled={!movie || movie.SubtitleStreams.length <= 1}
         >
           {#each movie.SubtitleStreams as subtitleStream}
-            <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
+            <Option value={subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
           {/each}
         </Select>
       </div>
