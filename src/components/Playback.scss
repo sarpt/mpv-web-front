@@ -1,9 +1,9 @@
-@use "@material/linear-progress/mixins";
 @use "@material/theme/color-palette";
-@use "@material/theme/variables";
+@use "@material/theme/variables" as variables;
 @use "sass:map";
+@use '@material/linear-progress/index' as linear-progress;
 
 .playback-progress {
-  @include mixins.mdc-linear-progress-bar-color(variables.$mdc-theme-on-primary);
-  @include mixins.mdc-linear-progress-buffer-color(map.get(variables.$mdc-theme-property-values, "text-primary-on-light"));
+  @include linear-progress.bar-color(variables.$on-primary);
+  @include linear-progress.buffer-color(map.get(variables.$property-values, "text-primary-on-light"));
 }

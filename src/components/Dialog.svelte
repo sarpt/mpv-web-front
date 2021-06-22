@@ -1,6 +1,6 @@
 <script lang="ts">
-  import SmuiDialog, {Title as DialogTitle, Content as DialogContent, Actions} from '@smui/dialog';
-  import type {DialogClosedEvent} from '@smui/dialog';
+  import SmuiDialog, { Title as DialogTitle, Content as DialogContent, Actions } from '@smui/dialog';
+  import type { DialogClosedEvent } from '@smui/dialog';
   import { CommonDialogActions } from '../models/dialogs';
 
   export let name: string;
@@ -8,16 +8,8 @@
   export let title: string;
   export let dialogCloseHandler: (() => void) | undefined = undefined;
   export let dialogActionHandler: (action: string) => void;
-  let eventDialog: SmuiDialog;
-
-  $: if (opened && eventDialog && !eventDialog.isOpen()) {
-    eventDialog.open();
-  } else if (!opened && eventDialog && eventDialog.isOpen()) {
-    eventDialog.close();
-  }
 
   function handleClose(event: DialogClosedEvent) {
-    opened = false;
     if (event.detail.action === CommonDialogActions.Close) {
       !!dialogCloseHandler && dialogCloseHandler();
     } else {
@@ -27,7 +19,7 @@
 </script>
 
 <SmuiDialog
-  bind:this={eventDialog}
+  bind:open={opened}
   aria-labelledby={`${name}-title`}
   aria-describedby={`${name}-content`}
   on:MDCDialog:closed={handleClose}
