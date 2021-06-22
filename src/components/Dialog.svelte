@@ -1,6 +1,6 @@
 <script lang="ts">
-  import SmuiDialog, { Title as DialogTitle, Content as DialogContent, Actions } from '@smui/dialog';
-  import type { DialogClosedEvent } from '@smui/dialog';
+  import SmuiDialog, { Title as DialogTitle, Content as DialogContent, Actions } from '@smui/dialog/styled';
+  import type { DialogClosedEvent } from '@smui/dialog/styled';
   import { CommonDialogActions } from '../models/dialogs';
 
   export let name: string;

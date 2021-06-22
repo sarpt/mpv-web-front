@@ -1,4 +1,4 @@
-declare module '@smui/textfield' {
+declare module '@smui/textfield/styled' {
   export default class Textfield {
     $$prop_def: any;
   }

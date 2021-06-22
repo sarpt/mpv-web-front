@@ -1,4 +1,4 @@
-declare module '@smui/list' {
+declare module '@smui/list/styled' {
   export default class List {
     $$prop_def: any;
     $on: any;

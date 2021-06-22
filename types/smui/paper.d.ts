@@ -1,4 +1,4 @@
-declare module '@smui/paper' {
+declare module '@smui/paper/styled' {
   export default class Paper {
     $$prop_def: any;
   }

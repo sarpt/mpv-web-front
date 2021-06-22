@@ -1,6 +1,6 @@
 <script lang="ts">
-  import LinearProgress from '@smui/linear-progress';
-  import IconButton from '@smui/icon-button';
+  import LinearProgress from '@smui/linear-progress/styled';
+  import IconButton from '@smui/icon-button/styled';
 
   import { fullscreen, pause } from "../functions/api";
   import { LoopVariant } from "../models/api";

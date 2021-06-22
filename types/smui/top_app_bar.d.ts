@@ -1,4 +1,4 @@
-declare module '@smui/top-app-bar' {
+declare module '@smui/top-app-bar/styled' {
   export default class TopAppBar {
     $$prop_def: any;
   }

@@ -1,9 +1,9 @@
 <script lang="typescript">
-  import {InitialFocus} from '@smui/dialog';
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button';
-  import Checkbox from '@smui/checkbox';
-  import FormField from '@smui/form-field';
-  import Select, {Option} from '@smui/select';
+  import {InitialFocus} from '@smui/dialog/styled';
+  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
+  import Checkbox from '@smui/checkbox/styled';
+  import FormField from '@smui/form-field/styled';
+  import Select, {Option} from '@smui/select/styled';
 
   import { getMovieName, getStreamName } from '../functions/movie';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import {InitialFocus} from '@smui/dialog';
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button';
-  import Select, {Option} from '@smui/select';
+  import {InitialFocus} from '@smui/dialog/styled';
+  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
+  import Select, {Option} from '@smui/select/styled';
 
   import { getMovieName, getStreamName } from '../functions/movie';
   import type { Movie, Playback } from '../models/api';

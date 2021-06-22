@@ -1,4 +1,4 @@
-declare module '@smui/dialog' {
+declare module '@smui/dialog/styled' {
   export default class Dialog {
     $$prop_def: any;
     $on:  any;

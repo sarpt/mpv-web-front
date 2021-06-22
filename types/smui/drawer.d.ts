@@ -1,4 +1,4 @@
-declare module '@smui/drawer' {
+declare module '@smui/drawer/styled' {
   export default class Drawer {
     $$prop_def: any;
     $on: any;

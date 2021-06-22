@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Drawer, { Content, Header, Title, Scrim } from '@smui/drawer';
-  import List, { Item, Text, Graphic } from '@smui/list';
+  import Drawer, { Content, Header, Title, Scrim } from '@smui/drawer/styled';
+  import List, { Item, Text, Graphic } from '@smui/list/styled';
 
   import { navigateToMovies, navigateToPlaybackHistory, navigateToPlaylist, Routes } from '../functions/routing';
   import type { MenuItem } from '../models/drawer';

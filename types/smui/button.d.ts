@@ -1,4 +1,4 @@
-declare module '@smui/button' {
+declare module '@smui/button/styled' {
   export default class Button {
     $$prop_def: any;
     $on: any;

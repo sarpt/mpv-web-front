@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Paper, { Title } from '@smui/paper';
+  import Paper, { Title } from '@smui/paper/styled';
   import { getMovieName } from '../functions/movie';
 
   import { getPlaybackHistory } from '../functions/playback_history';

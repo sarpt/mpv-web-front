@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {InitialFocus} from '@smui/dialog';
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button';
-  import Radio from '@smui/radio';
-  import FormField from '@smui/form-field';
+  import {InitialFocus} from '@smui/dialog/styled';
+  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
+  import Radio from '@smui/radio/styled';
+  import FormField from '@smui/form-field/styled';
   import { LoopVariant } from '../models/api';
   import { PlaybackRepeatDialogActions } from '../models/dialogs';
   import Dialog from './Dialog.svelte';

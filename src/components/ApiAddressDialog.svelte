@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button';
-  import Textfield from '@smui/textfield';
+  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
+  import Textfield from '@smui/textfield/styled';
 
   import { checkApiAvailability } from '../functions/api';
   import { apiAddressStore } from '../stores/api_address';
