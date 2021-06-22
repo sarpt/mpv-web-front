@@ -1,5 +1,5 @@
 import { Observable, Subject } from 'rxjs';
-import type { MoviesMap, Playback, Playlist, Status } from '../models/api';
+import type { MoviesMap, Playback, Playlist, Playlists, Status } from '../models/api';
 import {
   errorHandler,
   eventSourceEventListener,
@@ -15,7 +15,7 @@ let eventSource: EventSource;
 let address: string | undefined;
 
 const playbackSse = new Subject<Playback | undefined>();
-const playlistSse = new Subject<Playlist | undefined>();
+const playlistsSse = new Subject<Playlists>();
 const moviesSse = new Subject<MoviesMap>();
 const statusSse = new Subject<Status>();
 
@@ -23,8 +23,8 @@ export function getPlaybackSse(): Observable<Playback | undefined> {
   return playbackSse.asObservable();
 }
 
-export function getPlaylistSse(): Observable<Playlist | undefined> {
-  return playlistSse.asObservable();
+export function getPlaylistSse(): Observable<Playlists> {
+  return playlistsSse.asObservable();
 }
 
 export function getMoviesSse(): Observable<MoviesMap> {
@@ -110,27 +110,28 @@ export function getPlaybackSseChannel(): sseChannel {
 export function getPlaylistSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
-    const playlistPayload = event.data ? JSON.parse(event.data) as Playlist : undefined;
+    if (!event.data) return;
 
-    playlistSse.next(playlistPayload);
+    const playlistsPayload = JSON.parse(event.data) as Playlists;
+
+    playlistsSse.next(playlistsPayload);
   };
 
-  const playbackEvents = [
-    PlaylistEvents.CurrentIdxChange,
+  const playlistsEvents = [
     PlaylistEvents.ItemsChange,
     PlaylistEvents.Replay,
   ];
-  playbackEvents.forEach(event => {
-    const channelEvent = `${SseChannelVariant.Playlist}.${event}`;
+  playlistsEvents.forEach(event => {
+    const channelEvent = `${SseChannelVariant.Playlists}.${event}`;
     eventListeners.set(channelEvent, messageHandler);
   });
 
   const onError = (ev: Event) => {
-    playlistSse.error(ev);
+    playlistsSse.error(ev);
   };
 
   return {
-    variant: SseChannelVariant.Playlist,
+    variant: SseChannelVariant.Playlists,
     eventListeners,
     onError,
   };

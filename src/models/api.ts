@@ -24,14 +24,19 @@ export type Playback = {
   CurrentTime: number,
   SelectedAudioID: string,
   SelectedSubtitleID: string,
+  PlaylistUUID: string,
+  PlaylistCurrentIdx: number,
   Paused: boolean,
   Loop: Loop,
 };
 
 export type Playlist = {
-  CurrentIdx: number,
   Items: string[],
   Name: string,
+};
+
+export type Playlists = {
+  Items: Record<string, Playlist>,
 };
 
 export enum LoopVariant {

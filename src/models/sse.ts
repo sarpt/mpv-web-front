@@ -13,12 +13,14 @@ export enum PlaybackEvents {
   MovieChange =  'movieChange',
   PauseChange =  'pauseChange',
   PlaybackTimeChange =  'playbackTimeChange',
+  PlaylistSelectionChange =  'playlistSelectionChange',
+  PlaylistCurrentIdxChange =  'playlistCurrentIdxChange',
   SubtitleIdChange =  'subtitleIdChange',
 }
 
 export enum PlaylistEvents {
-  CurrentIdxChange = 'currentIdxChange',
-  ItemsChange =  'playlistItemsChange',
+  Added = 'playlistAdded',
+  ItemsChange = 'playlistItemsChange',
   Replay =  'replay',
 }
 
@@ -29,7 +31,7 @@ export enum MoviesEvents {
 export enum SseChannelVariant {
   Movies = 'movies',
   Playback = 'playback',
-  Playlist = 'playlist',
+  Playlists = 'playlists',
   Status = 'status',
 }
 

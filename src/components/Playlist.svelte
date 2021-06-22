@@ -3,17 +3,20 @@
 
   import { getMovieName } from '../functions/movie';
   import { moviesStore } from '../stores/movies';
-  import { playlistStore } from "../stores/playlist";
+  import { playbackStore } from '../stores/playback';
+  import { playlistsStore } from "../stores/playlists";
 
   $: movies = $moviesStore.movies;
-  $: playlist = $playlistStore.playlist;
+  $: playlists = $playlistsStore;
+  $: playback = $playbackStore.playback;
   $: getColor = (idx: number): string => {
-    return !!playlist && idx === playlist.CurrentIdx ? 'primary' : 'none';
+    return !!playlists && !!playback && idx === playback.PlaylistCurrentIdx ? 'primary' : 'none';
   }
+  $: currentPlaylist = (playback && playback.PlaylistUUID != "") ? playlists.Items[playback.PlaylistUUID] : undefined;
 </script>
 
-{#if playlist && playlist.Items.length > 0}
-    {#each playlist.Items as item, idx}
+{#if currentPlaylist && currentPlaylist.Items.length > 0}
+    {#each currentPlaylist.Items as item, idx}
       <div class="playlist-entry">
         <Paper transition color={getColor(idx)}>
             <Title>

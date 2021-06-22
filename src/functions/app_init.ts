@@ -5,7 +5,7 @@ import { apiConnectionStore } from '../stores/api_connection';
 
 import { initDB } from './db';
 import { initPlaybackHistoryWatch } from './playback_history';
-import { playlistStore } from '../stores/playlist';
+import { playlistsStore } from '../stores/playlists';
 
 export function appInit() {
   initDB();
@@ -20,10 +20,8 @@ export function appInit() {
   );
 
   getPlaylistSse().subscribe(
-    playlist => {
-      playlistStore.set({
-        playlist,
-      });
+    playlists => {
+      playlistsStore.set(playlists);
     },
   );
 
