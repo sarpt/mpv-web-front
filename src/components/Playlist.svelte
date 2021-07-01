@@ -1,5 +1,6 @@
 <script lang="ts">
   import Paper, { Title } from '@smui/paper/styled';
+import { changePlaylistIdx } from '../functions/api';
 
   import { getMovieName } from '../functions/movie';
   import { moviesStore } from '../stores/movies';
@@ -13,11 +14,15 @@
     return !!playlists && !!playback && idx === playback.PlaylistCurrentIdx ? 'primary' : 'none';
   }
   $: currentPlaylist = (playback && playback.PlaylistUUID != "") ? playlists.Items[playback.PlaylistUUID] : undefined;
+
+  const handlePlaylistEntryClick = async (idx: number) => {
+    return await changePlaylistIdx(idx);
+  }
 </script>
 
 {#if currentPlaylist && currentPlaylist.Items.length > 0}
     {#each currentPlaylist.Items as item, idx}
-      <div class="playlist-entry">
+      <div class="playlist-entry" on:click={() => handlePlaylistEntryClick(idx)}>
         <Paper transition color={getColor(idx)}>
             <Title>
               <div class="playlist-path">

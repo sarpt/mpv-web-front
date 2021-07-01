@@ -66,6 +66,18 @@ export async function changeSubtitles(subtitleId: string | undefined): Promise<b
   }
 }
 
+export async function changePlaylistIdx(playlistIdx: number): Promise<boolean> {
+  try {
+    await postPlayback({
+      playlistIdx,
+    });
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 export async function fullscreen(enabled: boolean): Promise<boolean> {
   try {
     await postPlayback({

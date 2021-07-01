@@ -26,37 +26,53 @@ export type playbackRequest = {
   loopFile?: boolean,
   path?: string,
   pause?: boolean,
+  playlistIdx?: number,
   subtitleId?: string,
 };
+
+enum PlaybackArgurments {
+  Append = 'append',
+  AudioId = 'audioID',
+  Fullscreen = 'fullscreen',
+  LoopFile = 'loopFile',
+  Path = 'path',
+  Pause = 'pause',
+  PlaylistIdx = 'playlistIdx',
+  SubtitleId = 'subtitleID',
+}
 
 export async function postPlayback(request: playbackRequest): Promise<Response> {
   const formData = new FormData();
   if (request.append !== undefined) {
-    formData.set('append', `${request.append}`);
+    formData.set(PlaybackArgurments.Append, `${request.append}`);
   }
 
   if (!!request.path) {
-    formData.set('path', request.path);
+    formData.set(PlaybackArgurments.Path, request.path);
   }
 
   if (!!request.audioId) {
-    formData.set('audioID', request.audioId);
+    formData.set(PlaybackArgurments.AudioId, request.audioId);
   }
 
   if (!!request.subtitleId) {
-    formData.set('subtitleID', request.subtitleId);
+    formData.set(PlaybackArgurments.SubtitleId, request.subtitleId);
   }
 
   if (request.fullscreen !== undefined) {
-    formData.set('fullscreen', `${request.fullscreen}`);
+    formData.set(PlaybackArgurments.Fullscreen, `${request.fullscreen}`);
   }
 
   if (request.pause !== undefined) {
-    formData.set('pause', `${request.pause}`);
+    formData.set(PlaybackArgurments.Pause, `${request.pause}`);
   }
 
   if (request.loopFile !== undefined) {
-    formData.set('loopFile', `${request.loopFile}`);
+    formData.set(PlaybackArgurments.LoopFile, `${request.loopFile}`);
+  }
+
+  if (request.playlistIdx !== undefined) {
+    formData.set(PlaybackArgurments.PlaylistIdx, `${request.playlistIdx}`);
   }
 
   return await fetch(`http://${address}/rest/playback`, {
