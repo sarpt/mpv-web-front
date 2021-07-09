@@ -1,7 +1,7 @@
-import { pairwise, startWith, withLatestFrom } from 'rxjs/operators';
+import { filter, map, pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
 import type { MoviesMap, Playback } from '../models/api';
-import { getDB, PlaybackHistory } from './db';
+import { dbChanges, getDB, PlaybackHistory, Tables } from './db';
 
 import { getPlaybackSse, getMoviesSse } from './sse';
 
@@ -37,14 +37,17 @@ function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback
 }
 
 function putEntryInHistory(entry: PlaybackHistory) {
-  getDB()
-    .playbackHistory
-    .put(entry);
+  const db = getDB();
+  if (!db) return 0;
+
+  return db.playbackHistory.put(entry);
 }
 
 function updateEntryInHistory(path: string, changes: Partial<PlaybackHistory>) {
-  getDB()
-    .playbackHistory
+  const db = getDB();
+  if (!db) return 0;
+
+  return db.playbackHistory
     .where('Path')
     .equals(path)
     .modify(changes);
@@ -56,8 +59,16 @@ function newEntry(prevPlayback: Playback | undefined, newPlayback: Playback | un
   return !!newPlayback;
 }
 
-// TODO: currently PlaybackHistory does not refresh on new entries.
-// To add some observable/svelte store mechanism to inform Svelte components on changes.
-export async function getPlaybackHistory() {
-  return getDB().playbackHistory.reverse().toArray();
+export function getPlaybackHistory() {
+  return getDB().playbackHistory.reverse().toArray()
+    ?? [] as PlaybackHistory[];
+}
+
+export function playbackHistoryChanges() {
+  return dbChanges().pipe(
+    map(changes => {
+      return changes.filter(change => change.table === Tables.PlaybackHistory);
+    }),
+    filter(changes => changes.length !== 0),
+  );
 }

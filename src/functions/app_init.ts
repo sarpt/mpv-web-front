@@ -3,12 +3,10 @@ import { moviesStore } from '../stores/movies';
 import { playbackStore } from '../stores/playback';
 import { apiConnectionStore } from '../stores/api_connection';
 
-import { initDB } from './db';
 import { initPlaybackHistoryWatch } from './playback_history';
 import { playlistsStore } from '../stores/playlists';
 
 export function appInit() {
-  initDB();
   initPlaybackHistoryWatch();
 
   getPlaybackSse().subscribe(
@@ -25,8 +23,8 @@ export function appInit() {
     },
   );
 
-  getStatusSse().subscribe(
-    () => {
+  getStatusSse().subscribe({
+    next: () => {
       apiConnectionStore.update(state => {
         if (state.connected) {
           return state;
@@ -37,12 +35,12 @@ export function appInit() {
         };
       });
     },
-    () => {
+    error: () => {
       apiConnectionStore.set({
         connected: false,
       });
     },
-  );
+  });
 
   getMoviesSse().subscribe(
     movies => {
