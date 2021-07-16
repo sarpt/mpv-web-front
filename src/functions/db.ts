@@ -12,7 +12,7 @@ export enum Tables {
 }
 
 export class AppDatabase extends Dexie {
-  playbackHistory: Dexie.Table<PlaybackHistory, number>;
+  playbackHistory: Dexie.Table<PlaybackHistoryEntry, number>;
 
   constructor() {
     super(dbName);
@@ -25,7 +25,7 @@ export class AppDatabase extends Dexie {
   }
 }
 
-export interface PlaybackHistory {
+export interface PlaybackHistoryEntry {
   id?: number;
   Path: string;
   Title: string;

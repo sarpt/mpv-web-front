@@ -14,20 +14,10 @@
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
   export let movie: Movie | undefined;
   export let opened: boolean;
+  export let selectedAudioId = '';
+  export let selectedSubtitleId = '';
 
-  let path: string;
   let fullscreen: boolean = false;
-  let selectedAudioId = '';
-  let selectedSubtitleId = '';
-
-  $: {
-    const newPath = movie?.Path || '';
-    if (path !== newPath) {
-      selectedAudioId = movie?.AudioStreams[0]?.AudioID || '';
-      selectedSubtitleId = movie?.SubtitleStreams[0]?.SubtitleID || '';
-      path = newPath;
-    }
-  }
 
   function handleAction(action: string) {
     dialogCloseHandler(action, fullscreen, selectedAudioId, selectedSubtitleId);
@@ -54,9 +44,13 @@
           label="Audio track"
           disabled={!movie || movie.AudioStreams.length <= 1}
         >
-          {#each movie.AudioStreams as audioStream}
-            <Option value={audioStream.AudioID}>{getStreamName(audioStream)}</Option>
-          {/each}
+          {#if movie.AudioStreams.length < 1}
+            <Option value="" />
+          {:else}
+            {#each movie.AudioStreams as audioStream}
+              <Option value={audioStream.AudioID}>{getStreamName(audioStream)}</Option>
+            {/each}
+          {/if}
         </Select>
       </div>
       <div class="row">
@@ -65,9 +59,13 @@
           label="Subtitle track"
           disabled={!movie || movie.SubtitleStreams.length <= 1}
         >
-          {#each movie.SubtitleStreams as subtitleStream}
-            <Option value={subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
-          {/each}
+          {#if movie.SubtitleStreams.length < 1}
+            <Option value="" />
+          {:else}
+            {#each movie.SubtitleStreams as subtitleStream}
+              <Option value={subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
+            {/each}
+          {/if}
         </Select>
       </div>
     {/if}

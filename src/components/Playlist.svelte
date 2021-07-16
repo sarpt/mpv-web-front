@@ -1,6 +1,6 @@
 <script lang="ts">
   import Paper, { Title } from '@smui/paper/styled';
-import { changePlaylistIdx } from '../functions/api';
+  import { changePlaylistIdx } from '../functions/api';
 
   import { getMovieName } from '../functions/movie';
   import { moviesStore } from '../stores/movies';

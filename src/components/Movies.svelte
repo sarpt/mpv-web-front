@@ -17,18 +17,22 @@
   import { playbackStore } from '../stores/playback';
   import { moviesStore } from '../stores/movies';
 
-  import MovieDialog from './MovieDialog.svelte';
+  import PlayMovieDialog from './PlayMovieDialog.svelte';
 
   let dialogOpened = false;
   let selectedMovie: Movie | undefined;
   let playback: Playback | undefined;
   let movies: Movie[] = [];
+  let selectedAudioId = ''; // TODO: this probably should not be held/decided by the Movies component - consider setting state for a modal in the store
+  let selectedSubtitleId = '';
 
   $: getColor = (movie: Movie, playback: Playback | undefined): string => {
     return !!playback && movie.Path === playback.MoviePath ? 'primary' : 'none';
   }
 
   function handleMovieEntryClick(movie: Movie, idx: number) {
+    selectedAudioId = movie.AudioStreams[0]?.AudioID ?? '';
+    selectedSubtitleId = movie.SubtitleStreams[0]?.SubtitleID ?? '';
     selectedMovie = movie;
     dialogOpened = true;
   }
@@ -46,18 +50,14 @@
     switch (action) {
       case MovieDialogActions.Added:
         request.append = true;
-        handlePlay(request);
+        changeMovie(request);
         break;
       case MovieDialogActions.Play:
-        handlePlay(request);
+        changeMovie(request);
         break;
       default:
         return;
     }
-  }
-
-  async function handlePlay(req: playMovieArguments) {
-    return await changeMovie(req);
   }
 
   $: playback = $playbackStore.playback;
@@ -82,7 +82,7 @@
   </div>
 {/if}
 
-<MovieDialog bind:opened={dialogOpened} movie={selectedMovie} {dialogCloseHandler}></MovieDialog>
+<PlayMovieDialog bind:opened={dialogOpened} movie={selectedMovie} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMovieDialog>
 
 <style lang="scss">
   .movie-entry {
