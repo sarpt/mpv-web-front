@@ -18,21 +18,23 @@
   }
 </script>
 
-<SmuiDialog
-  bind:open={opened}
-  aria-labelledby={`${name}-title`}
-  aria-describedby={`${name}-content`}
-  on:MDCDialog:closed={handleClose}
->
-  <DialogTitle id={`${name}-title`}>{title}</DialogTitle>
-  <DialogContent>
-    <div id={`${name}-content`}>
-      <slot name="content"></slot>
-    </div>
-  </DialogContent>
-  <Actions>
-    <div id={`${name}-actions`}>
-      <slot name="actions"></slot>
-    </div>
-  </Actions>
-</SmuiDialog>
+{#if opened}
+  <SmuiDialog
+    bind:open={opened}
+    aria-labelledby={`${name}-title`}
+    aria-describedby={`${name}-content`}
+    on:MDCDialog:closed={handleClose}
+  >
+    <DialogTitle id={`${name}-title`}>{title}</DialogTitle>
+    <DialogContent>
+      <div id={`${name}-content`}>
+        <slot name="content"></slot>
+      </div>
+    </DialogContent>
+    <Actions>
+      <div id={`${name}-actions`}>
+        <slot name="actions"></slot>
+      </div>
+    </Actions>
+  </SmuiDialog>
+{/if}
