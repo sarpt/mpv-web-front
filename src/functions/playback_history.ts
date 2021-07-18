@@ -1,7 +1,7 @@
 import { filter, map, pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
 import type { MoviesMap, Playback } from '../models/api';
-import { dbChanges, getDB, PlaybackHistoryEntry, Tables } from './db';
+import { dbChanges, getDB, PlaybackHistoryColumns, PlaybackHistoryEntry, Tables } from './db';
 
 import { getPlaybackSse, getMoviesSse } from './sse';
 
@@ -15,8 +15,10 @@ export function initPlaybackHistoryWatch() {
     .subscribe(updatePlaybackHistory);
 }
 
-function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback | undefined, Playback | undefined],  MoviesMap]) {
+async function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback | undefined, Playback | undefined],  MoviesMap]) {
   if (!newEntry(prevPlayback, newPlayback)) return;
+
+  const currentHistoryEntryId = await currentEntryId();
 
   const newMovie = movies[newPlayback!.MoviePath];
   putEntryInHistory({
@@ -26,11 +28,12 @@ function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback
     SubtitleID: newPlayback!.SelectedSubtitleID,
   });
 
-  // TODO: currently the playback history only refreshes mid-playback changes on the change on entry.
+  // TODO: currently the playback history only refreshes mid-playback changes on the change on entry
+  // (which makes currently playing entry have wrong information about playback)
   // To add some diffing mechanism.
-  if (!prevPlayback) return;
+  if (!prevPlayback || currentHistoryEntryId < 0) return;
 
-  updateEntryInHistory(prevPlayback.MoviePath, {
+  updateEntryInHistory(currentHistoryEntryId, {
     AudioID: prevPlayback.SelectedAudioID,
     SubtitleID: prevPlayback.SelectedSubtitleID,
   });
@@ -43,14 +46,26 @@ function putEntryInHistory(entry: PlaybackHistoryEntry) {
   return db.playbackHistory.put(entry);
 }
 
-function updateEntryInHistory(path: string, changes: Partial<PlaybackHistoryEntry>) {
+function updateEntryInHistory(id: number, changes: Partial<PlaybackHistoryEntry>) {
   const db = getDB();
   if (!db) return 0;
 
   return db.playbackHistory
-    .where('Path')
-    .equals(path)
+    .where(PlaybackHistoryColumns.Id)
+    .equals(id)
     .modify(changes);
+}
+
+async function currentEntryId() {
+  const db = getDB();
+  if (!db) return -1;
+
+  const currentEntry = await db.playbackHistory
+    .toCollection()
+    .last();
+  if (!currentEntry) return -1;
+
+  return currentEntry.id ?? -1;
 }
 
 function newEntry(prevPlayback: Playback | undefined, newPlayback: Playback | undefined): boolean {

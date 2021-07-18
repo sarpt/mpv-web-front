@@ -82,7 +82,7 @@
   {/if}
 {/await}
 
-<PlayMovieDialog bind:opened={dialogOpened} movie={selectedMovie} {selectedAudioId} {selectedSubtitleId} {dialogCloseHandler}></PlayMovieDialog>
+<PlayMovieDialog bind:opened={dialogOpened} movie={selectedMovie} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMovieDialog>
 
 <style lang="scss">
   .movie-entry {

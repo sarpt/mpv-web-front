@@ -11,6 +11,14 @@ export enum Tables {
   PlaybackHistory = 'playbackHistory',
 }
 
+export enum PlaybackHistoryColumns {
+  Id = 'id',
+  Path = 'Path',
+  Title = 'Title',
+  AudioID = 'AudioID',
+  SubtitleID = 'SubtitleID',
+}
+
 export class AppDatabase extends Dexie {
   playbackHistory: Dexie.Table<PlaybackHistoryEntry, number>;
 
@@ -18,7 +26,7 @@ export class AppDatabase extends Dexie {
     super(dbName);
 
     this.version(1).stores({
-      playbackHistory: '++id,Path',
+      playbackHistory: `++${PlaybackHistoryColumns.Id},${PlaybackHistoryColumns.Path}`,
     });
 
     this.playbackHistory = this.table(Tables.PlaybackHistory);
