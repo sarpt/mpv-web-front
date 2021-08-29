@@ -1,9 +1,9 @@
-import { moviesStore } from '../stores/movies';
-import { getMovies, headMovies, postPlayback } from './rest';
+import { mediaFilesStore } from '../stores/media_files';
+import { getMediaFiles, headMediaFiles, postPlayback } from './rest';
 
 export async function checkApiAvailability(newAddress: string): Promise<boolean> {
   try {
-    await headMovies(newAddress);
+    await headMediaFiles(newAddress);
 
     return true;
   } catch (err) {
@@ -11,7 +11,7 @@ export async function checkApiAvailability(newAddress: string): Promise<boolean>
   }
 }
 
-export type playMovieArguments = {
+export type playMediaFileArguments = {
   append: boolean,
   audioId?: string,
   fullscreen: boolean,
@@ -20,9 +20,9 @@ export type playMovieArguments = {
   subtitleId?: string,
 };
 
-export async function changeMovie(movie: playMovieArguments): Promise<boolean> {
+export async function changeMediaFile(mediaFile: playMediaFileArguments): Promise<boolean> {
   try {
-    await postPlayback(movie);
+    await postPlayback(mediaFile);
 
     return true;
   } catch (err) {
@@ -90,23 +90,23 @@ export async function fullscreen(enabled: boolean): Promise<boolean> {
   }
 }
 
-export async function fetchAllMovies() {
+export async function fetchAllMediaFiles() {
   try {
-    moviesStore.set({
-      movies: {},
+    mediaFilesStore.set({
+      mediaFiles: {},
       isFetchingInProgress: true,
     });
 
-    const res = await getMovies();
-    const moviesResponse = await res.json();
+    const res = await getMediaFiles();
+    const mediaFilesResponse = await res.json();
 
-    moviesStore.set({
-      movies: moviesResponse.movies || {},
+    mediaFilesStore.set({
+      mediaFiles: mediaFilesResponse.mediaFiles || {},
       isFetchingInProgress: false,
     });
   } catch(err) {
-    moviesStore.set({
-      movies: {},
+    mediaFilesStore.set({
+      mediaFiles: {},
       isFetchingInProgress: false,
     });
   }

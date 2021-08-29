@@ -9,12 +9,12 @@ function handleApiAddressChange(apiAddressState: ApiAddressState) {
   address = apiAddressState.address;
 }
 
-export async function getMovies(): Promise<Response> {
-  return await fetch(`http://${address}/rest/movies`);
+export async function getMediaFiles(): Promise<Response> {
+  return await fetch(`http://${address}/rest/media-files`);
 }
 
-export async function headMovies(newAddress: string): Promise<Response> {
-  return await fetch(`http://${newAddress}/rest/movies`, {
+export async function headMediaFiles(newAddress: string): Promise<Response> {
+  return await fetch(`http://${newAddress}/rest/media-files`, {
     method: 'HEAD',
   });
 }

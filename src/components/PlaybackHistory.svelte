@@ -2,22 +2,22 @@
   import { onDestroy } from 'svelte';
   import Paper, { Title } from '@smui/paper/styled';
 
-  import { changeMovie, playMovieArguments } from '../functions/api';
+  import { changeMediaFile, playMediaFileArguments } from '../functions/api';
   import type { PlaybackHistoryEntry } from '../functions/db';
-  import { getMovieName } from '../functions/movie';
+  import { getMediaFileName } from '../functions/media_file';
   import { getPlaybackHistory, playbackHistoryChanges } from '../functions/playback_history';
-  import type { Movie } from '../models/api';
-  import { MovieDialogActions } from '../models/dialogs';
-  import { moviesStore } from '../stores/movies';
+  import type { MediaFile } from '../models/api';
+  import { MediaFileDialogActions } from '../models/dialogs';
+  import { mediaFilesStore } from '../stores/media_files';
 
   import Loading  from './Loading.svelte';
-  import PlayMovieDialog from './PlayMovieDialog.svelte';
+  import PlayMediaDialog from './PlayMediaDialog.svelte';
 
-  $: movies = $moviesStore.movies;
+  $: mediaFiles = $mediaFilesStore.mediaFiles;
 
   let playbackHistory = getPlaybackHistory();
   let dialogOpened = false;
-  let selectedMovie: Movie | undefined;
+  let selectedMediaFile: MediaFile | undefined;
   let selectedAudioId = '';
   let selectedSubtitleId = '';
 
@@ -32,14 +32,14 @@
   function handleEntryClick(entry: PlaybackHistoryEntry, idx: number) {
     selectedSubtitleId = entry.SubtitleID;
     selectedAudioId = entry.AudioID;
-    selectedMovie = movies[entry.Path];
+    selectedMediaFile = mediaFiles[entry.Path];
     dialogOpened = true;
   }
 
   function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
-    const request: playMovieArguments = {
+    const request: playMediaFileArguments = {
       append: false,
-      path: selectedMovie?.Path || '',
+      path: selectedMediaFile?.Path || '',
       pause: false,
       fullscreen,
       audioId,
@@ -47,12 +47,12 @@
     }
 
     switch (action) {
-      case MovieDialogActions.Added:
+      case MediaFileDialogActions.Added:
         request.append = true;
-        changeMovie(request);
+        changeMediaFile(request);
         break;
-      case MovieDialogActions.Play:
-        changeMovie(request);
+      case MediaFileDialogActions.Play:
+        changeMediaFile(request);
         break;
       default:
         return;
@@ -65,11 +65,11 @@
 {:then playbackHistory} 
   {#if playbackHistory.length > 0}
     {#each playbackHistory as entry, idx}
-      <div class="movie-entry" on:click={() => handleEntryClick(entry, idx)}>
+      <div class="media-file-entry" on:click={() => handleEntryClick(entry, idx)}>
         <Paper transition>
           <Title>
-            <div class="movie-title">
-              {getMovieName(entry)}
+            <div class="media-file-title">
+              {getMediaFileName(entry)}
             </div>
           </Title>
         </Paper>
@@ -82,15 +82,15 @@
   {/if}
 {/await}
 
-<PlayMovieDialog bind:opened={dialogOpened} movie={selectedMovie} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMovieDialog>
+<PlayMediaDialog bind:opened={dialogOpened} mediaFile={selectedMediaFile} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMediaDialog>
 
 <style lang="scss">
-  .movie-entry {
+  .media-file-entry {
     margin-bottom: 5px;
     cursor: pointer;
   }
 
-  .movie-title {
+  .media-file-title {
     overflow-x: hidden;
     overflow-y: hidden;
     text-overflow: ellipsis;

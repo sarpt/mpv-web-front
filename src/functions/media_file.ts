@@ -1,11 +1,11 @@
-import type { Movie } from '../models/api';
+import type { MediaFile } from '../models/api';
 
 const defaultName = 'default';
 
-type MovieDescription = Pick<Movie, 'Path' | 'Title'>;
-export function getMovieName(movie: MovieDescription): string {
-  const title = movie.Title;
-  const pathParts = movie.Path.split('/');
+type MediaFileDescription = Pick<MediaFile, 'Path' | 'Title'>;
+export function getMediaFileName(mediaFile: MediaFileDescription): string {
+  const title = mediaFile.Title;
+  const pathParts = mediaFile.Path.split('/');
   const filename = pathParts[pathParts.length - 1];
 
   return title !== '' ? `${filename} (${title})` : filename;

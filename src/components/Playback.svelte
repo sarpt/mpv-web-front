@@ -4,9 +4,9 @@
 
   import { fullscreen, pause } from "../functions/api";
   import { LoopVariant } from "../models/api";
-  import type { Movie, MoviesMap, Playback} from "../models/api";
+  import type { MediaFile, MediaFilesMap, Playback} from "../models/api";
   import { secondsToHHMMSS } from "../functions/time";
-  import { getMovieName } from "../functions/movie";
+  import { getMediaFileName } from "../functions/media_file";
   import { playbackStore } from '../stores/playback';
 
   import PlaybackSettingsDialog from "./PlaybackSettingsDialog.svelte";
@@ -15,21 +15,21 @@
   import './Playback.scss';
   import { postPlayback } from "../functions/rest";
   import { drawerStore } from "../stores/drawer";
-  import { moviesStore } from "../stores/movies";
+  import { mediaFilesStore } from "../stores/media_files";
 
-  function getCurrentMovie(playback: Playback | undefined, movies: MoviesMap): Movie | undefined {
+  function getCurrentMediaFile(playback: Playback | undefined, mediaFiles: MediaFilesMap): MediaFile | undefined {
     if (!playback) return;
 
-    return movies[playback.MoviePath];
+    return mediaFiles[playback.MediaFilePath];
   }
 
-  $: movies = $moviesStore.movies;
+  $: mediaFiles = $mediaFilesStore.mediaFiles;
   $: playback = $playbackStore.playback;
-  $: currentMovie = getCurrentMovie(playback, movies);
+  $: currentMediaFile = getCurrentMediaFile(playback, mediaFiles);
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
 
-  $: playingMovieProgress = (!!playback && !!currentMovie && currentMovie.Duration > 0) ? (playback.CurrentTime / currentMovie.Duration) : 0;
+  $: playingMediaFileProgress = (!!playback && !!currentMediaFile && currentMediaFile.Duration > 0) ? (playback.CurrentTime / currentMediaFile.Duration) : 0;
 
   const openPlaybackSettings = () => { playbackSettingsOpened = true }
   const openRepeatSettings = () => { repeatSettingsOpened = true }
@@ -51,11 +51,11 @@
 </script>
 
 <div class="playback">
-  {#if !!playback && !!currentMovie}
-    <div class="name">{getMovieName(currentMovie)}</div>
+  {#if !!playback && !!currentMediaFile}
+    <div class="name">{getMediaFileName(currentMediaFile)}</div>
     <div class="progress-container">
-      <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(currentMovie.Duration)}</span>
-      <LinearProgress class="playback-progress" progress={playingMovieProgress} />
+      <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(currentMediaFile.Duration)}</span>
+      <LinearProgress class="playback-progress" progress={playingMediaFileProgress} />
     </div>
   {:else}
     No playback
@@ -88,7 +88,7 @@
       <PlaybackSettingsDialog
         bind:opened={playbackSettingsOpened}
         playback={playback}
-        currentMovie={currentMovie}
+        currentMediaFile={currentMediaFile}
         dialogCloseHandler={handlePlaybackSettingsChanged}
       >
       </PlaybackSettingsDialog>

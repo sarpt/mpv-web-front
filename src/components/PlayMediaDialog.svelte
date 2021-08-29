@@ -5,14 +5,14 @@
   import FormField from '@smui/form-field/styled';
   import Select, {Option} from '@smui/select/styled';
 
-  import { getMovieName, getStreamName } from '../functions/movie';
+  import { getMediaFileName, getStreamName } from '../functions/media_file';
 
-  import type { Movie } from '../models/api';
-  import { MovieDialogActions } from '../models/dialogs';
+  import type { MediaFile } from '../models/api';
+  import { MediaFileDialogActions } from '../models/dialogs';
   import Dialog from './Dialog.svelte';
 
   export let dialogCloseHandler: (action: string, fullscreen: boolean, audioId: string, subtitleId: string) => void;
-  export let movie: Movie | undefined;
+  export let mediaFile: MediaFile | undefined;
   export let opened: boolean;
   export let selectedAudioId = '';
   export let selectedSubtitleId = '';
@@ -25,9 +25,9 @@
 </script>
 
 <Dialog
-  name='movie-dialog'
+  name='media-file-dialog'
   bind:opened={opened}
-  title={!!movie ? getMovieName(movie) : ''}
+  title={!!mediaFile ? getMediaFileName(mediaFile) : ''}
   dialogActionHandler={handleAction}
 >
   <div class="content" slot="content">
@@ -37,17 +37,17 @@
         <span slot="label">Fullscreen</span>
       </FormField>
     </div>
-    {#if !!movie}
+    {#if !!mediaFile}
       <div class="row">
         <Select
           bind:value={selectedAudioId}
           label="Audio track"
-          disabled={!movie || movie.AudioStreams.length <= 1}
+          disabled={!mediaFile || mediaFile.AudioStreams.length <= 1}
         >
-          {#if movie.AudioStreams.length < 1}
+          {#if mediaFile.AudioStreams.length < 1}
             <Option value="" />
           {:else}
-            {#each movie.AudioStreams as audioStream}
+            {#each mediaFile.AudioStreams as audioStream}
               <Option value={audioStream.AudioID}>{getStreamName(audioStream)}</Option>
             {/each}
           {/if}
@@ -57,12 +57,12 @@
         <Select
           bind:value={selectedSubtitleId}
           label="Subtitle track"
-          disabled={!movie || movie.SubtitleStreams.length <= 1}
+          disabled={!mediaFile || mediaFile.SubtitleStreams.length <= 1}
         >
-          {#if movie.SubtitleStreams.length < 1}
+          {#if mediaFile.SubtitleStreams.length < 1}
             <Option value="" />
           {:else}
-            {#each movie.SubtitleStreams as subtitleStream}
+            {#each mediaFile.SubtitleStreams as subtitleStream}
               <Option value={subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
             {/each}
           {/if}
@@ -71,11 +71,11 @@
     {/if}
   </div>
   <div slot="actions">
-    <Button action={MovieDialogActions.Play} default use={[InitialFocus]}>
+    <Button action={MediaFileDialogActions.Play} default use={[InitialFocus]}>
       <ButtonIcon class="material-icons">play_arrow</ButtonIcon>
       <Label>Play</Label>
     </Button>
-    <Button action={MovieDialogActions.Added}>
+    <Button action={MediaFileDialogActions.Added}>
       <ButtonIcon class="material-icons">playlist_add</ButtonIcon>
       <Label>Add to playlist</Label>
     </Button>
