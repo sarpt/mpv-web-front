@@ -28,7 +28,7 @@
   dialogActionHandler={dispatchAddress}
 >
   <div slot="content">
-    <span>Movie list could not be fetched from the provided address. Please input a new address:</span>
+    <span>Media files list could not be fetched from the provided address. Please input a new address:</span>
     <div>
       <Textfield
         invalid={!valid}

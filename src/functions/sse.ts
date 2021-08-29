@@ -1,9 +1,9 @@
 import { Observable, Subject } from 'rxjs';
-import type { MoviesMap, Playback, Playlist, Playlists, Status } from '../models/api';
+import type { MediaFilesMap, Playback, Playlist, Playlists, Status } from '../models/api';
 import {
   errorHandler,
   eventSourceEventListener,
-  MoviesEvents,
+  MediaFilesEvents,
   PlaybackEvents,
   PlaylistEvents,
   SseChannelVariant,
@@ -16,7 +16,7 @@ let address: string | undefined;
 
 const playbackSse = new Subject<Playback | undefined>();
 const playlistsSse = new Subject<Playlists>();
-const moviesSse = new Subject<MoviesMap>();
+const mediaFilesSse = new Subject<MediaFilesMap>();
 const statusSse = new Subject<Status>();
 
 export function getPlaybackSse(): Observable<Playback | undefined> {
@@ -27,8 +27,8 @@ export function getPlaylistSse(): Observable<Playlists> {
   return playlistsSse.asObservable();
 }
 
-export function getMoviesSse(): Observable<MoviesMap> {
-  return moviesSse.asObservable();
+export function getMediaFilesSse(): Observable<MediaFilesMap> {
+  return mediaFilesSse.asObservable();
 }
 
 export function getStatusSse(): Observable<Status> {
@@ -88,7 +88,7 @@ export function getPlaybackSseChannel(): sseChannel {
     PlaybackEvents.AudioIdChange,
     PlaybackEvents.SubtitleIdChange,
     PlaybackEvents.CurrentChapterIndexChange,
-    PlaybackEvents.MovieChange,
+    PlaybackEvents.MediaFileChange,
     PlaybackEvents.PlaybackTimeChange,
   ];
   playbackEvents.forEach(event => {
@@ -137,20 +137,20 @@ export function getPlaylistSseChannel(): sseChannel {
   };
 }
 
-export function getMoviesSseChannel(): sseChannel {
+export function getMediaFilesSseChannel(): sseChannel {
   const eventListeners = new Map<string, eventSourceEventListener>();
   const messageHandler = (event: Event & { data?: string }) => {
-    moviesSse.next(JSON.parse(event.data || '') as MoviesMap);
+    mediaFilesSse.next(JSON.parse(event.data || '') as MediaFilesMap);
   };
 
-  eventListeners.set(`${SseChannelVariant.Movies}.${MoviesEvents.Added}`, messageHandler);
+  eventListeners.set(`${SseChannelVariant.MediaFiles}.${MediaFilesEvents.Added}`, messageHandler);
 
   const onError = (ev: Event) => {
-    moviesSse.error(ev);
+    mediaFilesSse.error(ev);
   };
 
   return {
-    variant: SseChannelVariant.Movies,
+    variant: SseChannelVariant.MediaFiles,
     eventListeners,
     onError,
   };
@@ -166,7 +166,7 @@ export function initEventSource(
     eventSource.close();
   }
 
-  const url = new URL(`http://${address}/sse/register`);
+  const url = new URL(`http://${address}/sse/channels`);
   sseVariants.forEach(variant => {
     url.searchParams.append('channel', variant);
   });
@@ -191,7 +191,7 @@ function handleApiAddressChange(apiAddressState: ApiAddressState) {
 
 function startSseChannels() {
   const sseChannels = [
-    getMoviesSseChannel(),
+    getMediaFilesSseChannel(),
     getPlaybackSseChannel(),
     getPlaylistSseChannel(),
     getStatusSseChannel(),

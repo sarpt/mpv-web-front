@@ -1,29 +1,29 @@
 import { filter, map, pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
-import type { MoviesMap, Playback } from '../models/api';
+import type { MediaFilesMap, Playback } from '../models/api';
 import { dbChanges, getDB, PlaybackHistoryColumns, PlaybackHistoryEntry, Tables } from './db';
 
-import { getPlaybackSse, getMoviesSse } from './sse';
+import { getPlaybackSse, getMediaFilesSse } from './sse';
 
 export function initPlaybackHistoryWatch() {
   getPlaybackSse()
     .pipe(
       startWith(undefined),
       pairwise(),
-      withLatestFrom(getMoviesSse()),
+      withLatestFrom(getMediaFilesSse()),
     )
     .subscribe(updatePlaybackHistory);
 }
 
-async function updatePlaybackHistory([[prevPlayback, newPlayback], movies]: [[Playback | undefined, Playback | undefined],  MoviesMap]) {
+async function updatePlaybackHistory([[prevPlayback, newPlayback], mediaFiles]: [[Playback | undefined, Playback | undefined],  MediaFilesMap]) {
   if (!newEntry(prevPlayback, newPlayback)) return;
 
   const currentHistoryEntryId = await currentEntryId();
 
-  const newMovie = movies[newPlayback!.MoviePath];
+  const newMediaFile = mediaFiles[newPlayback!.MediaFilePath];
   putEntryInHistory({
-    Path: newMovie.Path,
-    Title: newMovie.Title,
+    Path: newMediaFile.Path,
+    Title: newMediaFile.Title,
     AudioID: newPlayback!.SelectedAudioID,
     SubtitleID: newPlayback!.SelectedSubtitleID,
   });
@@ -69,7 +69,7 @@ async function currentEntryId() {
 }
 
 function newEntry(prevPlayback: Playback | undefined, newPlayback: Playback | undefined): boolean {
-  if (prevPlayback && newPlayback) return prevPlayback.MoviePath !== newPlayback.MoviePath;
+  if (prevPlayback && newPlayback) return prevPlayback.MediaFilePath !== newPlayback.MediaFilePath;
 
   return !!newPlayback;
 }

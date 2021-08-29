@@ -2,7 +2,7 @@ export enum CommonDialogActions {
   Close = 'close',
 }
 
-export enum MovieDialogActions {
+export enum MediaFileDialogActions {
   Added = 'added',
   Play = 'play',
 }

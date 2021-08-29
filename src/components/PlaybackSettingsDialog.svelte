@@ -3,14 +3,14 @@
   import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
   import Select, {Option} from '@smui/select/styled';
 
-  import { getMovieName, getStreamName } from '../functions/movie';
-  import type { Movie, Playback } from '../models/api';
+  import { getMediaFileName, getStreamName } from '../functions/media_file';
+  import type { MediaFile, Playback } from '../models/api';
   import { PlaybackSettingsDialogActions } from '../models/dialogs';
   import Dialog from './Dialog.svelte';
 
   export let opened: boolean;
   export let playback: Playback | undefined;
-  export let currentMovie: Movie | undefined;
+  export let currentMediaFile: MediaFile | undefined;
   export let dialogCloseHandler: (action: string, audioId: string, subtitleId: string) => void;
 
   let selectedAudioId = '';
@@ -30,19 +30,19 @@
 
 <Dialog
   name="playback-settings-dialog"
-  title={!!currentMovie ? getMovieName(currentMovie) : ''}
+  title={!!currentMediaFile ? getMediaFileName(currentMediaFile) : ''}
   bind:opened={opened}
   dialogActionHandler={handleCloseDialog}
 >
   <div slot="content" class="content">
-    {#if !!currentMovie && currentMovie.AudioStreams && currentMovie.SubtitleStreams}
+    {#if !!currentMediaFile && currentMediaFile.AudioStreams && currentMediaFile.SubtitleStreams}
       <div class="row">
         <Select
           bind:value={selectedAudioId}
           label="Audio track"
-          disabled={!currentMovie || currentMovie.AudioStreams.length <= 1}
+          disabled={!currentMediaFile || currentMediaFile.AudioStreams.length <= 1}
         >
-          {#each currentMovie.AudioStreams as audioStream}
+          {#each currentMediaFile.AudioStreams as audioStream}
             <Option value={audioStream.AudioID} selected={selectedAudioId === audioStream.AudioID}>{getStreamName(audioStream)}</Option>
           {/each}
         </Select>
@@ -51,9 +51,9 @@
         <Select
           bind:value={selectedSubtitleId}
           label="Subtitle track"
-          disabled={!currentMovie || currentMovie.SubtitleStreams.length <= 1}
+          disabled={!currentMediaFile || currentMediaFile.SubtitleStreams.length <= 1}
         >
-          {#each currentMovie.SubtitleStreams as subtitleStream}
+          {#each currentMediaFile.SubtitleStreams as subtitleStream}
             <Option value={subtitleStream.SubtitleID} selected={selectedSubtitleId === subtitleStream.SubtitleID}>{getStreamName(subtitleStream)}</Option>
           {/each}
         </Select>

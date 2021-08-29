@@ -18,7 +18,7 @@ export type SubtitleStream = {
 };
 
 export type Playback = {
-  MoviePath: string,
+  MediaFilePath: string,
   CurrentChapterIdx: number,
   Fullscreen: boolean,
   CurrentTime: number,
@@ -56,7 +56,7 @@ export type Chapter = {
   Title: string,
 };
 
-export type Movie = {
+export type MediaFile = {
   Title: string,
   FormatName: string,
   FormatLongName: string,
@@ -68,7 +68,7 @@ export type Movie = {
   Chapters: Chapter[],
 };
 
-export type MoviesMap = { [key in string]: Movie };
+export type MediaFilesMap = { [key in string]: MediaFile };
 
 export type Status = {
   ObservingAddresses: { [k in string]: string },

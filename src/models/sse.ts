@@ -10,7 +10,7 @@ export enum PlaybackEvents {
   CurrentChapterIndexChange =  'currentChapterIndexChange',
   FullscreenChange = 'fullscreenChange',
   LoopFileChange =  'loopFileChange',
-  MovieChange =  'movieChange',
+  MediaFileChange =  'mediaFileChange',
   PauseChange =  'pauseChange',
   PlaybackTimeChange =  'playbackTimeChange',
   PlaylistSelectionChange =  'playlistSelectionChange',
@@ -19,17 +19,17 @@ export enum PlaybackEvents {
 }
 
 export enum PlaylistEvents {
-  Added = 'playlistAdded',
-  ItemsChange = 'playlistItemsChange',
+  Added = 'added',
+  ItemsChange = 'itemsChange',
   Replay =  'replay',
 }
 
-export enum MoviesEvents {
+export enum MediaFilesEvents {
   Added = 'added',
 }
 
 export enum SseChannelVariant {
-  Movies = 'movies',
+  MediaFiles = 'mediaFiles',
   Playback = 'playback',
   Playlists = 'playlists',
   Status = 'status',

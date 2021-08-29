@@ -2,7 +2,7 @@
   import Drawer, { Content, Header, Title, Scrim } from '@smui/drawer/styled';
   import List, { Item, Text, Graphic } from '@smui/list/styled';
 
-  import { navigateToMovies, navigateToPlaybackHistory, navigateToPlaylist, Routes } from '../functions/routing';
+  import { navigateToMediaFiles, navigateToPlaybackHistory, navigateToPlaylist, Routes } from '../functions/routing';
   import type { MenuItem } from '../models/drawer';
   import { drawerStore } from '../stores/drawer';
   import { routingStore } from '../stores/routing';
@@ -18,10 +18,10 @@
 
   const menuItems: MenuItem[] = [
     {
-      route: Routes.Movies,
-      text: 'Movies',
+      route: Routes.MediaFiles,
+      text: 'Media files',
       graphic: 'movie',
-      handler: createNavigateHandler(navigateToMovies),
+      handler: createNavigateHandler(navigateToMediaFiles),
     },
     {
       route: Routes.PlaybackHistory,

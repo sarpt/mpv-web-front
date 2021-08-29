@@ -2,12 +2,12 @@
   import Paper, { Title } from '@smui/paper/styled';
   import { changePlaylistIdx } from '../functions/api';
 
-  import { getMovieName } from '../functions/movie';
-  import { moviesStore } from '../stores/movies';
+  import { getMediaFileName } from '../functions/media_file';
+  import { mediaFilesStore } from '../stores/media_files';
   import { playbackStore } from '../stores/playback';
   import { playlistsStore } from "../stores/playlists";
 
-  $: movies = $moviesStore.movies;
+  $: mediaFiles = $mediaFilesStore.mediaFiles;
   $: playlists = $playlistsStore;
   $: playback = $playbackStore.playback;
   $: getColor = (idx: number): string => {
@@ -26,7 +26,7 @@
         <Paper transition color={getColor(idx)}>
             <Title>
               <div class="playlist-path">
-                {getMovieName(movies[item])}
+                {getMediaFileName(mediaFiles[item])}
               </div>
             </Title>
         </Paper>

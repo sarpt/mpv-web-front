@@ -1,5 +1,5 @@
-import { getMoviesSse, getPlaybackSse, getPlaylistSse, getStatusSse, init as initSse } from '../functions/sse';
-import { moviesStore } from '../stores/movies';
+import { getMediaFilesSse, getPlaybackSse, getPlaylistSse, getStatusSse, init as initSse } from '../functions/sse';
+import { mediaFilesStore } from '../stores/media_files';
 import { playbackStore } from '../stores/playback';
 import { apiConnectionStore } from '../stores/api_connection';
 
@@ -42,13 +42,13 @@ export function appInit() {
     },
   });
 
-  getMoviesSse().subscribe(
-    movies => {
-      moviesStore.update(state => {
+  getMediaFilesSse().subscribe(
+    mediaFiles => {
+      mediaFilesStore.update(state => {
         return {
-          movies: {
-            ...state.movies,
-            ...movies,
+          mediaFiles: {
+            ...state.mediaFiles,
+            ...mediaFiles,
           },
           isFetchingInProgress: false,
         };

@@ -2,7 +2,7 @@ import page from 'page';
 
 export enum Routes {
   Root = '/',
-  Movies = '/movies',
+  MediaFiles = '/media-files',
   PlaybackHistory = '/playback-history',
   Playlist = '/playlist',
 }
@@ -25,8 +25,8 @@ export function navigateToRoot() {
   page(Routes.Root);
 }
 
-export function navigateToMovies() {
-  page(Routes.Movies);
+export function navigateToMediaFiles() {
+  page(Routes.MediaFiles);
 }
 
 export function navigateToPlaybackHistory() {
