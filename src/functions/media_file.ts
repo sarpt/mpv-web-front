@@ -15,6 +15,7 @@ interface Stream {
   Title: string;
   Language: string;
 }
+
 export function getStreamName(stream: Stream): string {
   const title = stream.Title;
   const language = stream.Language || defaultName;

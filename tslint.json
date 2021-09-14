@@ -10,7 +10,6 @@
       "eofline": true,
       "whitespace": true,
       "trailing-comma": [true, {
-          "multiline": "always",
           "singleline": "never"
         }
       ],

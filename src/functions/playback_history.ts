@@ -1,9 +1,9 @@
 import { filter, map, pairwise, startWith, withLatestFrom } from 'rxjs/operators';
 
-import type { MediaFilesMap, Playback } from '../models/api';
+import type { Playback } from '../models/api';
 import { dbChanges, getDB, PlaybackHistoryColumns, PlaybackHistoryEntry, Tables } from './db';
-
-import { getPlaybackSse, getMediaFilesSse } from './sse';
+import { getMediaFilesSse, MediaFilesAction } from './sse/media_files';
+import { getPlaybackSse } from './sse/playback';
 
 export function initPlaybackHistoryWatch() {
   getPlaybackSse()
@@ -15,12 +15,14 @@ export function initPlaybackHistoryWatch() {
     .subscribe(updatePlaybackHistory);
 }
 
-async function updatePlaybackHistory([[prevPlayback, newPlayback], mediaFiles]: [[Playback | undefined, Playback | undefined],  MediaFilesMap]) {
+async function updatePlaybackHistory(
+  [[prevPlayback, newPlayback], mediaFiles]: [[Playback | undefined, Playback | undefined], MediaFilesAction]
+) {
   if (!newEntry(prevPlayback, newPlayback)) return;
 
   const currentHistoryEntryId = await currentEntryId();
 
-  const newMediaFile = mediaFiles[newPlayback!.MediaFilePath];
+  const newMediaFile = mediaFiles.items[newPlayback!.MediaFilePath];
   putEntryInHistory({
     Path: newMediaFile.Path,
     Title: newMediaFile.Title,
