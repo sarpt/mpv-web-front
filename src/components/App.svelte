@@ -59,7 +59,7 @@
 	<div class="view-container">
 		<Router></Router>
 	</div>
-	<div class="playback-container smui-paper smui-paper--color-primary">
+	<div class="playback-container">
 		<Playback></Playback>
 	</div>
 	<div bind:this={intersectionObserverTrigger}></div>
@@ -74,6 +74,13 @@
 		max-height: calc(var(--vh, 1vh) * 100);
 	}
 
+	:global(button > span) {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		line-height: 1rem;
+	}
+
 	.view-container {
 		padding: 0 1rem;
 		flex-shrink: 1;
@@ -82,23 +89,15 @@
 	}
 
 	.playback-container {
+		@apply bg-primary-200;
+    padding: 24px 16px;
 		flex-shrink: 0;
-		height: 80px;
+		height: 120px;
 	}
 
 	@media (max-width: 640px) {
 		.view-container {
 			padding: 0 0.5rem;
 		}
-
-    :global(.smui-paper) {
-      padding: 9px 6px;
-    }
-
-    :global(.smui-paper .smui-paper__title) {
-      font-size: small;
-      line-height: 1em;
-      margin-bottom: 0;
-    }
 	}
 </style>

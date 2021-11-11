@@ -1,17 +1,17 @@
 <script lang="ts">
-  import Paper, { Title } from '@smui/paper/styled';
   import { changePlaylistIdx } from '../functions/api';
 
   import { getMediaFileName } from '../functions/media_file';
   import { mediaFilesStore } from '../stores/media_files';
   import { playbackStore } from '../stores/playback';
   import { playlistsStore } from "../stores/playlists";
+  import Row from './Row.svelte';
 
   $: mediaFiles = $mediaFilesStore.mediaFiles;
   $: playlists = $playlistsStore;
   $: playback = $playbackStore.playback;
-  $: getColor = (idx: number): string => {
-    return !!playlists && !!playback && idx === playback.PlaylistCurrentIdx ? 'primary' : 'none';
+  $: selected = (idx: number): boolean => {
+    return !!playlists && !!playback && idx === playback.PlaylistCurrentIdx;
   }
   $: currentPlaylist = (playback && playback.PlaylistUUID != "") ? playlists.Items[playback.PlaylistUUID] : undefined;
 
@@ -23,13 +23,11 @@
 {#if currentPlaylist && currentPlaylist.Items.length > 0}
     {#each currentPlaylist.Items as item, idx}
       <div class="playlist-entry" on:click={() => handlePlaylistEntryClick(idx)}>
-        <Paper transition color={getColor(idx)}>
-            <Title>
-              <div class="playlist-path">
-                {getMediaFileName(mediaFiles[item])}
-              </div>
-            </Title>
-        </Paper>
+        <Row selected={selected(idx)}> 
+          <div class="playlist-path">
+            {getMediaFileName(mediaFiles[item])}
+          </div>
+        </Row>
       </div>
     {/each}
 {:else}
@@ -42,18 +40,6 @@
   .playlist-entry {
     margin-bottom: 5px;
     cursor: pointer;
-  }
-
-  @media (max-width: 640px) {
-    :global(.smui-paper) {
-      padding: 9px 6px;
-    }
-
-    :global(.smui-paper .smui-paper__title) {
-      font-size: small;
-      line-height: 1em;
-      margin-bottom: 0;
-    }
   }
 
   .playlist-path {

@@ -1,65 +1,47 @@
 <script lang="ts">
-  import {InitialFocus} from '@smui/dialog/styled';
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
-  import Radio from '@smui/radio/styled';
-  import FormField from '@smui/form-field/styled';
+  import {
+    Button,
+    Dialog,
+    RadioButton
+  } from 'smelte';
   import { LoopVariant } from '../models/api';
-  import { PlaybackRepeatDialogActions } from '../models/dialogs';
-  import Dialog from './Dialog.svelte';
 
   export let opened: boolean;
   export let initialLoopVariant: LoopVariant;
-  export let dialogCloseHandler: (action: string, loopVariant: LoopVariant) => void;
+  export let dialogCloseHandler: (loopVariant: LoopVariant) => void;
 
   let selectedLoopVariant: LoopVariant;
   $: selectedLoopVariant = initialLoopVariant;
 
-  const handleActions = (action: string) => {
-    dialogCloseHandler(action, selectedLoopVariant);
-  }
-
-  const handleClose = () => {
+  const handleActions = () => {
+    dialogCloseHandler(selectedLoopVariant);
     selectedLoopVariant = initialLoopVariant;
+    opened = false;
   }
 </script>
 
 <Dialog
   name="repeat-dialog"
-  bind:opened={opened}
-  title="Repeat options"
-  dialogActionHandler={handleActions}
-  dialogCloseHandler={handleClose}
+  bind:value={opened}
 >
-  <div slot="content" class="content">
-    <FormField>
-      <Radio bind:group={selectedLoopVariant} value={LoopVariant.File} />
-      <span slot="label">
-        Currently playing
-      </span>
-    </FormField>
-    <FormField>
-      <Radio bind:group={selectedLoopVariant} value={LoopVariant.Playlist} disabled={true}/>
-      <span slot="label">
-        Playlist
-      </span>
-    </FormField>
-    <FormField>
-      <Radio bind:group={selectedLoopVariant} value={LoopVariant.AB} disabled={true}/>
-      <span slot="label">
-        A-B
-      </span>
-    </FormField>
-    <FormField>
-      <Radio bind:group={selectedLoopVariant} value={LoopVariant.Off} />
-      <span slot="label">
-        Off
-      </span>
-    </FormField>
+  <div slot="title">
+    <span>Repeat options</span>
+  </div>
+  <div slot="default" class="content">
+      <RadioButton label='Currently playing' bind:selected={selectedLoopVariant} value={LoopVariant.File} />
+      <RadioButton label='Playlist' bind:selected={selectedLoopVariant} value={LoopVariant.Playlist} disabled={true}/>
+      <RadioButton label='A-B' bind:selected={selectedLoopVariant} value={LoopVariant.AB} disabled={true}/>
+      <RadioButton label='Off' bind:selected={selectedLoopVariant} value={LoopVariant.Off} />
   </div>
   <div slot="actions">
-    <Button action={PlaybackRepeatDialogActions.Apply} default use={[InitialFocus]} disabled={initialLoopVariant === selectedLoopVariant}>
-      <ButtonIcon class="material-icons">check</ButtonIcon>
-      <Label>Apply</Label>
+    <Button
+      on:click={() => handleActions()}
+      disabled={initialLoopVariant === selectedLoopVariant}
+    >
+      <span>
+        <span class="material-icons">check</span>
+        Apply
+      </span>
     </Button>
   </div>
 </Dialog>

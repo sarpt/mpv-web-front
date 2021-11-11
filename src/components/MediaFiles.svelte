@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Paper, { Title } from '@smui/paper/styled';
-
   import { getMediaFileName } from '../functions/media_file';
   import {
     changeMediaFile,
@@ -12,12 +10,12 @@
     MediaFile,
     Playback,
   } from '../models/api'; // neccessary 'import type', otherwise rollup will not find import value
-  import { MediaFileDialogActions } from '../models/dialogs';
 
   import { playbackStore } from '../stores/playback';
   import { mediaFilesStore } from '../stores/media_files';
 
   import PlayMediaDialog from './PlayMediaDialog.svelte';
+  import Row from './Row.svelte';
 
   let dialogOpened = false;
   let selectedMediaFile: MediaFile | undefined;
@@ -26,8 +24,8 @@
   let selectedAudioId = ''; // TODO: this probably should not be held/decided by the MediaFiles component - consider setting state for a modal in the store
   let selectedSubtitleId = '';
 
-  $: getColor = (mediaFile: MediaFile, playback: Playback | undefined): string => {
-    return !!playback && mediaFile.Path === playback.MediaFilePath ? 'primary' : 'none';
+  $: selected = (mediaFile: MediaFile, playback: Playback | undefined): boolean => {
+    return !!playback && mediaFile.Path === playback.MediaFilePath;
   }
 
   function handleMediaFileEntryClick(mediaFile: MediaFile, idx: number) {
@@ -37,7 +35,7 @@
     dialogOpened = true;
   }
 
-  function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
+  const dialogPlayHandler = (fullscreen: boolean, audioId: string, subtitleId: string) => {
     const request: playMediaFileArguments = {
       append: false,
       path: selectedMediaFile?.Path || '',
@@ -45,35 +43,45 @@
       fullscreen,
       audioId,
       subtitleId,
-    }
+    };
 
-    switch (action) {
-      case MediaFileDialogActions.Added:
-        request.append = true;
-        changeMediaFile(request);
-        break;
-      case MediaFileDialogActions.Play:
-        changeMediaFile(request);
-        break;
-      default:
-        return;
-    }
+    changeMediaFile(request);
+  }
+
+  const dialogAddToPlaylistHandler = (fullscreen: boolean, audioId: string, subtitleId: string) => {
+    const request: playMediaFileArguments = {
+      append: true,
+      path: selectedMediaFile?.Path || '',
+      pause: false,
+      fullscreen,
+      audioId,
+      subtitleId,
+    };
+
+    changeMediaFile(request);
   }
 
   $: playback = $playbackStore.playback;
   $: mediaFiles = Object.values($mediaFilesStore.mediaFiles);
 </script>
 
+<PlayMediaDialog
+  bind:opened={dialogOpened}
+  mediaFile={selectedMediaFile}
+  bind:selectedAudioId
+  bind:selectedSubtitleId
+  handlePlay={dialogPlayHandler}
+  handleAddToPlaylist={dialogAddToPlaylistHandler}
+></PlayMediaDialog>
+
 {#if mediaFiles.length > 0}
     {#each mediaFiles as mediaFile, idx}
       <div class="media-file-entry" on:click={() => handleMediaFileEntryClick(mediaFile, idx)}>
-        <Paper transition color={getColor(mediaFile, playback)}>
-            <Title>
-              <div class="media-file-title">
-                {getMediaFileName(mediaFile)}
-              </div>
-            </Title>
-        </Paper>
+        <Row selected={selected(mediaFile, playback)}>
+          <div class="media-file-title" slot="content">
+            {getMediaFileName(mediaFile)}
+          </div>
+        </Row>
       </div>
     {/each}
 {:else}
@@ -82,24 +90,10 @@
   </div>
 {/if}
 
-<PlayMediaDialog bind:opened={dialogOpened} mediaFile={selectedMediaFile} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMediaDialog>
-
 <style lang="scss">
   .media-file-entry {
     margin-bottom: 5px;
     cursor: pointer;
-  }
-
-  @media (max-width: 640px) {
-    :global(.smui-paper) {
-      padding: 9px 6px;
-    }
-
-    :global(.smui-paper .smui-paper__title) {
-      font-size: small;
-      line-height: 1em;
-      margin-bottom: 0;
-    }
   }
 
   .media-file-title {

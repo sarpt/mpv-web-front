@@ -1,57 +1,65 @@
 <script lang="ts">
-  import Drawer, { Content, Header, Title, Scrim } from '@smui/drawer/styled';
-  import List, { Item, Text, Graphic } from '@smui/list/styled';
+  import {
+    List,
+    ListItem,
+    NavigationDrawer
+  } from "smelte";
 
-  import { navigateToMediaFiles, navigateToPlaybackHistory, navigateToPlaylist, Routes } from '../functions/routing';
+  import { Navigation, Routes } from '../functions/routing';
   import type { MenuItem } from '../models/drawer';
   import { drawerStore } from '../stores/drawer';
   import { routingStore } from '../stores/routing';
 
-  let menuDrawer: Drawer;
+  const navigate = (route: string | undefined) => {
+    if (!route) return;
 
-  const createNavigateHandler = (routingHandler: () => void) => {
-    return () => {
-      routingHandler();
-      drawerStore.set({ open: false });
-    };
+    const handler = Navigation.get(route as Routes);
+    if (!handler) return;
+
+    handler();
+    drawerStore.set({ open: false });
   };
 
   const menuItems: MenuItem[] = [
     {
-      route: Routes.MediaFiles,
+      to: Routes.MediaFiles,
       text: 'Media files',
-      graphic: 'movie',
-      handler: createNavigateHandler(navigateToMediaFiles),
+      icon: 'movie',
     },
     {
-      route: Routes.PlaybackHistory,
+      to: Routes.PlaybackHistory,
       text: 'Playback history',
-      graphic: 'history',
-      handler: createNavigateHandler(navigateToPlaybackHistory),
+      icon: 'history',
     },
     {
-      route: Routes.Playlist,
+      to: Routes.Playlist,
       text: 'Playlist',
-      graphic: 'playlist-play',
-      handler: createNavigateHandler(navigateToPlaylist),
+      icon: 'playlist_play',
     }
   ];
 
 </script>
 
-<Drawer variant="modal" bind:this={menuDrawer} bind:open={$drawerStore.open}>
-  <Header>
-    <Title>MPV web</Title>
-  </Header>
-  <Content>
-    <List>
-      {#each menuItems as menuItem}
-        <Item on:SMUI:action={menuItem.handler} activated={$routingStore.route === menuItem.route} selected={$routingStore.route === menuItem.route}>
-          <Graphic class="material-icons" aria-hidden="true">{menuItem.graphic}</Graphic>
-          <Text>{menuItem.text}</Text>
-        </Item>
-      {/each}
-    </List>
-  </Content>
-</Drawer>
-<Scrim/>
+<NavigationDrawer
+  bind:show={$drawerStore.open}
+  persistent={false}
+  elevation={true}
+  classes={(ec) => ec.replace('md:mt-16', 'md:mt-0')}
+>
+  <h6
+    class="p-6 ml-1 pb-2 text-xs text-gray-900"
+  >MPV Web</h6>
+  <List
+    items={menuItems}
+  >
+    <span slot="item" let:item={item} class="cursor-pointer">
+      <ListItem
+        selected={$routingStore.route === item.to}
+        {...item}
+        dense
+        on:click={() => navigate(item.to)}
+      />
+    </span>
+  </List>
+<hr>
+</NavigationDrawer>

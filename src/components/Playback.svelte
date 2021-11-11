@@ -1,6 +1,8 @@
 <script lang="ts">
-  import LinearProgress from '@smui/linear-progress/styled';
-  import IconButton from '@smui/icon-button/styled';
+  import {
+    Button,
+    ProgressLinear,
+  } from 'smelte';
 
   import { fullscreen, pause } from "../functions/api";
   import { LoopVariant } from "../models/api";
@@ -12,7 +14,6 @@
   import PlaybackSettingsDialog from "./PlaybackSettingsDialog.svelte";
   import PlaybackRepeatDialog from "./PlaybackRepeatDialog.svelte";
 
-  import './Playback.scss';
   import { postPlayback } from "../functions/rest";
   import { drawerStore } from "../stores/drawer";
   import { mediaFilesStore } from "../stores/media_files";
@@ -29,19 +30,21 @@
   let playbackSettingsOpened = false;
   let repeatSettingsOpened = false;
 
-  $: playingMediaFileProgress = (!!playback && !!currentMediaFile && currentMediaFile.Duration > 0) ? (playback.CurrentTime / currentMediaFile.Duration) : 0;
+  $: playingMediaFileProgress = (!!playback && !!currentMediaFile && currentMediaFile.Duration > 0)
+    ? (playback.CurrentTime / currentMediaFile.Duration) * 100
+    : 0;
 
   const openPlaybackSettings = () => { playbackSettingsOpened = true }
   const openRepeatSettings = () => { repeatSettingsOpened = true }
 
-  const handlePlaybackSettingsChanged = (action: string, audioId: string, subtitleId: string) => {
+  const handlePlaybackSettingsChanged = (audioId: string, subtitleId: string) => {
     postPlayback({
       audioId,
       subtitleId,
     });
   }
 
-  const handleRepeatSettingsChanged = (action: string, loopVariant: LoopVariant) => {
+  const handleRepeatSettingsChanged = (loopVariant: LoopVariant) => {
     postPlayback({
       loopFile: loopVariant === LoopVariant.File,
     });
@@ -51,32 +54,69 @@
 </script>
 
 <div class="playback">
-  {#if !!playback && !!currentMediaFile}
-    <div class="name">{getMediaFileName(currentMediaFile)}</div>
-    <div class="progress-container">
-      <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(currentMediaFile.Duration)}</span>
-      <LinearProgress class="playback-progress" progress={playingMediaFileProgress} />
-    </div>
-  {:else}
-    No playback
-  {/if}
+  <div class="info">
+    {#if !!playback && !!currentMediaFile}
+      <div class="name">{getMediaFileName(currentMediaFile)}</div>
+      <div class="progress-container">
+        <span>{secondsToHHMMSS(playback.CurrentTime)} - {secondsToHHMMSS(currentMediaFile.Duration)}</span>
+        <ProgressLinear color='white' progress={playingMediaFileProgress} />
+      </div>
+    {:else}
+      No playback
+    {/if}
+  </div>
   <div class="actions">
-    <div>
-      <IconButton class="material-icons" on:click={handleMenuClick}>menu_open</IconButton>
+    <div class="button-group">
+      <Button
+        icon='menu_open'
+        on:click={handleMenuClick}
+        small
+        outlined
+      />
     </div>
-    <div>
+    <div class="button-group">
       {#if playback?.Paused}
-        <IconButton class="material-icons" on:click={() => pause(false)} disabled={!playback}>play_arrow</IconButton>
+        <Button
+          on:click={() => pause(false)}
+          disabled={!playback}
+          icon='play_arrow'
+          small
+          outlined
+        />
       {:else}
-        <IconButton class="material-icons" on:click={() => pause(true)} disabled={!playback}>pause</IconButton>
+        <Button
+          on:click={() => pause(true)}
+          disabled={!playback}
+          icon='pause'
+          small
+          outlined
+        />
       {/if}
       {#if playback?.Fullscreen}
-        <IconButton class="material-icons" on:click={() => fullscreen(false)} disabled={!playback}>fullscreen_exit</IconButton>
+        <Button
+          on:click={() => fullscreen(false)}
+          disabled={!playback}
+          icon='fullscreen_exit'
+          small
+          outlined
+        />
       {:else}
-        <IconButton class="material-icons" on:click={() => fullscreen(true)} disabled={!playback}>fullscreen</IconButton>
+        <Button
+          on:click={() => fullscreen(true)}
+          disabled={!playback}
+          icon='fullscreen'
+          small
+          outlined
+        />
       {/if}
 
-      <IconButton class="material-icons" on:click={openRepeatSettings} disabled={!playback}>repeat</IconButton>
+      <Button
+        on:click={openRepeatSettings}
+        disabled={!playback}
+        icon='repeat'
+        small
+        outlined
+      />
       <PlaybackRepeatDialog
         bind:opened={repeatSettingsOpened}
         initialLoopVariant={playback?.Loop.Variant ?? LoopVariant.File}
@@ -84,20 +124,36 @@
       >
       </PlaybackRepeatDialog>
 
-      <IconButton class="material-icons" on:click={openPlaybackSettings} disabled={!playback}>video_settings</IconButton>
+      <Button
+        on:click={openPlaybackSettings}
+        disabled={!playback}
+        icon='video_settings'
+        small
+        outlined
+      />
       <PlaybackSettingsDialog
         bind:opened={playbackSettingsOpened}
-        playback={playback}
+        audioId={playback?.SelectedAudioID}
+        subtitleId={playback?.SelectedSubtitleID}
         currentMediaFile={currentMediaFile}
         dialogCloseHandler={handlePlaybackSettingsChanged}
       >
       </PlaybackSettingsDialog>
     </div>
-    <div></div>
+    <div class="button-group"></div>
   </div>
 </div>
 
 <style lang="scss">
+  .button-group {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .info {
+    color: white;
+  }
+
   .playback {
     display: flex;
     flex-direction: column;

@@ -1,8 +1,7 @@
-import type { Routes } from "../functions/routing";
+import type { Routes } from '../functions/routing';
 
 export type MenuItem = {
-    route: Routes,
+    to: Routes,
     text: string,
-    graphic: string,
-    handler: () => void,
-}
+    icon: string,
+};
