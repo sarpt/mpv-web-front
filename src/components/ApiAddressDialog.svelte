@@ -1,46 +1,58 @@
 <script lang="ts">
-  import Button, {Label, Icon as ButtonIcon} from '@smui/button/styled';
-  import Textfield from '@smui/textfield/styled';
+  import {
+    Button,
+    Dialog,
+    TextField,
+  } from 'smelte';
 
   import { checkApiAvailability } from '../functions/api';
   import { apiAddressStore } from '../stores/api_address';
   import { apiConnectionStore } from '../stores/api_connection';
 
-  import Dialog from './Dialog.svelte';
-
   export let opened = false;
   $: currentApiAddress = $apiAddressStore;
   let valid = true;
+  let err: string | undefined;
+  $: if (!valid) {
+    err = 'Incorrect address'; 
+  }
+
 	async function dispatchAddress() {
     valid = await checkApiAvailability(currentApiAddress.address);
 
     if (valid) {
       apiAddressStore.set({ address: currentApiAddress.address });
       apiConnectionStore.set({ connected: true });
+      opened = false
     }
 	}
 </script>
 
 <Dialog
   name="api-address"
-  title="API Address change"
-  {opened}
-  dialogActionHandler={dispatchAddress}
+  bind:value={opened}
 >
-  <div slot="content">
+  <div slot=title>
+    <span>API Address change</span>
+  </div>
+  <div slot="default">
     <span>Media files list could not be fetched from the provided address. Please input a new address:</span>
     <div>
-      <Textfield
-        invalid={!valid}
+      <TextField
+        error={err}
         bind:value={currentApiAddress.address}
         label="New address"
       />
     </div>
   </div>
   <div class="retry-button" slot="actions">
-    <Button action="ok">
-      <ButtonIcon class="material-icons">done</ButtonIcon>
-      <Label>OK</Label>
+    <Button
+      on:click={() => dispatchAddress()}
+    >
+      <span>
+        <span class="material-icons">done</span>
+        OK
+      </span>
     </Button>
   </div>
 </Dialog>

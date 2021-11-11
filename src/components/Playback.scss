@@ -1,9 +1,0 @@
-@use "@material/theme/color-palette";
-@use "@material/theme/variables" as variables;
-@use "sass:map";
-@use '@material/linear-progress/index' as linear-progress;
-
-.playback-progress {
-  @include linear-progress.bar-color(variables.$on-primary);
-  @include linear-progress.buffer-color(map.get(variables.$property-values, "text-primary-on-light"));
-}

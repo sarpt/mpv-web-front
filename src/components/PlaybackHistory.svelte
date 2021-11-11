@@ -1,17 +1,16 @@
 <script lang="ts">
+  import { ProgressCircular } from 'smelte';
   import { onDestroy } from 'svelte';
-  import Paper, { Title } from '@smui/paper/styled';
 
   import { changeMediaFile, playMediaFileArguments } from '../functions/api';
   import type { PlaybackHistoryEntry } from '../functions/db';
   import { getMediaFileName } from '../functions/media_file';
   import { getPlaybackHistory, playbackHistoryChanges } from '../functions/playback_history';
   import type { MediaFile } from '../models/api';
-  import { MediaFileDialogActions } from '../models/dialogs';
   import { mediaFilesStore } from '../stores/media_files';
 
-  import Loading  from './Loading.svelte';
   import PlayMediaDialog from './PlayMediaDialog.svelte';
+  import Row from './Row.svelte';
 
   $: mediaFiles = $mediaFilesStore.mediaFiles;
 
@@ -36,7 +35,20 @@
     dialogOpened = true;
   }
 
-  function dialogCloseHandler(action: string, fullscreen: boolean, audioId: string, subtitleId: string) {
+  function handleAddToPlaylist(fullscreen: boolean, audioId: string, subtitleId: string) {
+    const request: playMediaFileArguments = {
+      append: true,
+      path: selectedMediaFile?.Path || '',
+      pause: false,
+      fullscreen,
+      audioId,
+      subtitleId,
+    };
+
+    changeMediaFile(request);
+  }
+
+  function handlePlay(fullscreen: boolean, audioId: string, subtitleId: string) {
     const request: playMediaFileArguments = {
       append: false,
       path: selectedMediaFile?.Path || '',
@@ -44,36 +56,24 @@
       fullscreen,
       audioId,
       subtitleId,
-    }
+    };
 
-    switch (action) {
-      case MediaFileDialogActions.Added:
-        request.append = true;
-        changeMediaFile(request);
-        break;
-      case MediaFileDialogActions.Play:
-        changeMediaFile(request);
-        break;
-      default:
-        return;
-    }
+    changeMediaFile(request);
   }
 </script>
 
 {#await playbackHistory}
-  <Loading />
+  <ProgressCircular />
 {:then playbackHistory} 
   {#if playbackHistory.length > 0}
     {#each playbackHistory as entry, idx}
+    <Row selected={false}>
       <div class="media-file-entry" on:click={() => handleEntryClick(entry, idx)}>
-        <Paper transition>
-          <Title>
-            <div class="media-file-title">
-              {getMediaFileName(entry)}
-            </div>
-          </Title>
-        </Paper>
+          <div class="media-file-title">
+            {getMediaFileName(entry)}
+          </div>
       </div>
+    </Row>
     {/each}
   {:else}
     <div>
@@ -82,7 +82,14 @@
   {/if}
 {/await}
 
-<PlayMediaDialog bind:opened={dialogOpened} mediaFile={selectedMediaFile} bind:selectedAudioId bind:selectedSubtitleId {dialogCloseHandler}></PlayMediaDialog>
+<PlayMediaDialog
+  bind:opened={dialogOpened}
+  mediaFile={selectedMediaFile}
+  bind:selectedAudioId
+  bind:selectedSubtitleId
+  handleAddToPlaylist={handleAddToPlaylist}
+  handlePlay={handlePlay}
+></PlayMediaDialog>
 
 <style lang="scss">
   .media-file-entry {

@@ -21,18 +21,21 @@ export function initRouter(routes: Routing) {
   page.start();
 }
 
-export function navigateToRoot() {
-  page(Routes.Root);
-}
-
-export function navigateToMediaFiles() {
-  page(Routes.MediaFiles);
-}
-
-export function navigateToPlaybackHistory() {
-  page(Routes.PlaybackHistory);
-}
-
-export function navigateToPlaylist() {
-  page(Routes.Playlist);
-}
+export const Navigation = new Map<Routes, () => void>([
+  [
+    Routes.Root,
+    () => page(Routes.Root),
+  ],
+  [
+    Routes.MediaFiles,
+    () => page(Routes.MediaFiles),
+  ],
+  [
+    Routes.PlaybackHistory,
+    () => page(Routes.PlaybackHistory)
+  ],
+  [
+    Routes.Playlist,
+    () => page(Routes.Playlist)
+  ]
+]);

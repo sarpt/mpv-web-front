@@ -1,6 +1,0 @@
-@use "@material/theme/variables" as variables;
-@use '@material/circular-progress/index' as circular-progress;
- 
-.loading-progress {
-  @include circular-progress.color(variables.$on-primary);
-}
