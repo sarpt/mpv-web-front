@@ -77,7 +77,10 @@
 {#if mediaFiles.length > 0}
     {#each mediaFiles as mediaFile, idx}
       <div class="media-file-entry" on:click={() => handleMediaFileEntryClick(mediaFile, idx)}>
-        <Row selected={selected(mediaFile, playback)}>
+        <Row
+          selected={selected(mediaFile, playback)}
+          odd={idx % 2 !== 0}
+        >
           <div class="media-file-title" slot="content">
             {getMediaFileName(mediaFile)}
           </div>
@@ -92,7 +95,7 @@
 
 <style lang="scss">
   .media-file-entry {
-    margin-bottom: 5px;
+    margin: 4px 0px;
     cursor: pointer;
   }
 

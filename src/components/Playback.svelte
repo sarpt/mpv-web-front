@@ -148,6 +148,19 @@
   .button-group {
     display: flex;
     flex-direction: row;
+
+    :global(button) {
+      margin: 0px 2px;
+    }
+
+    :global(button:disabled) {
+      background-color: inherit;
+      border: none;
+    }
+
+    :global(button:enabled > i) {
+      color: white;
+    }
   }
 
   .info {

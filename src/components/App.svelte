@@ -89,7 +89,7 @@
 	}
 
 	.playback-container {
-		@apply bg-primary-200;
+		@apply bg-primary-400;
     padding: 24px 16px;
 		flex-shrink: 0;
 		height: 120px;
