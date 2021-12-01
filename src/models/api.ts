@@ -30,9 +30,18 @@ export type Playback = {
   Loop: Loop,
 };
 
+export type PlaylistEntry = {
+  Path: string,
+  PlaybackTimestamp: number,
+  AudioId: string,
+  SubtitleId: string
+};
+
 export type Playlist = {
-  Items: string[],
+  Entries: PlaylistEntry[],
   Name: string,
+  CurrentEntryIdx: number,
+  Description: string,
 };
 
 export type Playlists = {
