@@ -20,12 +20,12 @@
   }
 </script>
 
-{#if currentPlaylist && currentPlaylist.Items.length > 0}
-    {#each currentPlaylist.Items as item, idx}
+{#if currentPlaylist && currentPlaylist.Entries.length > 0}
+    {#each currentPlaylist.Entries as entry, idx}
       <div class="playlist-entry" on:click={() => handlePlaylistEntryClick(idx)}>
-        <Row selected={selected(idx)}> 
-          <div class="playlist-path">
-            {getMediaFileName(mediaFiles[item])}
+        <Row selected={selected(idx)} odd={idx % 2 !== 1}> 
+          <div class="playlist-path" slot="content">
+            {getMediaFileName(mediaFiles[entry.Path])}
           </div>
         </Row>
       </div>
