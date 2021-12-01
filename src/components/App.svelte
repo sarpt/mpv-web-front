@@ -82,10 +82,11 @@
 	}
 
 	.view-container {
-		padding: 0 1rem;
 		flex-shrink: 1;
 		flex-grow: 1;
-		overflow-y: scroll;
+		overflow-y: hidden;
+		display: flex;
+		flex-direction: column
 	}
 
 	.playback-container {
@@ -93,11 +94,5 @@
     padding: 24px 16px;
 		flex-shrink: 0;
 		height: 120px;
-	}
-
-	@media (max-width: 640px) {
-		.view-container {
-			padding: 0 0.5rem;
-		}
 	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import VirtualScroll from "svelte-virtual-scroll-list"
   import { getMediaFileName } from '../functions/media_file';
   import {
     changeMediaFile,
@@ -28,7 +29,7 @@
     return !!playback && mediaFile.Path === playback.MediaFilePath;
   }
 
-  function handleMediaFileEntryClick(mediaFile: MediaFile, idx: number) {
+  function handleMediaFileEntryClick(mediaFile: MediaFile) {
     selectedAudioId = mediaFile.AudioStreams[0]?.AudioID ?? '';
     selectedSubtitleId = mediaFile.SubtitleStreams[0]?.SubtitleID ?? '';
     selectedMediaFile = mediaFile;
@@ -75,18 +76,24 @@
 ></PlayMediaDialog>
 
 {#if mediaFiles.length > 0}
-    {#each mediaFiles as mediaFile, idx}
-      <div class="media-file-entry" on:click={() => handleMediaFileEntryClick(mediaFile, idx)}>
+    <VirtualScroll
+      rootNodeClass="virtual-scroll"
+      data={mediaFiles}
+      key="Path"
+      let:data
+      let:idx
+    >
+      <div class="media-file-entry" on:click={() => handleMediaFileEntryClick(data)}>
         <Row
-          selected={selected(mediaFile, playback)}
+          selected={selected(data, playback)}
           odd={idx % 2 !== 0}
         >
           <div class="media-file-title" slot="content">
-            {getMediaFileName(mediaFile)}
+            {getMediaFileName(data)}
           </div>
         </Row>
       </div>
-    {/each}
+    </VirtualScroll>
 {:else}
   <div>
     Seems there are no mediaFiles :/
@@ -105,4 +112,15 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+
+  :global(.virtual-scroll) {
+		padding: 0 1rem;
+    flex-grow: 0;
+  }
+
+	@media (max-width: 640px) {
+		.virtual-scroll {
+			padding: 0 0.5rem;
+		}
+	}
 </style>
