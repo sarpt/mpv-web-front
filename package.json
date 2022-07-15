@@ -20,7 +20,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "sirv-cli": "^1.0.12",
     "smelte": "github:matyunya/smelte#e795a60f32ddf39970237e794833a2505e29c2e9",
-    "svelte": "^3.44.1",
+    "svelte": "^3.49.0",
     "svelte-check": "^2.2.0",
     "svelte-preprocess": "^4.7.3",
     "svelte-virtual-scroll-list": "github:sarpt/svelte-virtual-scroll-list",
