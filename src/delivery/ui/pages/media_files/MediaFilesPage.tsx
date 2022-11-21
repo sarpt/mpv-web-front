@@ -1,7 +1,8 @@
 import { styled } from "@mui/material";
 import useSize from "@react-hook/size";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMediaFiles } from "../../plocs/media_files/actions";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
 import { MediaFilesList } from "./components/MediaFilesList";
 
@@ -22,12 +23,17 @@ export const MediaFilesPage = () => {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
   const [width, height] = useSize(parentRef);
 
+  const dispatch = useDispatch();
+
   const mediaFiles = useSelector(selectMediaFiles);
+  useEffect(() => {
+    dispatch(fetchMediaFiles());
+  }, []);
 
   return (
     <PageBase>
       <ListContainer ref={node => node && setParentRef(node)}>
-        <MediaFilesList mediaFiles={mediaFiles} width={width} height={height} />
+        <MediaFilesList mediaFiles={[...Object.values(mediaFiles)]} width={width} height={height} />
       </ListContainer>
     </PageBase>
   );

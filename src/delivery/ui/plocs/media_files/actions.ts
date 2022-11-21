@@ -1,5 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
-import { MediaFile } from "./models";
+import { MediaFilesMap } from "./models";
 
 enum MediaFileActions {
   FetchMediaFiles = 'FetchMediaFiles',
@@ -12,7 +12,7 @@ export const fetchMediaFiles = createAction(MediaFileActions.FetchMediaFiles);
 
 export const subscribeToMediaFiles = createAction(MediaFileActions.SubscribeToMediaFiles);
 
-export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched, (mediaFiles: MediaFile[]) => {
+export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched, (mediaFiles: MediaFilesMap) => {
   return {
     payload: {
       mediaFiles,

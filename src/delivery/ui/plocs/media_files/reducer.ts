@@ -1,28 +1,29 @@
 import { AnyAction } from "redux"
+import { MediaFilesMap } from "../../../../domains/media_files/entities";
 import { mediaFilesFetched, mediaFilesFetchError } from "./actions";
 import { MediaFile } from "./models";
 
-const stubbedMediaFiles: MediaFile[] = [...Array(10000)].map((_, idx) => {
-  return {
-    Title: `title ${idx}`,
-    FormatLongName: '',
-    FormatName: '',
-    Duration: 5,
-    Path: `/root/${idx}`,
-    VideoStreams: [],
-    AudioStreams: [],
-    SubtitleStreams: [],
-    Chapters: [],
-  };
-});
+// const stubbedMediaFiles: MediaFile[] = [...Array(10000)].map((_, idx) => {
+//   return {
+//     Title: `title ${idx}`,
+//     FormatLongName: '',
+//     FormatName: '',
+//     Duration: 5,
+//     Path: `/root/${idx}`,
+//     VideoStreams: [],
+//     AudioStreams: [],
+//     SubtitleStreams: [],
+//     Chapters: [],
+//   };
+// });
 
 type State = {
-  mediaFiles: MediaFile[],
+  mediaFiles: MediaFilesMap,
   errMsg?: string,
 };
 
 const initialState: State = {
-  mediaFiles: stubbedMediaFiles,
+  mediaFiles: {},
 };
 
 export default function mediaFilesReducer(state = initialState, action: AnyAction): State {

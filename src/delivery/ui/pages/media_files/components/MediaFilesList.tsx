@@ -23,23 +23,15 @@ const OddRow = styled(ListItem)`
 const rowSize = 48;
 
 const ItemRender = (props: { entry: MediaFile, idx: number }) => {
+  const Row = props.idx % 2 ? OddRow : EvenRow;
+
   return (
     <div>
-      {
-        props.idx % 2
-          ?
-            <OddRow key={props.idx} disablePadding>
-              <ListItemButton>
-                <ListItemText primary={<span>Row {props.idx}: {props.entry.Path}</span>} />
-              </ListItemButton>
-            </OddRow>
-          :
-            <EvenRow key={props.idx} disablePadding>
-              <ListItemButton>
-                <ListItemText primary={<span>Row {props.idx}: {props.entry.Path}</span>} />
-              </ListItemButton>
-            </EvenRow>
-      }
+      <Row key={props.idx} disablePadding>
+        <ListItemButton>
+          <ListItemText primary={<span>{props.entry.Path}</span>} />
+        </ListItemButton>
+      </Row>
     </div>
   );
 };
