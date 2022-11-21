@@ -1,5 +1,5 @@
-import { MediaFilesMap } from "../../media_files/entities";
-import { MediaFilesRepository } from "../../media_files/gateways/interfaces";
+import { MediaFilesMap } from "../../domains/media_files/entities";
+import { MediaFilesRepository } from "../../domains/media_files/interfaces";
 
 const address = 'localhost:3001';
 

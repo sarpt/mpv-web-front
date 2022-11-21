@@ -1,5 +1,5 @@
-import { Dependencies, resolve } from "../di";
 import { MediaFilesMap } from "../entities";
+import { MediaFilesRepository } from "../interfaces";
 
 export type Output = {
   mediaFiles: MediaFilesMap,
@@ -10,9 +10,9 @@ export interface FetchMediaFilesUC {
 }
 
 export class FetchMediaFiles implements FetchMediaFilesUC {
+  constructor(private mediaFilesRepository: MediaFilesRepository) {}
   async invoke(): Promise<Output> {
-    const mediaFilesRepository = resolve(Dependencies.MediaFilesRepository);
-    const mediaFiles = await mediaFilesRepository().fetchMediaFiles();
+    const mediaFiles = await this.mediaFilesRepository.fetchMediaFiles();
 
     return { mediaFiles };
   }

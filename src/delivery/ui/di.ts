@@ -1,13 +1,17 @@
-import { RestApiService } from '../../domains/api_service/gateways.ts/restApiService';
-import {
-  container as mediaFilesContainer,
-  Dependencies as MediaFilesDependencies,
-} from '../../domains/media_files/di';
-import { MediaFilesRepository } from '../../domains/media_files/gateways/interfaces';
+import { Container, token, createResolve } from "@owja/ioc";
 
 import { FetchMediaFiles, FetchMediaFilesUC } from '../../domains/media_files/usecases/fetchMediaFiles';
+import { RestApiService } from '../../gateways/api_service/restApiService';
+
+export const Dependencies = {
+  "FetchMediaFilesUC": token<FetchMediaFilesUC>("FetchMediaFilesUC"),
+}
+
+export const container = new Container();
+export const resolve = createResolve(container);
 
 export function init() {
-  mediaFilesContainer.bind<FetchMediaFilesUC>(MediaFilesDependencies.FetchMediaFilesUC).to(FetchMediaFiles);
-  mediaFilesContainer.bind<MediaFilesRepository>(MediaFilesDependencies.MediaFilesRepository).to(RestApiService).inSingletonScope();
+  const restApiService = new RestApiService();
+
+  container.bind<FetchMediaFilesUC>(Dependencies.FetchMediaFilesUC).toFactory(() => new FetchMediaFiles(restApiService));
 }
