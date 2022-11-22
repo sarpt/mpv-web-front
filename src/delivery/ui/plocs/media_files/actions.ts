@@ -3,7 +3,7 @@ import { MediaFilesMap } from "./models";
 
 enum MediaFileActions {
   FetchMediaFiles = 'FetchMediaFiles',
-  MediaFilesFetched = 'MediaFilesFetched',
+  MediaFilesAdded = 'MediaFilesAdded',
   MediaFilesFetchError = 'MediaFilesFetchError',
   SubscribeToMediaFiles = 'SubscribeToMediaFiles',
 }
@@ -12,7 +12,7 @@ export const fetchMediaFiles = createAction(MediaFileActions.FetchMediaFiles);
 
 export const subscribeToMediaFiles = createAction(MediaFileActions.SubscribeToMediaFiles);
 
-export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched, (mediaFiles: MediaFilesMap) => {
+export const mediaFilesAdded = createAction(MediaFileActions.MediaFilesAdded, (mediaFiles: MediaFilesMap) => {
   return {
     payload: {
       mediaFiles,
@@ -20,7 +20,7 @@ export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched
   };
 });
 
-export const mediaFilesFetchError = createAction(MediaFileActions.MediaFilesFetched, (errMsg: string) => {
+export const mediaFilesFetchError = createAction(MediaFileActions.MediaFilesAdded, (errMsg: string) => {
   return {
     payload: {
       errMsg,

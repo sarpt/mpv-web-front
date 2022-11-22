@@ -1,5 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { fetchMediaFiles, mediaFilesFetched } from "./actions";
+import { fetchMediaFiles, mediaFilesAdded, subscribeToMediaFiles } from "./actions";
 import {
   resolve,
   Dependencies
@@ -13,7 +13,24 @@ mediaFilesListenerMiddleware.startListening({
     const fetchMediaFilesUC = resolve(Dependencies.FetchMediaFilesUC)();
     const { mediaFiles } = await fetchMediaFilesUC.invoke();
 
-    listenerApi.dispatch(mediaFilesFetched(mediaFiles));
+    listenerApi.dispatch(mediaFilesAdded(mediaFiles));
+
+    // TODO: this probably should not be here (maybe as an option to action?), test only
+    listenerApi.dispatch(subscribeToMediaFiles());
+  },
+});
+
+mediaFilesListenerMiddleware.startListening({
+  actionCreator: subscribeToMediaFiles,
+  effect: async (action, listenerApi) => {
+    const subscribeToMediaFilesUC = resolve(Dependencies.SubscribeToMediaFilesUC)();
+    const { subscription } = await subscribeToMediaFilesUC.invoke();
+
+    listenerApi.fork(async () => {
+      for await (const mediaFiles of subscription) {
+        listenerApi.dispatch(mediaFilesAdded(mediaFiles));
+      }
+    });
   },
 });
 
