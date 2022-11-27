@@ -1,6 +1,6 @@
-import { MediaFilesMap } from "./entities";
+import { MediaFilesMap, MediaFilesSubscriptions } from "./entities";
 
 export interface MediaFilesRepository {
   fetchMediaFiles(): Promise<MediaFilesMap>,
-  subscribeToMediaFiles(): AsyncGenerator<MediaFilesMap, void, undefined>,
+  subscribeToMediaFiles(): MediaFilesSubscriptions,
 }

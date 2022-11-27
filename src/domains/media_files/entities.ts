@@ -78,3 +78,8 @@ export type MediaFile = {
 };
 
 export type MediaFilesMap = { [key in string]: MediaFile };
+
+export type MediaFilesSubscriptions = {
+  added: AsyncGenerator<MediaFilesMap, void, undefined>,
+  removed: AsyncGenerator<MediaFilesMap, void, undefined>
+}

@@ -1,8 +1,8 @@
-import { MediaFilesMap } from "../entities";
+import { MediaFilesSubscriptions } from "../entities";
 import { MediaFilesRepository } from "../interfaces";
 
 export type Output = {
-  subscription: AsyncGenerator<MediaFilesMap, void, undefined>,
+  subscriptions: MediaFilesSubscriptions,
 };
 
 export interface SubscribeToMediaFilesUC {
@@ -12,8 +12,8 @@ export interface SubscribeToMediaFilesUC {
 export class SubscribeToMediaFiles implements SubscribeToMediaFilesUC {
   constructor(private mediaFilesRepository: MediaFilesRepository) {}
   async invoke(): Promise<Output> {
-    const subscription = await this.mediaFilesRepository.subscribeToMediaFiles();
-
-    return { subscription };
+    return {
+      subscriptions: await this.mediaFilesRepository.subscribeToMediaFiles()
+    };
   }
 }

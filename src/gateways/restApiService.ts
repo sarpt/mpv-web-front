@@ -1,4 +1,4 @@
-import { MediaFilesMap } from "../domains/media_files/entities";
+import { MediaFilesMap, MediaFilesSubscriptions } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { EventsObserver } from "./eventsObserver";
 
@@ -24,10 +24,13 @@ export class RestApiService implements MediaFilesRepository {
     }
   }
 
-  subscribeToMediaFiles(): AsyncGenerator<MediaFilesMap, void, undefined> {
-    const observer = new EventsObserver<MediaFilesMap>('mediaFiles.added');
-    observer.setSource(this.eventSource);
+  subscribeToMediaFiles(): MediaFilesSubscriptions {
+    const addedObserver = new EventsObserver<MediaFilesMap>('mediaFiles.added');
+    addedObserver.setSource(this.eventSource);
 
-    return observer.observe();
+    const removedObserver = new EventsObserver<MediaFilesMap>('mediaFiles.removed');
+    removedObserver.setSource(this.eventSource);
+
+    return { added: addedObserver.observe(), removed: removedObserver.observe() };
   }
 }

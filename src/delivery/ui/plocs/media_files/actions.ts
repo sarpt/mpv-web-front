@@ -4,6 +4,7 @@ import { MediaFilesMap } from "./models";
 enum MediaFileActions {
   FetchMediaFiles = 'FetchMediaFiles',
   MediaFilesAdded = 'MediaFilesAdded',
+  MediaFilesRemoved = 'MediaFilesRemoved',
   MediaFilesFetchError = 'MediaFilesFetchError',
   SubscribeToMediaFiles = 'SubscribeToMediaFiles',
 }
@@ -13,6 +14,14 @@ export const fetchMediaFiles = createAction(MediaFileActions.FetchMediaFiles);
 export const subscribeToMediaFiles = createAction(MediaFileActions.SubscribeToMediaFiles);
 
 export const mediaFilesAdded = createAction(MediaFileActions.MediaFilesAdded, (mediaFiles: MediaFilesMap) => {
+  return {
+    payload: {
+      mediaFiles,
+    },
+  };
+});
+
+export const mediaFilesRemoved = createAction(MediaFileActions.MediaFilesRemoved, (mediaFiles: MediaFilesMap) => {
   return {
     payload: {
       mediaFiles,

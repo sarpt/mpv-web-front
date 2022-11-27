@@ -1,6 +1,6 @@
 import { AnyAction } from "redux"
 import { MediaFilesMap } from "../../../../domains/media_files/entities";
-import { mediaFilesAdded, mediaFilesFetchError } from "./actions";
+import { mediaFilesAdded, mediaFilesFetchError, mediaFilesRemoved } from "./actions";
 
 type State = {
   mediaFiles: MediaFilesMap,
@@ -19,6 +19,21 @@ export default function mediaFilesReducer(state = initialState, action: AnyActio
         ...state.mediaFiles,
         ...action.payload.mediaFiles,
       }
+    };
+  }
+
+  if (mediaFilesRemoved.match(action)) {
+    const changedMediaFiles: MediaFilesMap = {};
+
+    for (const path in state.mediaFiles) {
+      if (!!action.payload.mediaFiles[path]) continue;
+
+      Object.assign(changedMediaFiles, { [path]: state.mediaFiles[path] });
+    }
+
+    return {
+      ...state,
+      mediaFiles: changedMediaFiles, 
     };
   }
 
