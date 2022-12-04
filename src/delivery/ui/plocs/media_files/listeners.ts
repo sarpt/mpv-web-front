@@ -3,10 +3,11 @@ import {
   resolve,
   Dependencies
 } from '../../di';
-import { AppListenerEffectAPI, startAppListening } from "../../store";
 import { MediaFilesSubscriptions } from "../../../../domains/media_files/entities";
+import { AppListenerEffectAPI } from "../../reducers";
 
 export const fetchMediaFilesEffect = async (action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
+  console.log('fetch media files called');
   const fetchMediaFilesUC = resolve(Dependencies.FetchMediaFilesUC)();
   const { mediaFiles } = await fetchMediaFilesUC.invoke();
 
@@ -37,16 +38,5 @@ export const subscribeToMediaFilesEffect = async (action: ReturnType<typeof subs
   const { subscriptions } = await subscribeToMediaFilesUC.invoke();
 
   listenerApi.fork(iterateOverAddedMediaFiles(subscriptions.added, listenerApi));
-  listenerApi.fork(iterateOverAddedMediaFiles(subscriptions.added, listenerApi));
+  listenerApi.fork(iterateOverRemovedMediaFiles(subscriptions.removed, listenerApi));
 }
-
-startAppListening({
-  actionCreator: fetchMediaFiles,
-  effect: fetchMediaFilesEffect
-});
-
-startAppListening({
-  actionCreator: subscribeToMediaFiles,
-  effect: subscribeToMediaFilesEffect,
-});
-
