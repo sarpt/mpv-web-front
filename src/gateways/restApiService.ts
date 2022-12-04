@@ -5,13 +5,16 @@ import { EventsObserver } from "./eventsObserver";
 const address = 'localhost:3001';
 
 export class RestApiService implements MediaFilesRepository {
-  private eventSource: EventSource;
+  private eventObserver: EventsObserver;
 
   constructor() {
     const url = new URL(`http://${address}/sse/channels`);
     url.searchParams.append('channel', 'mediaFiles');
 
-    this.eventSource = new EventSource(url.toString());
+    this.eventObserver = new EventsObserver();
+
+    const eventsSource = new EventSource(url.toString());
+    this.eventObserver.setSource(eventsSource);
   }
 
   async fetchMediaFiles(): Promise<MediaFilesMap> {
@@ -25,12 +28,9 @@ export class RestApiService implements MediaFilesRepository {
   }
 
   subscribeToMediaFiles(): MediaFilesSubscriptions {
-    const addedObserver = new EventsObserver<MediaFilesMap>('mediaFiles.added');
-    addedObserver.setSource(this.eventSource);
-
-    const removedObserver = new EventsObserver<MediaFilesMap>('mediaFiles.removed');
-    removedObserver.setSource(this.eventSource);
-
-    return { added: addedObserver.observe(), removed: removedObserver.observe() };
+    return {
+      added: this.eventObserver.observe<MediaFilesMap>('mediaFiles.added'),
+      removed: this.eventObserver.observe<MediaFilesMap>('mediaFiles.removed'),
+    };
   }
 }
