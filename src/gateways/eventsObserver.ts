@@ -6,36 +6,45 @@ async function tick() {
   });
 }
 
-export class EventsObserver<T> {
-  private events: T[] = [];
-
-  constructor(private event: string) {}
+export class EventsObserver {
+  private eventsMap: Map<string, string[]> = new Map();
+  private eventSource: EventSource | undefined;
 
   setSource(eventSource: EventSource) {
-    eventSource.addEventListener(this.event, (event: any) => {
-      this.events.push(JSON.parse(event.data ?? '') as T);  
-    });
+    this.eventSource = eventSource;
+
+    for (const [eventName] of this.eventsMap.entries()) {
+      this.addEventListener(eventName);
+    }
   }
 
-  async *observe() {
-    let nextIdx = 0;
+  observe<T>(event: string) {
+    this.addEventListener(event);
 
+    return this.iterateOverEvents<T>(event);
+  }
+
+  private async *iterateOverEvents<T>(eventName: string) {
     while(true) {
-      await this.waitTillNextEvent();
+      await this.waitTillEventsAvailable(eventName);
 
-      for (let idx = nextIdx; idx < this.events.length; idx++) {
-        yield this.events[idx];
-        nextIdx = idx + 1;
+      while (this.eventsMap.get(eventName)?.length) {
+        const nextEvent = this.eventsMap.get(eventName)?.shift() ?? '';
+        yield JSON.parse(nextEvent) as T;
       }
     }
   }
 
-  private async waitTillNextEvent() {
-    const previousEventsCount = this.events.length;
+  private addEventListener(eventName: string) {
+    this.eventsMap.set(eventName, []);
 
-    while (true) {
-      if (this.events.length > previousEventsCount) return;
+    this.eventSource?.addEventListener(eventName, (event: any) => {
+      this.eventsMap.get(eventName)?.push(event.data);  
+    });
+  }
 
+  private async waitTillEventsAvailable(event: string) {
+    while (!this.eventsMap.get(event)?.length) {
       await tick();
     }
   }
