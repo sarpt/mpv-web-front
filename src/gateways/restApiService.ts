@@ -12,6 +12,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
   constructor() {
     const url = new URL(`http://${address}/sse/channels`);
     url.searchParams.append('channel', 'mediaFiles');
+    url.searchParams.append('channel', 'playback');
 
     this.eventObserver = new EventsObserver();
 
@@ -83,7 +84,8 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
   subscribeToPlayback(): PlaybackSubscriptions {
     return {
       mediaFileChange: this.eventObserver.observe<Playback>('playback.mediaFileChange'),
-      pauseChange: this.eventObserver.observe<Playback>('playback.pauseChange')
+      pauseChange: this.eventObserver.observe<Playback>('playback.pauseChange'),
+      changeTime: this.eventObserver.observe<Playback>('playback.playbackTimeChange'),
     };
   }
 }

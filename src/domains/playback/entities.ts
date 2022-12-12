@@ -27,4 +27,5 @@ export type Playback = {
 export type PlaybackSubscriptions = {
   mediaFileChange: AsyncGenerator<Playback, void, undefined>,
   pauseChange: AsyncGenerator<Playback, void, undefined>
+  changeTime: AsyncGenerator<Playback, void, undefined>
 }
