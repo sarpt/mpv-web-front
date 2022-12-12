@@ -17,3 +17,5 @@ export const appListenersMiddleware = createListenerMiddleware();
 export const startAppListening =
   appListenersMiddleware.startListening as AppStartListening;
 export const addAppListener = addListener as AppAddListener;
+
+export const selectStoreState = (state: RootState) => state

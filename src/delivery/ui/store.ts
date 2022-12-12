@@ -2,8 +2,7 @@ import {
   configureStore,
 } from '@reduxjs/toolkit'
 import { initListeners } from './listeners';
-import { reducers, RootState } from './reducers';
-
+import { reducers } from './reducers';
 
 export const store = configureStore({
   reducer: reducers,
@@ -14,4 +13,3 @@ export const store = configureStore({
   },
 });
 
-export const selectStoreState = (state: RootState) => state
