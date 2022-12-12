@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit"
-import { selectStoreState } from "../../store"
+import { selectStoreState } from "../../reducers";
 
 const selectMediaFilesState = createSelector(selectStoreState, (state) => state.mediaFiles);
 
