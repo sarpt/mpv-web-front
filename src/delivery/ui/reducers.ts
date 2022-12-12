@@ -1,8 +1,10 @@
 import { addListener, AnyAction, createListenerMiddleware, Dispatch, ListenerEffectAPI, StateFromReducersMapObject, TypedAddListener, TypedStartListening } from "@reduxjs/toolkit";
 import mediaFilesReducer from "./plocs/media_files/reducer";
+import playbackReducer from "./plocs/playback/reducer";
 
 export const reducers = {
   mediaFiles: mediaFilesReducer,
+  playback: playbackReducer,
 };
 
 export type RootState = StateFromReducersMapObject<typeof reducers>;
