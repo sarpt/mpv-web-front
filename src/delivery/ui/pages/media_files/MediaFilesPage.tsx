@@ -1,9 +1,11 @@
 import { styled } from "@mui/material";
 import useSize from "@react-hook/size";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMediaFiles } from "../../plocs/media_files/actions";
+import { MediaFile } from "../../plocs/media_files/models";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
+import { playMediaFile } from "../../plocs/playback/actions";
 import { MediaFilesList } from "./components/MediaFilesList";
 
 const PageBase = styled('div')`
@@ -30,10 +32,19 @@ export const MediaFilesPage = () => {
     dispatch(fetchMediaFiles());
   }, []);
 
+  const onMediaFileSelected = useCallback((mediaFile: MediaFile) => {
+    dispatch(playMediaFile(mediaFile.Path));
+  }, []);
+
   return (
     <PageBase>
       <ListContainer ref={node => node && setParentRef(node)}>
-        <MediaFilesList mediaFiles={[...Object.values(mediaFiles)]} width={width} height={height} />
+        <MediaFilesList
+          mediaFiles={[...Object.values(mediaFiles)]}
+          width={width}
+          height={height}
+          onMediaFileSelected={onMediaFileSelected}
+        />
       </ListContainer>
     </PageBase>
   );
