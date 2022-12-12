@@ -6,10 +6,11 @@ type Props<T> = {
   width: number,
   height: number,
   rowSize: number,
+  onSelected: (entry: T) => void,
   entryRenderer: (props: { entry: T, idx: number }) => ReactElement
 };
 
-export function VirtualList<T>({ data, height, rowSize, entryRenderer }: Props<T>) {
+export function VirtualList<T>({ data, height, rowSize, entryRenderer, onSelected }: Props<T>) {
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -48,6 +49,7 @@ export function VirtualList<T>({ data, height, rowSize, entryRenderer }: Props<T
                   height: `${virtualItem.size}px`,
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
+                onClick={() => onSelected(data[itemIdx])}
               >
                 {
                   entryRenderer({ entry: data[itemIdx], idx: itemIdx })

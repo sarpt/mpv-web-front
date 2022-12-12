@@ -8,6 +8,7 @@ import { MediaFile } from "../../../plocs/media_files/models";
 
 type Props = {
   mediaFiles: MediaFile[],
+  onMediaFileSelected: (mediaFile: MediaFile) => void,
   width: number,
   height: number, 
 };
@@ -36,8 +37,15 @@ const ItemRender = (props: { entry: MediaFile, idx: number }) => {
   );
 };
 
-export const MediaFilesList = ({ mediaFiles, height, width }: Props) => {
+export const MediaFilesList = ({ mediaFiles, height, width, onMediaFileSelected }: Props) => {
   return (
-    <VirtualList width={width} height={height} data={mediaFiles} rowSize={rowSize} entryRenderer={ItemRender} />
+    <VirtualList
+      width={width}
+      height={height}
+      data={mediaFiles}
+      rowSize={rowSize}
+      entryRenderer={ItemRender}
+      onSelected={onMediaFileSelected}
+    />
   );
 };

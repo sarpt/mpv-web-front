@@ -3,7 +3,7 @@ import {
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-import { fetchPlayback, playbackFetched, playbackFetchError, subscribeToPlayback } from "./actions";
+import { fetchPlayback, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback } from "./actions";
 import { PlaybackSubscriptions } from '../../../../domains/playback/entities';
 
 export const fetchPlaybackEffect = async (action: ReturnType<typeof fetchPlayback>, listenerApi: AppListenerEffectAPI) => {
@@ -41,4 +41,9 @@ export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscr
 
   listenerApi.fork(iterateOverMediaFilesChanges(subscriptions.mediaFileChange, listenerApi));
   listenerApi.fork(iterateOverPauseChanges(subscriptions.pauseChange, listenerApi));
+}
+
+export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {
+  const playMediaFileUC = resolve(Dependencies.PlayMediaFileUC)();
+  await playMediaFileUC.invoke(action.payload.mediaFilePath);
 }
