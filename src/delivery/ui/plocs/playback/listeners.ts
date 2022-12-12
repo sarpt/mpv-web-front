@@ -29,8 +29,16 @@ export const iterateOverMediaFilesChanges = (subscription: PlaybackSubscriptions
 
 export const iterateOverPauseChanges = (subscription: PlaybackSubscriptions['pauseChange'], listenerApi: AppListenerEffectAPI) => {
   return async () => {
-    for await (const mediaFiles of subscription) {
-      listenerApi.dispatch(playbackFetched(mediaFiles));
+    for await (const playback of subscription) {
+      listenerApi.dispatch(playbackFetched(playback));
+    }
+  }
+}
+
+export const iterateOverPlaybackChangeTime = (subscription: PlaybackSubscriptions['changeTime'], listenerApi: AppListenerEffectAPI) => {
+  return async () => {
+    for await (const playback of subscription) {
+      listenerApi.dispatch(playbackFetched(playback));
     }
   }
 }
@@ -41,6 +49,7 @@ export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscr
 
   listenerApi.fork(iterateOverMediaFilesChanges(subscriptions.mediaFileChange, listenerApi));
   listenerApi.fork(iterateOverPauseChanges(subscriptions.pauseChange, listenerApi));
+  listenerApi.fork(iterateOverPlaybackChangeTime(subscriptions.changeTime, listenerApi));
 }
 
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {
