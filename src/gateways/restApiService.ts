@@ -29,6 +29,16 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
     }
   }
 
+  async fetchPlayback(): Promise<Playback | undefined> {
+    try {
+      const response = await fetch(`http://${address}/rest/playback`);
+      return (await response.json()).playback;
+    } catch (err) {
+      // TODO: add error handling idiot
+      return;
+    }
+  }
+
   async playMediaFile(path: string, append?: boolean): Promise<void> {
     const formData = new FormData();
     formData.set('path', path);

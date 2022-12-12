@@ -7,7 +7,6 @@ import { MediaFilesSubscriptions } from "../../../../domains/media_files/entitie
 import { AppListenerEffectAPI } from "../../reducers";
 
 export const fetchMediaFilesEffect = async (action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
-  console.log('fetch media files called');
   const fetchMediaFilesUC = resolve(Dependencies.FetchMediaFilesUC)();
   const { mediaFiles } = await fetchMediaFilesUC.invoke();
 
