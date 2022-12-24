@@ -5,5 +5,5 @@ export const Footer = styled('div')(({ theme }) => ({
   flexShrink: 0,
   flexGrow: 0,
   backgroundColor: theme.palette.primary.main,
-  font: theme.palette.primary.contrastText,
+  color: theme.palette.primary.contrastText,
 }));
