@@ -7,11 +7,14 @@ enum PlaybackActions {
   PlaybackFetched = 'PlaybackFetched',
   PlyabackFetchError = 'PlaybackFetchError',
   SubscribeToPlayback = 'SubscribeToPlayback',
+  UnsubscribeToPlayback = 'UnsubscribeToPlayback',
 }
 
 export const fetchPlayback = createAction(PlaybackActions.FetchPlayback);
 
 export const subscribeToPlayback = createAction(PlaybackActions.SubscribeToPlayback);
+
+export const unsubscribeToPlayback = createAction(PlaybackActions.UnsubscribeToPlayback);
 
 export const playMediaFile = createAction(PlaybackActions.PlayMediaFile, (mediaFilePath: string) => {
   return {

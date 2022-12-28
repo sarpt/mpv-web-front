@@ -3,8 +3,7 @@ import {
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-import { fetchPlayback, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback } from "./actions";
-import { PlaybackSubscriptions } from '../../../../domains/playback/entities';
+import { fetchPlayback, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
 
 export const fetchPlaybackEffect = async (action: ReturnType<typeof fetchPlayback>, listenerApi: AppListenerEffectAPI) => {
   const fetchPlaybackUC = resolve(Dependencies.FetchPlaybackUC)();
@@ -15,41 +14,22 @@ export const fetchPlaybackEffect = async (action: ReturnType<typeof fetchPlaybac
   } else {
     listenerApi.dispatch(playbackFetchError(''))
   }
-
-  listenerApi.dispatch(subscribeToPlayback());
 };
 
-export const iterateOverMediaFilesChanges = (subscription: PlaybackSubscriptions['mediaFileChange'], listenerApi: AppListenerEffectAPI) => {
-  return async () => {
-    for await (const playback of subscription) {
-      listenerApi.dispatch(playbackFetched(playback));
-    }
-  };
-}
-
-export const iterateOverPauseChanges = (subscription: PlaybackSubscriptions['pauseChange'], listenerApi: AppListenerEffectAPI) => {
-  return async () => {
-    for await (const playback of subscription) {
-      listenerApi.dispatch(playbackFetched(playback));
-    }
-  }
-}
-
-export const iterateOverPlaybackChangeTime = (subscription: PlaybackSubscriptions['changeTime'], listenerApi: AppListenerEffectAPI) => {
-  return async () => {
-    for await (const playback of subscription) {
-      listenerApi.dispatch(playbackFetched(playback));
-    }
-  }
-}
-
+const playbackPollTimeoutMs = 200;
 export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscribeToPlayback>, listenerApi: AppListenerEffectAPI) => {
-  const subscribeToMediaFilesUC = resolve(Dependencies.SubscribeToPlaybackUC)();
-  const { subscriptions } = await subscribeToMediaFilesUC.invoke();
+    listenerApi.unsubscribe()
 
-  listenerApi.fork(iterateOverMediaFilesChanges(subscriptions.mediaFileChange, listenerApi));
-  listenerApi.fork(iterateOverPauseChanges(subscriptions.pauseChange, listenerApi));
-  listenerApi.fork(iterateOverPlaybackChangeTime(subscriptions.changeTime, listenerApi));
+    const pollingTask = listenerApi.fork(async (forkApi) => {
+      while (true) {
+        await forkApi.delay(playbackPollTimeoutMs)
+
+        listenerApi.dispatch(fetchPlayback());
+      }
+    })
+
+    await listenerApi.condition(unsubscribeToPlayback.match);
+    pollingTask.cancel();
 }
 
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {

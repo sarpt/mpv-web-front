@@ -2,7 +2,7 @@ import { styled } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { fetchPlayback } from "../../plocs/playback/actions";
+import { fetchPlayback, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
 import { selectPlayback } from "../../plocs/playback/selectors";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
@@ -39,7 +39,11 @@ export const PlaybackControls = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchPlayback());
+    dispatch(subscribeToPlayback());
+  
+    return () => {
+      dispatch(unsubscribeToPlayback());
+    };
   }, []);
 
   const currentMediaFile = useMemo(() => {
