@@ -3,7 +3,7 @@ import { FetchMediaFilesUC } from "../../../../../domains/media_files/usecases/f
 import { SubscribeToMediaFilesUC } from "../../../../../domains/media_files/usecases/subscribeToMediaFiles";
 import { container, Dependencies } from "../../../di";
 import { AppListenerEffectAPI } from "../../../store";
-import { fetchMediaFiles, subscribeToMediaFiles, mediaFilesAdded } from "../actions";
+import { fetchMediaFiles, subscribeToMediaFiles, mediaFilesFetched } from "../actions";
 import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "../listeners";
 
 describe('media files listeners', () => {
@@ -82,7 +82,7 @@ describe('media files listeners', () => {
 
       await fetchMediaFilesEffect(action, listenerApiMock);
     
-      expect(listenerApiMock.dispatch).toHaveBeenCalledWith(mediaFilesAdded(mediaFilesMap));
+      expect(listenerApiMock.dispatch).toHaveBeenCalledWith(mediaFilesFetched(mediaFilesMap));
     });
 
     it('should dispatch subscribeToMediaFiles action', async () => {

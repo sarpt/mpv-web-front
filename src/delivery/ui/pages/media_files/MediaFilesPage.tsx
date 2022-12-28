@@ -2,7 +2,7 @@ import { styled } from "@mui/material";
 import useSize from "@react-hook/size";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMediaFiles } from "../../plocs/media_files/actions";
+import { subscribeToMediaFiles, unsubscribeToMediaFiles } from "../../plocs/media_files/actions";
 import { MediaFile } from "../../plocs/media_files/models";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
 import { playMediaFile } from "../../plocs/playback/actions";
@@ -32,7 +32,11 @@ export const MediaFilesPage = () => {
   const playback = useSelector(selectPlayback);
 
   useEffect(() => {
-    dispatch(fetchMediaFiles());
+    dispatch(subscribeToMediaFiles());
+
+    return () => {
+      dispatch(unsubscribeToMediaFiles());
+    };
   }, []);
 
   const onMediaFileSelected = useCallback((mediaFile: MediaFile) => {

@@ -1,6 +1,6 @@
-import { MediaFilesMap, MediaFilesSubscriptions } from "../domains/media_files/entities";
+import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
-import { Playback, PlaybackSubscriptions } from "../domains/playback/entities";
+import { Playback } from "../domains/playback/entities";
 import { PlaybackRepository } from "../domains/playback/interfaces";
 import { EventsObserver } from "./eventsObserver";
 
@@ -33,7 +33,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
   async fetchPlayback(): Promise<Playback | undefined> {
     try {
       const response = await fetch(`http://${address}/rest/playback`);
-      return (await response.json()).playback;
+      return (await response.json());
     } catch (err) {
       // TODO: add error handling idiot
       return;
@@ -74,18 +74,4 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
     }
   }
 
-  subscribeToMediaFiles(): MediaFilesSubscriptions {
-    return {
-      added: this.eventObserver.observe<MediaFilesMap>('mediaFiles.added'),
-      removed: this.eventObserver.observe<MediaFilesMap>('mediaFiles.removed'),
-    };
-  }
-
-  subscribeToPlayback(): PlaybackSubscriptions {
-    return {
-      mediaFileChange: this.eventObserver.observe<Playback>('playback.mediaFileChange'),
-      pauseChange: this.eventObserver.observe<Playback>('playback.pauseChange'),
-      changeTime: this.eventObserver.observe<Playback>('playback.playbackTimeChange'),
-    };
-  }
 }
