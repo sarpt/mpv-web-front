@@ -29,6 +29,7 @@ export class EventsObserver {
       await this.waitTillEventsAvailable(eventName);
 
       while (this.eventsMap.get(eventName)?.length) {
+        await tick();
         const nextEvent = this.eventsMap.get(eventName)?.shift() ?? '';
         yield JSON.parse(nextEvent) as T;
       }

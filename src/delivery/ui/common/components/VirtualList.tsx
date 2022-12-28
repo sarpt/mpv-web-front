@@ -1,13 +1,15 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ReactElement, useRef } from "react";
 
-type Props<T> = {
+export type EntryRendererProps<T> = { entry: T, idx: number };
+
+export type Props<T> = {
   data: T[],
   width: number,
   height: number,
   rowSize: number,
   onSelected: (entry: T) => void,
-  entryRenderer: (props: { entry: T, idx: number }) => ReactElement
+  entryRenderer: (props: EntryRendererProps<T>) => ReactElement
 };
 
 export function VirtualList<T>({ data, height, rowSize, entryRenderer, onSelected }: Props<T>) {
