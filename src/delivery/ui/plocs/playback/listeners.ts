@@ -3,7 +3,7 @@ import {
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-import { fetchPlayback, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
+import { fetchPlayback, pause, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
 
 export const fetchPlaybackEffect = async (action: ReturnType<typeof fetchPlayback>, listenerApi: AppListenerEffectAPI) => {
   const fetchPlaybackUC = resolve(Dependencies.FetchPlaybackUC)();
@@ -35,4 +35,9 @@ export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscr
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {
   const playMediaFileUC = resolve(Dependencies.PlayMediaFileUC)();
   await playMediaFileUC.invoke(action.payload.mediaFilePath);
+}
+
+export const changePauseEffect = async (action: ReturnType<typeof pause>, listenerApi: AppListenerEffectAPI) => {
+  const pauseUC = resolve(Dependencies.PauseUC)();
+  await pauseUC.invoke(action.payload.paused);
 }

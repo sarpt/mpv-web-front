@@ -2,6 +2,7 @@ import { createAction } from "@reduxjs/toolkit";
 import { Playback } from "./models";
 
 enum PlaybackActions {
+  Pause = 'Pause',
   FetchPlayback = 'FetchMediaFiles',
   PlayMediaFile = 'PlayMediaFile',
   PlaybackFetched = 'PlaybackFetched',
@@ -20,6 +21,14 @@ export const playMediaFile = createAction(PlaybackActions.PlayMediaFile, (mediaF
   return {
     payload: {
       mediaFilePath,
+    },
+  };
+});
+
+export const pause = createAction(PlaybackActions.Pause, (paused: boolean) => {
+  return {
+    payload: {
+      paused,
     },
   };
 });
