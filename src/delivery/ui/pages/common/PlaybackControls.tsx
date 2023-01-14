@@ -1,11 +1,13 @@
-import { styled } from "@mui/material";
-import { useEffect, useMemo } from "react";
+import { IconButton, styled } from "@mui/material";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { fetchPlayback, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
+import { pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
 import { selectPlayback } from "../../plocs/playback/selectors";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Pause } from "@mui/icons-material";
 
 const PlaybackProgress = styled(LinearProgress)(({
   flexGrow: 1,
@@ -19,10 +21,17 @@ const PlaybackProgress = styled(LinearProgress)(({
 }));
 
 const PlaybackContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
+}));
+
+const ProgressInfoContainer = styled('div')(({
   padding: '10px',
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center'
+  alignItems: 'center',
+  width: '100%'
 }));
 
 const PlaybackTime = styled('span')(({
@@ -31,6 +40,18 @@ const PlaybackTime = styled('span')(({
   marginRight: 5,
   fontWeight: 'bold',
 }));
+
+const ButtonsContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center'
+}))
+
+const PlaybackControlButton = styled(IconButton)(({ theme }) => {
+  return {
+    color: theme.palette.primary.contrastText
+  };
+})
 
 export const PlaybackControls = () => {
   const playback = useSelector(selectPlayback);
@@ -70,12 +91,23 @@ export const PlaybackControls = () => {
     return secondsToHHMMSS(currentMediaFile.Duration);
   }, [currentMediaFile?.Duration]);
 
+  const togglePlayback = useCallback(() => {
+    dispatch(pause(!playback?.Paused));
+  }, [playback?.Paused]);
+
   return (
     <PlaybackContainer>
-      <PlaybackTime>
-        {playbackTime} / {mediaTime}
-      </PlaybackTime>
-      <PlaybackProgress variant="determinate" value={playbackProgress} />
+      <ProgressInfoContainer>
+        <PlaybackTime>
+          {playbackTime} / {mediaTime}
+        </PlaybackTime>
+        <PlaybackProgress variant="determinate" value={playbackProgress} />
+      </ProgressInfoContainer>
+      <ButtonsContainer>
+        <PlaybackControlButton aria-label="playChange" onClick={togglePlayback} disabled={!playback?.MediaFilePath}>
+          { playback?.Paused ? <PlayArrowIcon /> : <Pause /> }
+        </PlaybackControlButton>
+      </ButtonsContainer>
     </PlaybackContainer>
   );
 };
