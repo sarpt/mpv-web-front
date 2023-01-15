@@ -1,10 +1,18 @@
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
-import { Playback } from "../domains/playback/entities";
+import { LoopVariant, Playback } from "../domains/playback/entities";
 import { PlaybackRepository } from "../domains/playback/interfaces";
 import { EventsObserver } from "./eventsObserver";
 
 const address = 'localhost:3001';
+
+enum PlaybackParameters {
+  Append = 'append',
+  Path = 'path',
+  Pause = 'pause',
+  Fullscreen = 'fullscren',
+  LoopFile = 'loopFile',
+}
 
 export class RestApiService implements MediaFilesRepository, PlaybackRepository {
   private eventObserver: EventsObserver;
@@ -41,27 +49,35 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
   }
 
   async playMediaFile(path: string, append?: boolean): Promise<void> {
-    const formData = new FormData();
-    formData.set('path', path);
-
-    if (append) {
-      formData.set('append', `${append}`);
-    }
-
-    try {
-      await fetch(`http://${address}/rest/playback`, {
-        method: 'POST',
-        body: formData,
-      });
-    } catch (err) {
-      // TODO: add error handling idiot
-      return;
-    }
+    await this.postPlayback({
+      [PlaybackParameters.Path]: path,
+      [PlaybackParameters.Append]: append ?? false  
+    });
   }
 
   async setPause(paused: boolean): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.Pause]: paused
+    });
+  }
+
+  async setFullscreen(enabled: boolean): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.Fullscreen]: enabled
+    });
+  }
+
+  async setLoopFile(variant: LoopVariant): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.LoopFile]: variant
+    });
+  }
+
+  private async postPlayback(params: Partial<Record<PlaybackParameters, unknown>>): Promise<void> {
     const formData = new FormData();
-    formData.set('pause', `${paused}`);
+    for (const [key, value] of Object.entries(params)) {
+      formData.set(key, `${value}`);
+    }
 
     try {
       await fetch(`http://${address}/rest/playback`, {
@@ -73,5 +89,4 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
       return;
     }
   }
-
 }

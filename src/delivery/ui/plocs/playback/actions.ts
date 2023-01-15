@@ -1,12 +1,14 @@
 import { createAction } from "@reduxjs/toolkit";
-import { Playback } from "./models";
+import { LoopVariant, Playback } from "./models";
 
 enum PlaybackActions {
-  Pause = 'Pause',
   FetchPlayback = 'FetchMediaFiles',
-  PlayMediaFile = 'PlayMediaFile',
+  Fullscreen = 'Fullscreen',
+  Loop = 'Loop',
+  Pause = 'Pause',
   PlaybackFetched = 'PlaybackFetched',
   PlyabackFetchError = 'PlaybackFetchError',
+  PlayMediaFile = 'PlayMediaFile',
   SubscribeToPlayback = 'SubscribeToPlayback',
   UnsubscribeToPlayback = 'UnsubscribeToPlayback',
 }
@@ -29,6 +31,22 @@ export const pause = createAction(PlaybackActions.Pause, (paused: boolean) => {
   return {
     payload: {
       paused,
+    },
+  };
+});
+
+export const fullscreen = createAction(PlaybackActions.Fullscreen, (enabled: boolean) => {
+  return {
+    payload: {
+      enabled,
+    },
+  };
+});
+
+export const loop = createAction(PlaybackActions.Loop, (variant: LoopVariant) => {
+  return {
+    payload: {
+      variant,
     },
   };
 });

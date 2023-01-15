@@ -1,13 +1,14 @@
 import { IconButton, styled } from "@mui/material";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Pause } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
 import { pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
 import { selectPlayback } from "../../plocs/playback/selectors";
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Pause } from "@mui/icons-material";
 
 const PlaybackProgress = styled(LinearProgress)(({
   flexGrow: 1,
@@ -101,11 +102,22 @@ export const PlaybackControls = () => {
         <PlaybackTime>
           {playbackTime} / {mediaTime}
         </PlaybackTime>
-        <PlaybackProgress variant="determinate" value={playbackProgress} />
+        <PlaybackProgress
+          variant="determinate"
+          value={playbackProgress}
+        />
       </ProgressInfoContainer>
       <ButtonsContainer>
-        <PlaybackControlButton aria-label="playChange" onClick={togglePlayback} disabled={!playback?.MediaFilePath}>
-          { playback?.Paused ? <PlayArrowIcon /> : <Pause /> }
+        <PlaybackControlButton
+          aria-label="playChange"
+          onClick={togglePlayback}
+          disabled={!playback?.MediaFilePath}
+        >
+          {
+            playback?.Paused
+              ? <PlayArrowIcon />
+              : <Pause />
+          }
         </PlaybackControlButton>
       </ButtonsContainer>
     </PlaybackContainer>
