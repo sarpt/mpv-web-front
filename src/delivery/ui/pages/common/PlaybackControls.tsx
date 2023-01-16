@@ -1,12 +1,12 @@
 import { IconButton, styled } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Pause } from "@mui/icons-material";
+import { Fullscreen, FullscreenExit, Pause } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
+import { fullscreen, pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
 import { selectPlayback } from "../../plocs/playback/selectors";
 import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
 
@@ -96,6 +96,14 @@ export const PlaybackControls = () => {
     dispatch(pause(!playback?.Paused));
   }, [playback?.Paused]);
 
+  const toggleFullscreen = useCallback(() => {
+    dispatch(fullscreen(!playback?.Fullscreen));
+  }, [playback?.Fullscreen]);
+
+  const mediaFileSelected = useMemo(() => {
+    return !!playback?.MediaFilePath;
+  }, [playback?.MediaFilePath]);
+
   return (
     <PlaybackContainer>
       <ProgressInfoContainer>
@@ -111,12 +119,23 @@ export const PlaybackControls = () => {
         <PlaybackControlButton
           aria-label="playChange"
           onClick={togglePlayback}
-          disabled={!playback?.MediaFilePath}
+          disabled={!mediaFileSelected}
         >
           {
             playback?.Paused
               ? <PlayArrowIcon />
               : <Pause />
+          }
+        </PlaybackControlButton>
+        <PlaybackControlButton
+          aria-label="fullscreen"
+          onClick={toggleFullscreen}
+          disabled={!mediaFileSelected}
+        >
+          {
+            playback?.Fullscreen
+              ? <FullscreenExit />
+              : <Fullscreen/>
           }
         </PlaybackControlButton>
       </ButtonsContainer>
