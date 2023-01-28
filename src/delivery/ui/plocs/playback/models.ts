@@ -1,5 +1,10 @@
 import * as Entities from '../../../../domains/playback/entities';
 
-export type LoopVariant = Entities.LoopVariant;
+export enum LoopVariant {
+  File = 'file',
+  Playlist = 'playlist',
+  AB = 'ab',
+  Off = 'off',
+}
 
 export type Playback = Entities.Playback;

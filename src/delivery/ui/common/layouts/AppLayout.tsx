@@ -2,7 +2,7 @@ import { PageViewport } from '../components/PageViewport';
 import { Footer } from '../components/Footer';
 import { AppContainer } from '../components/AppContainer';
 import { MediaFilesPage } from '../../pages/media_files/MediaFilesPage';
-import { PlaybackControls } from '../../pages/common/PlaybackControls';
+import { PlaybackSummary } from '../../pages/common/PlaybackSummary';
 
 export const AppLayout = () => {
   return (
@@ -11,7 +11,7 @@ export const AppLayout = () => {
         <MediaFilesPage />
       </PageViewport>
       <Footer>
-        <PlaybackControls />
+        <PlaybackSummary />
       </Footer>
     </AppContainer>
   );
