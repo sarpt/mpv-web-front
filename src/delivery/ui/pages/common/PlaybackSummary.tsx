@@ -1,14 +1,16 @@
 import { IconButton, styled } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Fullscreen, FullscreenExit, Pause } from "@mui/icons-material";
-import { useCallback, useEffect, useMemo } from "react";
+import { Fullscreen, FullscreenExit, Loop, Pause } from "@mui/icons-material";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { fullscreen, pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
+import { fullscreen, loop, pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
 import { selectPlayback } from "../../plocs/playback/selectors";
 import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
+import { LoopDialog } from "./LoopDialog";
+import { LoopVariant } from "../../plocs/playback/models";
 
 const PlaybackProgress = styled(LinearProgress)(({
   flexGrow: 1,
@@ -54,7 +56,9 @@ const PlaybackControlButton = styled(IconButton)(({ theme }) => {
   };
 })
 
-export const PlaybackControls = () => {
+export const PlaybackSummary = () => {
+  const [loopDialogOpen, setLoopDialogOpen] = useState<boolean>(false);
+
   const playback = useSelector(selectPlayback);
   const mediaFiles = useSelector(selectMediaFiles);
 
@@ -138,6 +142,19 @@ export const PlaybackControls = () => {
               : <Fullscreen/>
           }
         </PlaybackControlButton>
+        <PlaybackControlButton
+          aria-label="loop"
+          onClick={() => setLoopDialogOpen(true)}
+          disabled={!mediaFileSelected}
+        >
+          <Loop />
+        </PlaybackControlButton>
+        <LoopDialog
+          currentVariant={playback?.Loop.Variant ?? LoopVariant.Off}
+          open={loopDialogOpen}
+          onOk={(variant) => { dispatch(loop(variant)); setLoopDialogOpen(false) }}
+          onClose={() => setLoopDialogOpen(false)}
+        />
       </ButtonsContainer>
     </PlaybackContainer>
   );
