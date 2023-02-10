@@ -104,6 +104,11 @@ export const PlaybackSummary = () => {
     dispatch(fullscreen(!playback?.Fullscreen));
   }, [playback?.Fullscreen]);
 
+  const onLoopChange = useCallback((variant: LoopVariant) => {
+    dispatch(loop(variant));
+    setLoopDialogOpen(false); 
+  }, []);
+
   const mediaFileSelected = useMemo(() => {
     return !!playback?.MediaFilePath;
   }, [playback?.MediaFilePath]);
@@ -152,7 +157,7 @@ export const PlaybackSummary = () => {
         <LoopDialog
           currentVariant={playback?.Loop.Variant ?? LoopVariant.Off}
           open={loopDialogOpen}
-          onOk={(variant) => { dispatch(loop(variant)); setLoopDialogOpen(false) }}
+          onOk={onLoopChange}
           onClose={() => setLoopDialogOpen(false)}
         />
       </ButtonsContainer>

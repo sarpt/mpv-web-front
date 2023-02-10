@@ -1,7 +1,7 @@
 import { fetchMediaFiles, subscribeToMediaFiles } from "./plocs/media_files/actions";
 import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "./plocs/media_files/listeners";
-import { fetchPlayback, pause, playMediaFile, subscribeToPlayback } from "./plocs/playback/actions";
-import { changePauseEffect, fetchPlaybackEffect, playMediaFileEffect, subscribeToPlaybackEffect } from "./plocs/playback/listeners";
+import { fetchPlayback, fullscreen, loop, pause, playMediaFile, subscribeToPlayback } from "./plocs/playback/actions";
+import { changePauseEffect, fetchPlaybackEffect, fullscreenEffect, loopEffect, playMediaFileEffect, subscribeToPlaybackEffect } from "./plocs/playback/listeners";
 import { appListenersMiddleware, startAppListening } from "./reducers";
 
 export function initListeners() {
@@ -33,6 +33,16 @@ export function initListeners() {
   startAppListening({
     actionCreator: pause,
     effect: changePauseEffect,
+  });
+
+  startAppListening({
+    actionCreator: fullscreen,
+    effect: fullscreenEffect,
+  });
+
+  startAppListening({
+    actionCreator: loop,
+    effect: loopEffect,
   });
 
   return appListenersMiddleware;
