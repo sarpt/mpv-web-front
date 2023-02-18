@@ -2,6 +2,8 @@ import { createAction } from "@reduxjs/toolkit";
 import { LoopVariant, Playback } from "./models";
 
 enum PlaybackActions {
+  ChangeAudio = 'ChangeAudio',
+  ChangeSubtitles = 'ChangeSubtitles',
   FetchPlayback = 'FetchMediaFiles',
   Fullscreen = 'Fullscreen',
   Loop = 'Loop',
@@ -12,6 +14,22 @@ enum PlaybackActions {
   SubscribeToPlayback = 'SubscribeToPlayback',
   UnsubscribeToPlayback = 'UnsubscribeToPlayback',
 }
+
+export const changeAudio = createAction(PlaybackActions.ChangeAudio, (audioId: string) => {
+  return {
+    payload: {
+      audioId,
+    },
+  };
+});
+
+export const changeSubtitles = createAction(PlaybackActions.ChangeSubtitles, (subtitleId: string) => {
+  return {
+    payload: {
+      subtitleId,
+    },
+  };
+});
 
 export const fetchPlayback = createAction(PlaybackActions.FetchPlayback);
 
