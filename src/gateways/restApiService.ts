@@ -7,11 +7,13 @@ import { EventsObserver } from "./eventsObserver";
 const address = 'localhost:3001';
 
 enum PlaybackParameters {
+  AudioId = 'audioID',
   Append = 'append',
   Path = 'path',
   Pause = 'pause',
   Fullscreen = 'fullscren',
   LoopFile = 'loopFile',
+  SubtitleId = 'subtitleID',
 }
 
 export class RestApiService implements MediaFilesRepository, PlaybackRepository {
@@ -26,6 +28,18 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
 
     const eventsSource = new EventSource(url.toString());
     this.eventObserver.setSource(eventsSource);
+  }
+
+  async changeAudio(audioId: string): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.AudioId]: audioId
+    });
+  }
+
+  async changeSubtitles(subtitleId: string): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.SubtitleId]: subtitleId
+    });
   }
 
   async fetchMediaFiles(): Promise<MediaFilesMap> {

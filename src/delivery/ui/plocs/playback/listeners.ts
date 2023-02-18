@@ -3,7 +3,7 @@ import {
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-import { fetchPlayback, fullscreen, loop, pause, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
+import { changeAudio, changeSubtitles, fetchPlayback, fullscreen, loop, pause, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
 
 export const fetchPlaybackEffect = async (action: ReturnType<typeof fetchPlayback>, listenerApi: AppListenerEffectAPI) => {
   const fetchPlaybackUC = resolve(Dependencies.FetchPlaybackUC)();
@@ -35,6 +35,16 @@ export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscr
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {
   const playMediaFileUC = resolve(Dependencies.PlayMediaFileUC)();
   await playMediaFileUC.invoke(action.payload.mediaFilePath);
+}
+
+export const changeAudioEffect = async (action: ReturnType<typeof changeAudio>, listenerApi: AppListenerEffectAPI) => {
+  const changeAudioUC = resolve(Dependencies.ChangeAudioUC)();
+  await changeAudioUC.invoke({ audioId: action.payload.audioId });
+}
+
+export const changeSubtitlesEffect = async (action: ReturnType<typeof changeSubtitles>, listenerApi: AppListenerEffectAPI) => {
+  const changeSubtitlesUC = resolve(Dependencies.ChangeSubtitlesUC)();
+  await changeSubtitlesUC.invoke({ subtitleId: action.payload.subtitleId });
 }
 
 export const changePauseEffect = async (action: ReturnType<typeof pause>, listenerApi: AppListenerEffectAPI) => {
