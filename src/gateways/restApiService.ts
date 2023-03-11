@@ -11,7 +11,7 @@ enum PlaybackParameters {
   Append = 'append',
   Path = 'path',
   Pause = 'pause',
-  Fullscreen = 'fullscren',
+  Fullscreen = 'fullscreen',
   LoopFile = 'loopFile',
   SubtitleId = 'subtitleID',
 }
@@ -83,7 +83,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
 
   async setLoopFile(variant: LoopVariant): Promise<void> {
     await this.postPlayback({
-      [PlaybackParameters.LoopFile]: variant
+      [PlaybackParameters.LoopFile]: variant === LoopVariant.File
     });
   }
 
