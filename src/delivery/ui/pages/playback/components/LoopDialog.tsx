@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { LoopVariant } from "../../plocs/playback/models";
+import { LoopVariant } from "../../../plocs/playback/models";
 
 type Props = {
   currentVariant: LoopVariant,

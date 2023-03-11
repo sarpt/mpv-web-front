@@ -6,7 +6,7 @@ import { subscribeToMediaFiles, unsubscribeToMediaFiles } from "../../plocs/medi
 import { MediaFile } from "../../plocs/media_files/models";
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
 import { playMediaFile } from "../../plocs/playback/actions";
-import { selectPlayback } from "../../plocs/playback/selectors";
+import { selectMediaFilePath } from "../../plocs/playback/selectors";
 import { List } from "./components/List";
 
 const PageBase = styled('div')`
@@ -29,7 +29,7 @@ export const MediaFilesPage = () => {
   const dispatch = useDispatch();
 
   const mediaFiles = useSelector(selectMediaFiles);
-  const playback = useSelector(selectPlayback);
+  const playbackMediaFilePath = useSelector(selectMediaFilePath);
 
   useEffect(() => {
     dispatch(subscribeToMediaFiles());
@@ -44,10 +44,10 @@ export const MediaFilesPage = () => {
   }, []);
 
   const currentMediaFile = useMemo(() => {
-    if (!playback?.MediaFilePath) return undefined;
+    if (!playbackMediaFilePath) return undefined;
 
-    return mediaFiles[playback.MediaFilePath];
-  }, [playback?.MediaFilePath, mediaFiles]);
+    return mediaFiles[playbackMediaFilePath];
+  }, [playbackMediaFilePath, mediaFiles]);
 
   return (
     <PageBase>

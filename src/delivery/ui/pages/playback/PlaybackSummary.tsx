@@ -4,46 +4,19 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { Fullscreen, FullscreenExit, Loop, Pause } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { selectMediaFiles } from "../../plocs/media_files/selectors";
 import { changeAudio, changeSubtitles, fullscreen, loop, pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
-import { selectPlayback } from "../../plocs/playback/selectors";
-import { secondsToHHMMSS } from "../../plocs/playback/functions/formatTime";
-import { LoopDialog } from "./LoopDialog";
+import { selectAudioId, selectFullscreen, selectLoopVariant, selectMediaFilePath, selectPaused, selectSubtitleId } from "../../plocs/playback/selectors";
+import { LoopDialog } from "./components/LoopDialog";
 import { LoopVariant } from "../../plocs/playback/models";
-import { AudioSubtitleDialog } from "./AudioSubtitleDialog";
-
-const PlaybackProgress = styled(LinearProgress)(({
-  flexGrow: 1,
-  flexShrink: 1,
-  [`&.${linearProgressClasses.root}`]: {
-    height: '10px'
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    backgroundColor: '#1b007a',
-  },
-}));
+import { AudioSubtitleDialog } from "./components/AudioSubtitleDialog";
+import { Progress } from "./components/Progress";
 
 const PlaybackContainer = styled('div')(({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center'
-}));
-
-const ProgressInfoContainer = styled('div')(({
-  padding: '10px',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  width: '100%'
-}));
-
-const PlaybackTime = styled('span')(({
-  flexGrow: 0,
-  flexShrink: 1,
-  marginRight: 5,
-  fontWeight: 'bold',
 }));
 
 const ButtonsContainer = styled('div')(({
@@ -62,8 +35,14 @@ export const PlaybackSummary = () => {
   const [loopDialogOpen, setLoopDialogOpen] = useState<boolean>(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState<boolean>(false);
 
-  const playback = useSelector(selectPlayback);
   const mediaFiles = useSelector(selectMediaFiles);
+
+  const playbackMediaFilePath = useSelector(selectMediaFilePath);
+  const playbackPaused = useSelector(selectPaused);
+  const playbackFullscreen = useSelector(selectFullscreen);
+  const currentSubtitleId = useSelector(selectSubtitleId);
+  const currentAudioId = useSelector(selectAudioId);
+  const currentLoopVariant = useSelector(selectLoopVariant);
 
   const dispatch = useDispatch();
 
@@ -76,42 +55,24 @@ export const PlaybackSummary = () => {
   }, []);
 
   const currentMediaFile = useMemo(() => {
-    if (!playback?.MediaFilePath) return undefined;
+    if (!playbackMediaFilePath) return undefined;
 
-    return mediaFiles[playback.MediaFilePath];
-  }, [playback?.MediaFilePath, mediaFiles]);
-
-  const playbackProgress = useMemo(() => {
-    if (!currentMediaFile?.Duration || !playback?.CurrentTime) return 0;
-
-    return (playback.CurrentTime / currentMediaFile.Duration) * 100;
-  }, [playback?.CurrentTime, currentMediaFile?.Duration]);
-
-  const playbackTime = useMemo(() => {
-    if (!playback?.CurrentTime) return '';
-
-    return secondsToHHMMSS(playback.CurrentTime);
-  }, [playback?.CurrentTime]);
-
-  const mediaTime = useMemo(() => {
-    if (!currentMediaFile?.Duration) return '';
-
-    return secondsToHHMMSS(currentMediaFile.Duration);
-  }, [currentMediaFile?.Duration]);
+    return mediaFiles[playbackMediaFilePath];
+  }, [playbackMediaFilePath, mediaFiles]);
 
   const togglePlayback = useCallback(() => {
-    dispatch(pause(!playback?.Paused));
-  }, [playback?.Paused]);
+    dispatch(pause(!playbackPaused));
+  }, [playbackPaused]);
 
   const toggleFullscreen = useCallback(() => {
-    dispatch(fullscreen(!playback?.Fullscreen));
-  }, [playback?.Fullscreen]);
+    dispatch(fullscreen(!playbackFullscreen));
+  }, [playbackFullscreen]);
 
   const onLanguageChange = useCallback((args: { subtitleId?: string, audioId?: string }) => {
-    if (args.subtitleId && args.subtitleId !== playback?.SelectedSubtitleID) dispatch(changeSubtitles(args.subtitleId));
-    if (args.audioId && args.audioId !== playback?.SelectedAudioID) dispatch(changeAudio(args.audioId));
+    if (args.subtitleId && args.subtitleId !== currentSubtitleId) dispatch(changeSubtitles(args.subtitleId));
+    if (args.audioId && args.audioId !== currentAudioId) dispatch(changeAudio(args.audioId));
     setLoopDialogOpen(false); 
-  }, [playback?.SelectedSubtitleID, playback?.SelectedAudioID]);
+  }, [currentSubtitleId, currentAudioId]);
 
   const onLoopChange = useCallback((variant: LoopVariant) => {
     dispatch(loop(variant));
@@ -119,20 +80,12 @@ export const PlaybackSummary = () => {
   }, []);
 
   const mediaFileSelected = useMemo(() => {
-    return !!playback?.MediaFilePath;
-  }, [playback?.MediaFilePath]);
+    return !!playbackMediaFilePath;
+  }, [playbackMediaFilePath]);
 
   return (
     <PlaybackContainer>
-      <ProgressInfoContainer>
-        <PlaybackTime>
-          {playbackTime} / {mediaTime}
-        </PlaybackTime>
-        <PlaybackProgress
-          variant="determinate"
-          value={playbackProgress}
-        />
-      </ProgressInfoContainer>
+      <Progress/>
       <ButtonsContainer>
         <PlaybackControlButton
           aria-label="playChange"
@@ -140,7 +93,7 @@ export const PlaybackSummary = () => {
           disabled={!mediaFileSelected}
         >
           {
-            playback?.Paused
+            playbackPaused
               ? <PlayArrowIcon />
               : <Pause />
           }
@@ -151,7 +104,7 @@ export const PlaybackSummary = () => {
           disabled={!mediaFileSelected}
         >
           {
-            playback?.Fullscreen
+            playbackFullscreen
               ? <FullscreenExit />
               : <Fullscreen/>
           }
@@ -171,7 +124,7 @@ export const PlaybackSummary = () => {
           <LanguageIcon />
         </PlaybackControlButton>
         <LoopDialog
-          currentVariant={playback?.Loop.Variant ?? LoopVariant.Off}
+          currentVariant={currentLoopVariant ?? LoopVariant.Off}
           open={loopDialogOpen}
           onOk={onLoopChange}
           onClose={() => setLoopDialogOpen(false)}
