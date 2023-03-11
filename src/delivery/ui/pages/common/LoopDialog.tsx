@@ -18,19 +18,19 @@ export const LoopDialog = ({ currentVariant, open, onClose, onOk }: Props) => {
 
   const handleOk = useCallback(() => {
     onOk(loopValue);
-  }, [handleClose]);
+  }, [handleClose, loopValue]);
 
   useEffect(() => {
     if (open) setLoopValue(currentVariant);
   }, [open]);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoopValue((event.target as HTMLInputElement).value as LoopVariant);
+    setLoopValue(event.target.value as LoopVariant);
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Subscribe</DialogTitle>
+      <DialogTitle>Loop</DialogTitle>
       <DialogContent>
         <FormControl>
           <RadioGroup
