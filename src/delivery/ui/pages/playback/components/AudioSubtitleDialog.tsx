@@ -31,7 +31,7 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
       subtitleId,
       audioId,
     });
-  }, [handleClose]);
+  }, [subtitleId, audioId]);
 
   useEffect(() => {
     if (!open || !mediaFile) return;
@@ -41,26 +41,30 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
   }, [open, mediaFile]);
 
   const onSubtitleChange = (event: SelectChangeEvent) => {
-    console.log('onSubtitleChange');
     setSubtitleId(event.target.value);
   };
 
   const onAudioChange = (event: SelectChangeEvent) => {
-    console.log('onAudioChange');
     setAudioId(event.target.value);
   };
 
   const subtitles = useMemo(() => {
     if (!mediaFile) return [];
 
-    return mediaFile.SubtitleStreams;
-  }, [mediaFile])
+    return [
+      ...mediaFile.SubtitleStreams,
+      { SubtitleID: 'no', Language: 'none', Title: 'Off' } // TODO: this should be returned from API
+    ];
+  }, [mediaFile]);
 
   const audios = useMemo(() => {
     if (!mediaFile) return [];
 
-    return mediaFile.AudioStreams;
-  }, [mediaFile])
+    return [
+      ...mediaFile.AudioStreams,
+      { AudioID: 'no', Language: 'none', Title: 'Off' }
+    ];
+  }, [mediaFile]);
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -79,7 +83,12 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
             >
               {
                 audios.map(audio => (
-                  <MenuItem key={audio.AudioID} value={audio.AudioID}>{`${audio.Title} (${audio.Language})`}</MenuItem>
+                  <MenuItem
+                    key={audio.AudioID}
+                    value={audio.AudioID}
+                  >
+                    {`${audio.Title} (${audio.Language})`}
+                  </MenuItem>
                 ))
               }
             </Select>
@@ -96,7 +105,12 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
             >
               {
                 subtitles.map(subtitle => (
-                  <MenuItem key={subtitle.SubtitleID} value={subtitle.SubtitleID}>{`${subtitle.Title} (${subtitle.Language})`}</MenuItem>
+                  <MenuItem
+                    key={subtitle.SubtitleID}
+                    value={subtitle.SubtitleID}
+                  >
+                    {`${subtitle.Title} (${subtitle.Language})`}
+                  </MenuItem>
                 ))
               }
             </Select>

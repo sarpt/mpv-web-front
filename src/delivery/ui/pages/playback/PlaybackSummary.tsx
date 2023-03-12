@@ -71,7 +71,7 @@ export const PlaybackSummary = () => {
   const onLanguageChange = useCallback((args: { subtitleId?: string, audioId?: string }) => {
     if (args.subtitleId && args.subtitleId !== currentSubtitleId) dispatch(changeSubtitles(args.subtitleId));
     if (args.audioId && args.audioId !== currentAudioId) dispatch(changeAudio(args.audioId));
-    setLoopDialogOpen(false); 
+    setLanguageDialogOpen(false); 
   }, [currentSubtitleId, currentAudioId]);
 
   const onLoopChange = useCallback((variant: LoopVariant) => {
@@ -91,6 +91,7 @@ export const PlaybackSummary = () => {
           aria-label="playChange"
           onClick={togglePlayback}
           disabled={!mediaFileSelected}
+          title={playbackPaused ? 'Play' : 'Pause'}
         >
           {
             playbackPaused
@@ -102,10 +103,11 @@ export const PlaybackSummary = () => {
           aria-label="fullscreen"
           onClick={toggleFullscreen}
           disabled={!mediaFileSelected}
+          title={playbackFullscreen ? 'Go fullscreen' : 'Exit fullscreen'}
         >
           {
             playbackFullscreen
-              ? <FullscreenExit />
+              ? <FullscreenExit/>
               : <Fullscreen/>
           }
         </PlaybackControlButton>
@@ -113,6 +115,7 @@ export const PlaybackSummary = () => {
           aria-label="loop"
           onClick={() => setLoopDialogOpen(true)}
           disabled={!mediaFileSelected}
+          title='Change loop options'
         >
           <Loop />
         </PlaybackControlButton>
@@ -120,6 +123,7 @@ export const PlaybackSummary = () => {
           aria-label="language"
           onClick={() => setLanguageDialogOpen(true)}
           disabled={!mediaFileSelected}
+          title='Audio & Video language'
         >
           <LanguageIcon />
         </PlaybackControlButton>
@@ -131,6 +135,8 @@ export const PlaybackSummary = () => {
         />
         <AudioSubtitleDialog
           mediaFile={currentMediaFile}
+          currentSubtitleId={currentSubtitleId}
+          currentAudioId={currentAudioId}
           open={languageDialogOpen}
           onOk={onLanguageChange}
           onClose={() => setLanguageDialogOpen(false)}
