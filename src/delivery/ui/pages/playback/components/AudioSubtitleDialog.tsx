@@ -51,19 +51,13 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
   const subtitles = useMemo(() => {
     if (!mediaFile) return [];
 
-    return [
-      ...mediaFile.SubtitleStreams,
-      { SubtitleID: 'no', Language: 'none', Title: 'Off' } // TODO: this should be returned from API
-    ];
+    return mediaFile.SubtitleStreams;
   }, [mediaFile]);
 
   const audios = useMemo(() => {
     if (!mediaFile) return [];
 
-    return [
-      ...mediaFile.AudioStreams,
-      { AudioID: 'no', Language: 'none', Title: 'Off' }
-    ];
+    return mediaFile.AudioStreams;
   }, [mediaFile]);
 
   return (
