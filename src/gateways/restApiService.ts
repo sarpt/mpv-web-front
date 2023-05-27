@@ -16,8 +16,38 @@ enum PlaybackParameters {
   SubtitleId = 'subtitleID',
 }
 
+enum DomainNames {
+  MediaFiles = 'MediaFiles',
+  Playback = 'Playback',
+}
+
+const etagHeader = 'Etag';
+
+type Domain<T = unknown> = {
+  etag?: string | undefined,
+  latestPayload?: T,
+  path: string,
+  responseJsonHandler: (json: any) => T,
+}
+
+type Domains = {
+  [DomainNames.MediaFiles]: Domain<MediaFilesMap>,
+  [DomainNames.Playback]: Domain<Playback>,
+}
+
 export class RestApiService implements MediaFilesRepository, PlaybackRepository {
   private eventObserver: EventsObserver;
+
+  private domains: Domains  = {
+    [DomainNames.MediaFiles]: {
+      path: '/media-files',
+      responseJsonHandler: (jsonPayload) => jsonPayload.mediaFiles,
+    },
+    [DomainNames.Playback]: {
+      path: '/playback',
+      responseJsonHandler: (jsonPayload) => jsonPayload,
+    },
+  };
 
   constructor() {
     const url = new URL(`http://${address}/sse/channels`);
@@ -44,8 +74,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
 
   async fetchMediaFiles(): Promise<MediaFilesMap> {
     try {
-      const response = await fetch(`http://${address}/rest/media-files`);
-      return (await response.json()).mediaFiles;
+      return await this.fetchRestData(DomainNames.MediaFiles) as MediaFilesMap;
     } catch (err) {
       // TODO: add error handling idiot
       return {};
@@ -54,8 +83,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
 
   async fetchPlayback(): Promise<Playback | undefined> {
     try {
-      const response = await fetch(`http://${address}/rest/playback`);
-      return (await response.json());
+      return await this.fetchRestData(DomainNames.Playback) as Playback;
     } catch (err) {
       // TODO: add error handling idiot
       return;
@@ -102,5 +130,20 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
       // TODO: add error handling idiot
       return;
     }
+  }
+
+  private async fetchRestData(domainName: DomainNames) {
+    const domain = this.domains[domainName];
+    const headers = new Headers();
+    if (!domain) throw new Error('domain has no handling information');
+
+    if (domain?.etag) headers.set(etagHeader, domain.etag);
+
+    const response = await fetch(`http://${address}/rest${domain.path}`, { headers });
+    if (response.status === 304) {
+      return domain.latestPayload;
+    }
+
+    return domain.responseJsonHandler(await response.json());
   }
 }
