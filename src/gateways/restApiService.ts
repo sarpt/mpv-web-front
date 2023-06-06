@@ -22,9 +22,11 @@ enum DomainNames {
 }
 
 const etagHeader = 'Etag';
+const cacheControlHeader = 'Cache-Control';
+const cacheControlForEtag = 'no-cache';
 
-type Domain<T = unknown> = {
-  etag?: string | undefined,
+type Domain<T = unknown> =  {
+  etag?: string | undefined | null,
   latestPayload?: T,
   path: string,
   responseJsonHandler: (json: any) => T,
@@ -137,13 +139,19 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
     const headers = new Headers();
     if (!domain) throw new Error('domain has no handling information');
 
-    if (domain?.etag) headers.set(etagHeader, domain.etag);
+    if (domain?.etag) {
+      headers.set(etagHeader, domain.etag);
+      headers.set(cacheControlHeader, cacheControlForEtag);
+    }
 
     const response = await fetch(`http://${address}/rest${domain.path}`, { headers });
     if (response.status === 304) {
       return domain.latestPayload;
     }
 
-    return domain.responseJsonHandler(await response.json());
+    const payload = domain.responseJsonHandler(await response.json());
+    this.domains[domainName].etag = response.headers.get(etagHeader);
+    this.domains[domainName].latestPayload = payload;
+    return payload;
   }
 }

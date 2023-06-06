@@ -4,7 +4,7 @@ import { LoopVariant, Playback } from "./models";
 enum PlaybackActions {
   ChangeAudio = 'ChangeAudio',
   ChangeSubtitles = 'ChangeSubtitles',
-  FetchPlayback = 'FetchMediaFiles',
+  FetchPlayback = 'FetchPlayback',
   Fullscreen = 'Fullscreen',
   Loop = 'Loop',
   Pause = 'Pause',
