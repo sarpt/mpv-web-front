@@ -18,9 +18,9 @@ export const subscribeToMediaFilesEffect = async (action: ReturnType<typeof subs
 
     const pollingTask = listenerApi.fork(async (forkApi) => {
       while (true) {
-        await forkApi.delay(mediaFilesPollTimeoutMs)
-
         listenerApi.dispatch(fetchMediaFiles());
+
+        await forkApi.delay(mediaFilesPollTimeoutMs)
       }
     })
 
