@@ -1,14 +1,14 @@
 import { PageViewport } from '../components/PageViewport';
 import { Footer } from '../components/Footer';
 import { AppContainer } from '../components/AppContainer';
-import { MediaFilesPage } from '../../pages/media_files/MediaFilesPage';
 import { PlaybackSummary } from '../../pages/playback/PlaybackSummary';
+import { FC, PropsWithChildren } from 'react';
 
-export const AppLayout = () => {
+export const AppLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
   return (
     <AppContainer>
       <PageViewport>
-        <MediaFilesPage />
+        {children}
       </PageViewport>
       <Footer>
         <PlaybackSummary />
