@@ -42,3 +42,8 @@ export const selectLoopVariant = createSelector(
   selectPlayback,
   (playback) => playback?.Loop.Variant,
 );
+
+export const selectPlaylistUuid = createSelector(
+  selectPlayback,
+  (playback) => playback?.PlaylistUUID
+);
