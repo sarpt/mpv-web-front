@@ -2,6 +2,8 @@ import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
 import { PlaybackRepository } from "../domains/playback/interfaces";
+import { PlaylistsMap } from "../domains/playlists/entities";
+import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { EventsObserver } from "./eventsObserver";
 
 const address = 'localhost:3001';
@@ -19,7 +21,14 @@ enum PlaybackParameters {
 enum DomainNames {
   MediaFiles = 'MediaFiles',
   Playback = 'Playback',
+  Playlists = 'Playlists',
 }
+
+const sseChannels = [
+  'mediaFiles',
+  'playback',
+  'playlists'
+];
 
 const etagHeader = 'Etag';
 const cacheControlHeader = 'Cache-Control';
@@ -35,9 +44,10 @@ type Domain<T = unknown> =  {
 type Domains = {
   [DomainNames.MediaFiles]: Domain<MediaFilesMap>,
   [DomainNames.Playback]: Domain<Playback>,
+  [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements MediaFilesRepository, PlaybackRepository {
+export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository {
   private eventObserver: EventsObserver;
 
   private domains: Domains  = {
@@ -49,12 +59,17 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
       path: '/playback',
       responseJsonHandler: (jsonPayload) => jsonPayload,
     },
+    [DomainNames.Playlists]: {
+      path: '/playlists',
+      responseJsonHandler: (jsonPayload) => jsonPayload,
+    }
   };
 
   constructor() {
     const url = new URL(`http://${address}/sse/channels`);
-    url.searchParams.append('channel', 'mediaFiles');
-    url.searchParams.append('channel', 'playback');
+    sseChannels.forEach(channel => {
+        url.searchParams.append('channel', channel);
+    });
 
     this.eventObserver = new EventsObserver();
 
@@ -77,6 +92,15 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository 
   async fetchMediaFiles(): Promise<MediaFilesMap> {
     try {
       return await this.fetchRestData(DomainNames.MediaFiles) as MediaFilesMap;
+    } catch (err) {
+      // TODO: add error handling idiot
+      return {};
+    }
+  }
+
+  async fetchPlaylists(): Promise<PlaylistsMap> {
+    try {
+      return await this.fetchRestData(DomainNames.Playlists) as PlaylistsMap;
     } catch (err) {
       // TODO: add error handling idiot
       return {};
