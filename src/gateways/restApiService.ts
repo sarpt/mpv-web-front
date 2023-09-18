@@ -61,7 +61,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     },
     [DomainNames.Playlists]: {
       path: '/playlists',
-      responseJsonHandler: (jsonPayload) => jsonPayload,
+      responseJsonHandler: (jsonPayload) => jsonPayload.playlists,
     }
   };
 
