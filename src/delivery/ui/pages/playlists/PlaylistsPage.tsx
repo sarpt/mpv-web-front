@@ -21,7 +21,7 @@ const ListContainer = styled('div')`
   width: 100%;
 `;
 
-export const PlalistsPage = () => {
+export const PlaylistsPage = () => {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
   const [width, height] = useSize(parentRef);
 

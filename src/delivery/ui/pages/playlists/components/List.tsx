@@ -12,7 +12,7 @@ type Props = {
   height: number, 
 };
 
-const rowSize = 48;
+const rowSize = 72;
 
 export const List = ({ playlists, height, width, onPlaylistSelected, currentPlaylist }: Props) => {
   const entryRenderer = useCallback((props: EntryRendererProps<Playlist>) => {
