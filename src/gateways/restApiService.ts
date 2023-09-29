@@ -15,6 +15,7 @@ enum PlaybackParameters {
   Pause = 'pause',
   Fullscreen = 'fullscreen',
   LoopFile = 'loopFile',
+  PlaylistUUID = 'playlistUUID',
   SubtitleId = 'subtitleID',
 }
 
@@ -121,6 +122,13 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
       [PlaybackParameters.Path]: path,
       [PlaybackParameters.Append]: append ?? false  
     });
+  }
+
+  async loadPlaylist(uuid: string, append?: boolean): Promise<void> {
+    await this.postPlayback({
+      [PlaybackParameters.PlaylistUUID]: uuid,
+      [PlaybackParameters.Append]: append ?? false  
+    })
   }
 
   async setPause(paused: boolean): Promise<void> {

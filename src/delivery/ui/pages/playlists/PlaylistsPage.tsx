@@ -7,6 +7,7 @@ import { Playlist } from "../../plocs/playlists/models";
 import { selectPlaylists } from "../../plocs/playlists/selectors";
 import { useSelectedPlaylist } from "../../plocs/playlists/hooks/useSelectedPlaylist";
 import { subscribeToPlaylists, unsubscribeToPlaylists } from "../../plocs/playlists/actions";
+import { loadPlaylist } from "../../plocs/playback/actions";
 
 const PageBase = styled('div')`
   height: 100%;
@@ -39,7 +40,7 @@ export const PlaylistsPage = () => {
   }, []);
 
   const onPlaylistSelected = useCallback((playlist: Playlist) => {
-    // dispatch(playMediaFile(playlist.Path));
+    dispatch(loadPlaylist(playlist.UUID));
   }, []);
 
   return (

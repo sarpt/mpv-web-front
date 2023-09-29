@@ -6,6 +6,7 @@ enum PlaybackActions {
   ChangeSubtitles = 'ChangeSubtitles',
   FetchPlayback = 'FetchPlayback',
   Fullscreen = 'Fullscreen',
+  LoadPlaylist = 'LoadPlaylist',
   Loop = 'Loop',
   Pause = 'Pause',
   PlaybackFetched = 'PlaybackFetched',
@@ -65,6 +66,14 @@ export const loop = createAction(PlaybackActions.Loop, (variant: LoopVariant) =>
   return {
     payload: {
       variant,
+    },
+  };
+});
+
+export const loadPlaylist = createAction(PlaybackActions.LoadPlaylist, (uuid: string) => {
+  return {
+    payload: {
+      uuid,
     },
   };
 });

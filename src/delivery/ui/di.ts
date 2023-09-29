@@ -9,6 +9,7 @@ import { Fullscreen, FullscreenUC } from "../../domains/playback/usecases/fullsc
 import { Loop, LoopUC } from "../../domains/playback/usecases/loop";
 import { Pause, PauseUC } from "../../domains/playback/usecases/pause";
 import { PlayMediaFile, PlayMediaFileUC } from "../../domains/playback/usecases/playMediaFile";
+import { LoadPlaylist, LoadPlaylistUC } from "../../domains/playback/usecases/loadPlaylist";
 
 import { RestApiService } from '../../gateways/restApiService';
 
@@ -19,6 +20,7 @@ export const Dependencies = {
   "FetchPlaybackUC": token<FetchPlaybackUC>("FetchPlaybackUC"),
   "FetchPlaylistsUC": token<FetchPlaylistsUC>("FetchPlaylistsUC"),
   "FullscreenUC": token<FullscreenUC>("FullscreenUC"),
+  "LoadPlaylistUC": token<LoadPlaylistUC>("LoadPlaylistUC"),
   "LoopUC": token<LoopUC>("LoopUC"),
   "PlayMediaFileUC": token<PlayMediaFileUC>("PlayMediaFileUC"),
   "PauseUC": token<PauseUC>("PauseUC"),
@@ -36,6 +38,7 @@ export function init() {
   container.bind<FetchPlaybackUC>(Dependencies.FetchPlaybackUC).toFactory(() => new FetchPlayback(restApiService));
   container.bind<FetchPlaylistsUC>(Dependencies.FetchPlaylistsUC).toFactory(() => new FetchPlaylists(restApiService));
   container.bind<FullscreenUC>(Dependencies.FullscreenUC).toFactory(() => new Fullscreen(restApiService));
+  container.bind<LoadPlaylistUC>(Dependencies.LoadPlaylistUC).toFactory(() => new LoadPlaylist(restApiService));
   container.bind<LoopUC>(Dependencies.LoopUC).toFactory(() => new Loop(restApiService));
   container.bind<PauseUC>(Dependencies.PauseUC).toFactory(() => new Pause(restApiService));
   container.bind<PlayMediaFileUC>(Dependencies.PlayMediaFileUC).toFactory(() => new PlayMediaFile(restApiService));
