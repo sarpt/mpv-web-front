@@ -1,6 +1,7 @@
 import { IconButton, styled } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import LanguageIcon from '@mui/icons-material/Language';
+import MenuIcon from '@mui/icons-material/Menu';
 import { Fullscreen, FullscreenExit, Loop, Pause } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +13,12 @@ import { LoopDialog } from "./components/LoopDialog";
 import { LoopVariant } from "../../plocs/playback/models";
 import { AudioSubtitleDialog } from "./components/AudioSubtitleDialog";
 import { Progress } from "./components/Progress";
+
+const SectionsContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '15px'
+}));
 
 const PlaybackContainer = styled('div')(({
   display: 'flex',
@@ -31,7 +38,11 @@ const PlaybackControlButton = styled(IconButton)(({ theme }) => {
   };
 })
 
-export const PlaybackSummary = () => {
+type Props = {
+  onMenuClick: () => void
+};
+
+export const PlaybackSummary = (props: Props) => {
   const [loopDialogOpen, setLoopDialogOpen] = useState<boolean>(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState<boolean>(false);
 
@@ -84,64 +95,67 @@ export const PlaybackSummary = () => {
   }, [playbackMediaFilePath]);
 
   return (
-    <PlaybackContainer>
-      <Progress/>
-      <ButtonsContainer>
-        <PlaybackControlButton
-          aria-label="playChange"
-          onClick={togglePlayback}
-          disabled={!mediaFileSelected}
-          title={playbackPaused ? 'Play' : 'Pause'}
-        >
-          {
-            playbackPaused
-              ? <PlayArrowIcon />
-              : <Pause />
-          }
-        </PlaybackControlButton>
-        <PlaybackControlButton
-          aria-label="fullscreen"
-          onClick={toggleFullscreen}
-          disabled={!mediaFileSelected}
-          title={playbackFullscreen ? 'Go fullscreen' : 'Exit fullscreen'}
-        >
-          {
-            playbackFullscreen
-              ? <FullscreenExit/>
-              : <Fullscreen/>
-          }
-        </PlaybackControlButton>
-        <PlaybackControlButton
-          aria-label="loop"
-          onClick={() => setLoopDialogOpen(true)}
-          disabled={!mediaFileSelected}
-          title='Change loop options'
-        >
-          <Loop />
-        </PlaybackControlButton>
-        <PlaybackControlButton
-          aria-label="language"
-          onClick={() => setLanguageDialogOpen(true)}
-          disabled={!mediaFileSelected}
-          title='Audio & Video language'
-        >
-          <LanguageIcon />
-        </PlaybackControlButton>
-        <LoopDialog
-          currentVariant={currentLoopVariant ?? LoopVariant.Off}
-          open={loopDialogOpen}
-          onOk={onLoopChange}
-          onClose={() => setLoopDialogOpen(false)}
-        />
-        <AudioSubtitleDialog
-          mediaFile={currentMediaFile}
-          currentSubtitleId={currentSubtitleId}
-          currentAudioId={currentAudioId}
-          open={languageDialogOpen}
-          onOk={onLanguageChange}
-          onClose={() => setLanguageDialogOpen(false)}
-        />
-      </ButtonsContainer>
-    </PlaybackContainer>
+    <SectionsContainer>
+      <MenuIcon onClick={props.onMenuClick} />
+      <PlaybackContainer>
+        <Progress/>
+        <ButtonsContainer>
+          <PlaybackControlButton
+            aria-label="playChange"
+            onClick={togglePlayback}
+            disabled={!mediaFileSelected}
+            title={playbackPaused ? 'Play' : 'Pause'}
+          >
+            {
+              playbackPaused
+                ? <PlayArrowIcon />
+                : <Pause />
+            }
+          </PlaybackControlButton>
+          <PlaybackControlButton
+            aria-label="fullscreen"
+            onClick={toggleFullscreen}
+            disabled={!mediaFileSelected}
+            title={playbackFullscreen ? 'Go fullscreen' : 'Exit fullscreen'}
+          >
+            {
+              playbackFullscreen
+                ? <FullscreenExit/>
+                : <Fullscreen/>
+            }
+          </PlaybackControlButton>
+          <PlaybackControlButton
+            aria-label="loop"
+            onClick={() => setLoopDialogOpen(true)}
+            disabled={!mediaFileSelected}
+            title='Change loop options'
+          >
+            <Loop />
+          </PlaybackControlButton>
+          <PlaybackControlButton
+            aria-label="language"
+            onClick={() => setLanguageDialogOpen(true)}
+            disabled={!mediaFileSelected}
+            title='Audio & Video language'
+          >
+            <LanguageIcon />
+          </PlaybackControlButton>
+          <LoopDialog
+            currentVariant={currentLoopVariant ?? LoopVariant.Off}
+            open={loopDialogOpen}
+            onOk={onLoopChange}
+            onClose={() => setLoopDialogOpen(false)}
+          />
+          <AudioSubtitleDialog
+            mediaFile={currentMediaFile}
+            currentSubtitleId={currentSubtitleId}
+            currentAudioId={currentAudioId}
+            open={languageDialogOpen}
+            onOk={onLanguageChange}
+            onClose={() => setLanguageDialogOpen(false)}
+          />
+        </ButtonsContainer>
+      </PlaybackContainer>
+    </SectionsContainer>
   );
 };
