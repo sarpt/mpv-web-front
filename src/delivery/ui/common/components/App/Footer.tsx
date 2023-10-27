@@ -6,4 +6,6 @@ export const Footer = styled('div')(({ theme }) => ({
   flexGrow: 0,
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
+  display: 'flex',
+  flexDirection: 'column'
 }));
