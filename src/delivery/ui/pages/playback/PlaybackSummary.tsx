@@ -17,13 +17,16 @@ import { Progress } from "./components/Progress";
 const SectionsContainer = styled('div')(({
   display: 'flex',
   flexDirection: 'row',
-  gap: '15px'
+  gap: '15px',
+  flexGrow: 1,
+  alignItems: 'center',
 }));
 
 const PlaybackContainer = styled('div')(({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center'
+  alignItems: 'center',
+  flexGrow: 1,
 }));
 
 const ButtonsContainer = styled('div')(({
