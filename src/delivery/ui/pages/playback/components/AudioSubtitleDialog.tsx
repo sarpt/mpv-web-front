@@ -1,6 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, styled } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, SelectChangeEvent, styled } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MediaFile } from "../../../plocs/media_files/models";
+import { AudioSelection } from "./controls/AudioSelection";
+import { SubtitlesSelection } from "./controls/SubtitlesSelection";
 
 type Props = {
   mediaFile?: MediaFile,
@@ -11,7 +13,7 @@ type Props = {
   onOk: (args: { subtitleId: string | undefined, audioId: string | undefined }) => void,
 };
 
-const LaguageControls = styled('div')`
+const LanguageControls = styled('div')`
   display: flex;
   flex-direction: column;
   padding: 5px;
@@ -64,52 +66,18 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Language options</DialogTitle>
       <DialogContent>
-        <LaguageControls>
-          <FormControl>
-            <InputLabel id="audio-id-select-label">Audio</InputLabel>
-            <Select
-              labelId="audio-id-select-label"
-              id="audio-id-select"
-              value={audioId}
-              label="Audio"
-              onChange={onAudioChange}
-              disabled={audios.length <= 1}
-            >
-              {
-                audios.map(audio => (
-                  <MenuItem
-                    key={audio.AudioID}
-                    value={audio.AudioID}
-                  >
-                    {`${audio.Title} (${audio.Language})`}
-                  </MenuItem>
-                ))
-              }
-            </Select>
-          </FormControl>
-          <FormControl>
-            <InputLabel id="subtitle-id-select-label">Subtitles</InputLabel>
-            <Select
-              labelId="subtitles-id-select-label"
-              id="subtitles-id-select"
-              value={subtitleId}
-              label="Subtitles"
-              onChange={onSubtitleChange}
-              disabled={subtitles.length <= 1}
-            >
-              {
-                subtitles.map(subtitle => (
-                  <MenuItem
-                    key={subtitle.SubtitleID}
-                    value={subtitle.SubtitleID}
-                  >
-                    {`${subtitle.Title} (${subtitle.Language})`}
-                  </MenuItem>
-                ))
-              }
-            </Select>
-          </FormControl>
-        </LaguageControls>
+        <LanguageControls>
+          <AudioSelection
+            audios={audios}
+            audioId={audioId}
+            onAudioChange={onAudioChange}
+          />
+          <SubtitlesSelection 
+            subtitles={subtitles}
+            subtitleId={subtitleId}
+            onSubtitleChange={onSubtitleChange}
+          />
+        </LanguageControls>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Close</Button>
