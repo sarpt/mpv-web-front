@@ -4,7 +4,7 @@ import { AudioStream } from "../../../../plocs/media_files/models";
 type Props = {
     audios: AudioStream[],
     audioId?: string,
-    onAudioChange: (event: SelectChangeEvent) => void,
+    onAudioChange: (audioId: string) => void,
 };
 
 export const AudioSelection = ({ audioId, audios, onAudioChange }: Props) => {
@@ -16,7 +16,7 @@ export const AudioSelection = ({ audioId, audios, onAudioChange }: Props) => {
             id="audio-id-select"
             value={audioId}
             label="Audio"
-            onChange={onAudioChange}
+            onChange={event => onAudioChange(event.target.value)}
             disabled={audios.length <= 1}
         >
             {

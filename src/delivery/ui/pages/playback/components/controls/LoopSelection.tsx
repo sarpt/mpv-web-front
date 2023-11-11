@@ -3,7 +3,7 @@ import { LoopVariant } from "../../../../plocs/playback/models";
 
 type Props = {
     loopValue: LoopVariant,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+    onChange: (variant: LoopVariant) => void
 };
 
 export const LoopSelection = ({ loopValue, onChange }: Props) => {
@@ -13,7 +13,7 @@ export const LoopSelection = ({ loopValue, onChange }: Props) => {
             aria-labelledby="loop-choice"
             name="loop-radio-group"
             value={loopValue}
-            onChange={onChange}
+            onChange={event => onChange(event.target.value as LoopVariant)}
           >
             <FormControlLabel value={LoopVariant.File} control={<Radio />} label="Currently playing" />
             <FormControlLabel value={LoopVariant.Playlist} control={<Radio />} label="Playlist" disabled={true} />

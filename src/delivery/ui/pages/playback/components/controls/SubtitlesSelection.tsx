@@ -4,7 +4,7 @@ import { SubtitleStream } from "../../../../plocs/media_files/models";
 type Props = {
     subtitleId?: string,
     subtitles: SubtitleStream[],
-    onSubtitleChange: (event: SelectChangeEvent) => void,
+    onSubtitleChange: (subtitleId: string) => void,
 };
 
 export const SubtitlesSelection = ({ subtitles, subtitleId, onSubtitleChange }: Props) => {
@@ -16,7 +16,7 @@ export const SubtitlesSelection = ({ subtitles, subtitleId, onSubtitleChange }: 
             id="subtitles-id-select"
             value={subtitleId}
             label="Subtitles"
-            onChange={onSubtitleChange}
+            onChange={event => onSubtitleChange(event.target.value)}
             disabled={subtitles.length <= 1}
         >
             {
