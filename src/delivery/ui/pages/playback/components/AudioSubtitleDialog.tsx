@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, SelectChangeEvent, styled } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, styled } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MediaFile } from "../../../plocs/media_files/models";
 import { AudioSelection } from "./controls/AudioSelection";
@@ -42,14 +42,6 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
     setAudioId(currentAudioId);
   }, [open, mediaFile]);
 
-  const onSubtitleChange = (event: SelectChangeEvent) => {
-    setSubtitleId(event.target.value);
-  };
-
-  const onAudioChange = (event: SelectChangeEvent) => {
-    setAudioId(event.target.value);
-  };
-
   const subtitles = useMemo(() => {
     if (!mediaFile) return [];
 
@@ -70,12 +62,12 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
           <AudioSelection
             audios={audios}
             audioId={audioId}
-            onAudioChange={onAudioChange}
+            onAudioChange={setAudioId}
           />
           <SubtitlesSelection 
             subtitles={subtitles}
             subtitleId={subtitleId}
-            onSubtitleChange={onSubtitleChange}
+            onSubtitleChange={setSubtitleId}
           />
         </LanguageControls>
       </DialogContent>

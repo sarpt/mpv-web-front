@@ -25,17 +25,13 @@ export const LoopDialog = ({ currentVariant, open, onClose, onOk }: Props) => {
     if (open) setLoopValue(currentVariant);
   }, [open]);
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoopValue(event.target.value as LoopVariant);
-  };
-
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Loop</DialogTitle>
       <DialogContent>
         <LoopSelection
           loopValue={loopValue}
-          onChange={onChange}
+          onChange={setLoopValue}
         />
       </DialogContent>
       <DialogActions>
