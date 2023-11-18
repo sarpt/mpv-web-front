@@ -28,7 +28,7 @@ export const MediaFilesPage = () => {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
   const [width, height] = useSize(parentRef);
   const [playbackOptionsDialogOpen, setPlaybackOptionsDialogOpen] = useState(false);
-  const [selectedMediaFilePath, setSelectedMediaFilePath] = useState<MediaFile | undefined>(undefined);
+  const [selectedMediaFile, setSelectedMediaFile] = useState<MediaFile | undefined>(undefined);
 
   const dispatch = useDispatch();
 
@@ -45,8 +45,9 @@ export const MediaFilesPage = () => {
   }, []);
 
   const onMediaFileClicked = useCallback((mediaFile: MediaFile) => {
-    setSelectedMediaFilePath(mediaFile);
-  }, [setSelectedMediaFilePath]);
+    setSelectedMediaFile(mediaFile);
+    setPlaybackOptionsDialogOpen(true);
+  }, [setSelectedMediaFile, setPlaybackOptionsDialogOpen]);
 
   const currentMediaFile = useMemo(() => {
     if (!playbackMediaFilePath) return undefined;
@@ -54,19 +55,13 @@ export const MediaFilesPage = () => {
     return mediaFiles[playbackMediaFilePath];
   }, [playbackMediaFilePath, mediaFiles]);
 
-  const selectedMediaFile = useMemo(() => {
-    if (!selectedMediaFilePath) return currentMediaFile;
-  
-    return selectedMediaFilePath;
-  }, [currentMediaFile, selectedMediaFilePath]);
-
   const handlePlayDialogOk = useCallback(() => {
     setPlaybackOptionsDialogOpen(false);
 
     if (!selectedMediaFile) return;
 
-    dispatch(playMediaFile(selectedMediaFile.Path));
-  }, [selectedMediaFile]);
+    dispatch(playMediaFile(selectedMediaFile.Path)); // TODO: modify this action
+  }, [selectedMediaFile, setPlaybackOptionsDialogOpen]);
 
   return (
     <PageBase>
