@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { useCallback, useState } from "react";
+import styled from "styled-components";
 
 import { MediaFile } from "../../../plocs/media_files/models";
 import { LoopVariant } from "../../../plocs/playback/models";
@@ -37,7 +38,7 @@ export const MediaFilePlayDialog = ({ mediaFile, open, onClose, onOk, currentLoo
       audioId,
       loopVariant
     });
-  }, [subtitleId, audioId, loopVariant]);
+  }, [subtitleId, audioId, loopVariant, onOk]);
 
   const handlePlay = useCallback(() => {
     onOk({
@@ -46,7 +47,7 @@ export const MediaFilePlayDialog = ({ mediaFile, open, onClose, onOk, currentLoo
       audioId,
       loopVariant
     });
-  }, [subtitleId, audioId, loopVariant]);
+  }, [subtitleId, audioId, loopVariant, onOk]);
 
   if (!mediaFile) return (<></>);
 
@@ -54,9 +55,11 @@ export const MediaFilePlayDialog = ({ mediaFile, open, onClose, onOk, currentLoo
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Playback options: {mediaFile.Title}</DialogTitle>
       <DialogContent>
-        <AudioSelection audios={mediaFile.AudioStreams} audioId={audioId} onAudioChange={setAudioId} />
-        <SubtitlesSelection subtitles={mediaFile.SubtitleStreams} subtitleId={subtitleId} onSubtitleChange={ setSubtitleId } />
-        <LoopSelection loopValue={loopVariant} onChange={ setLoopVariant } />
+        <DialogContentContainer>
+          <AudioSelection audios={mediaFile.AudioStreams} audioId={audioId} onAudioChange={setAudioId} />
+          <SubtitlesSelection subtitles={mediaFile.SubtitleStreams} subtitleId={subtitleId} onSubtitleChange={ setSubtitleId } />
+          <LoopSelection loopValue={loopVariant} onChange={ setLoopVariant } />
+        </DialogContentContainer>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleAppendToPlaylist}>Append to playlist</Button>
@@ -66,3 +69,5 @@ export const MediaFilePlayDialog = ({ mediaFile, open, onClose, onOk, currentLoo
     </Dialog>
   );
 };
+
+const DialogContentContainer = styled('div')({ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '5px' });
