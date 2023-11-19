@@ -1,7 +1,7 @@
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
-import { PlaybackRepository } from "../domains/playback/interfaces";
+import { PlaybackRepository, playMediaFileOpts } from "../domains/playback/interfaces";
 import { PlaylistsMap } from "../domains/playlists/entities";
 import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { EventsObserver } from "./eventsObserver";
@@ -117,10 +117,13 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     }
   }
 
-  async playMediaFile(path: string, append?: boolean): Promise<void> {
+  async playMediaFile(path: string, opts?: playMediaFileOpts): Promise<void> {
     await this.postPlayback({
       [PlaybackParameters.Path]: path,
-      [PlaybackParameters.Append]: append ?? false  
+      [PlaybackParameters.Append]: opts?.append ?? false, 
+      [PlaybackParameters.AudioId]: opts?.audioId,
+      [PlaybackParameters.SubtitleId]: opts?.subtitleId,
+      [PlaybackParameters.LoopFile]: opts?.loopVariant === LoopVariant.File
     });
   }
 

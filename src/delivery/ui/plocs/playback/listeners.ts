@@ -34,7 +34,12 @@ export const subscribeToPlaybackEffect = async (action: ReturnType<typeof subscr
 
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, listenerApi: AppListenerEffectAPI) => {
   const playMediaFileUC = resolve(Dependencies.PlayMediaFileUC)();
-  await playMediaFileUC.invoke(action.payload.mediaFilePath);
+  await playMediaFileUC.invoke(action.payload.mediaFilePath, {
+    append: action.payload.append,
+    audioId: action.payload.audioId,
+    subtitleId: action.payload.subtitleId,
+    loopVariant: action.payload.loopVariant,
+  });
 }
 
 export const loadPlaylistEffect = async (action: ReturnType<typeof loadPlaylist>, listenerApi: AppListenerEffectAPI) => {
