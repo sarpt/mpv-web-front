@@ -38,10 +38,20 @@ export const subscribeToPlayback = createAction(PlaybackActions.SubscribeToPlayb
 
 export const unsubscribeToPlayback = createAction(PlaybackActions.UnsubscribeToPlayback);
 
-export const playMediaFile = createAction(PlaybackActions.PlayMediaFile, (mediaFilePath: string) => {
+type PlayMediaFileOpts = {
+  append?: boolean,
+  subtitleId?: string,
+  audioId?: string,
+  loopVariant: LoopVariant,
+}
+export const playMediaFile = createAction(PlaybackActions.PlayMediaFile, (mediaFilePath: string, opts?: PlayMediaFileOpts) => {
   return {
     payload: {
       mediaFilePath,
+      append: opts?.append,
+      subtitleId: opts?.subtitleId,
+      audioId: opts?.audioId,
+      loopVariant: opts?.loopVariant
     },
   };
 });
