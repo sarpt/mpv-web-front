@@ -6,8 +6,8 @@ import {
 import { AppListenerEffectAPI } from "../../reducers";
 
 export const fetchMediaFilesEffect = async (action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
-  const fetchMediaFilesUC = resolve(Dependencies.FetchMediaFilesUC)();
-  const { mediaFiles } = await fetchMediaFilesUC.invoke();
+  const repo = resolve(Dependencies.MediaFilesRepository)();
+  const mediaFiles = await repo.fetchMediaFiles();
 
   listenerApi.dispatch(mediaFilesFetched(mediaFiles));
 };
