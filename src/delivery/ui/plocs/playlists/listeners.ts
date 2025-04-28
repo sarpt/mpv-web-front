@@ -6,8 +6,8 @@ import {
 import { AppListenerEffectAPI } from "../../reducers";
 
 export const fetchPlaylistsEffect = async (action: ReturnType<typeof fetchPlaylists>, listenerApi: AppListenerEffectAPI) => {
-  const fetchPlaylistsUC = resolve(Dependencies.FetchPlaylistsUC)();
-  const { playlists } = await fetchPlaylistsUC.invoke();
+  const repo = resolve(Dependencies.PlaylistsRepository)();
+  const playlists = await repo.fetchPlaylists();
 
   listenerApi.dispatch(playlistsFetched(playlists));
 };
