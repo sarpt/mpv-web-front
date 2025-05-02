@@ -24,6 +24,10 @@ export class EventsObserver {
     return this.iterateOverEvents<T>(event);
   }
 
+  close() {
+    this.eventSource?.close();
+  }
+
   private async *iterateOverEvents<T>(eventName: string) {
     while(true) {
       await this.waitTillEventsAvailable(eventName);

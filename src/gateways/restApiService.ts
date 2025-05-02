@@ -8,8 +8,6 @@ import { PlaylistsMap } from "../domains/playlists/entities";
 import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { EventsObserver } from "./eventsObserver";
 
-const address = 'localhost:3001';
-
 enum PlaybackParameters {
   AudioId = 'audioID',
   Append = 'append',
@@ -52,7 +50,8 @@ type Domains = {
 }
 
 export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository, ConnectionRepository {
-  private eventObserver: EventsObserver;
+  private address?: string;
+  private eventObserver?: EventsObserver;
 
   private domains: Domains = {
     [DomainNames.MediaFiles]: {
@@ -69,7 +68,22 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     }
   };
 
-  constructor() {
+  async checkConnection(address: string): Promise<boolean> {
+    try {
+      await fetch(`http://${address}/rest/playback`, {
+        method: 'HEAD',
+      });
+      this.address = address;
+      this.initSse(address);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  private initSse(address: string) {
+    this.eventObserver?.close();
+
     const url = new URL(`http://${address}/sse/channels`);
     sseChannels.forEach(channel => {
         url.searchParams.append('channel', channel);
@@ -79,17 +93,6 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
 
     const eventsSource = new EventSource(url.toString());
     this.eventObserver.setSource(eventsSource);
-  }
-
-  async checkConnection(address: string): Promise<boolean> {
-    try {
-      await fetch(`http://${address}/rest/playback`, {
-        method: 'HEAD',
-      });
-      return true;
-    } catch (err) {
-      return false;
-    }
   }
 
   async changeAudio(audioId: string): Promise<void> {
@@ -173,7 +176,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     }
 
     try {
-      await fetch(`http://${address}/rest/playback`, {
+      await fetch(`http://${this.address}/rest/playback`, {
         method: 'POST',
         body: formData,
       });
@@ -193,7 +196,7 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
       headers.set(cacheControlHeader, cacheControlForEtag);
     }
 
-    const response = await fetch(`http://${address}/rest${domain.path}`, { headers });
+    const response = await fetch(`http://${this.address}/rest${domain.path}`, { headers });
     if (response.status === 304) {
       return domain.latestPayload;
     }
