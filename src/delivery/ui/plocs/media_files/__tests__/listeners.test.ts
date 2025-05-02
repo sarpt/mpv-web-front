@@ -1,24 +1,9 @@
-import { MediaFilesSubscriptions } from "../../../../../domains/media_files/entities";
-import { FetchMediaFilesUC } from "../../../../../domains/media_files/usecases/fetchMediaFiles";
-import { SubscribeToMediaFilesUC } from "../../../../../domains/media_files/usecases/subscribeToMediaFiles";
 import { container, Dependencies } from "../../../di";
-import { AppListenerEffectAPI } from "../../../store";
+import { AppListenerEffectAPI } from "../../../reducers";
 import { fetchMediaFiles, subscribeToMediaFiles, mediaFilesFetched } from "../actions";
 import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "../listeners";
 
 describe('media files listeners', () => {
-  const subscribeToMediaFilesUCMock: jest.Mocked<SubscribeToMediaFilesUC> = {
-    invoke: jest.fn(),
-  };
-  const fetchMediaFilesUCMock: jest.Mocked<FetchMediaFilesUC> = {
-    invoke: jest.fn(),
-  };
-
-  const subscriptionsMock = {
-    added: jest.fn(),
-    remove: jest.fn()
-  } as unknown as MediaFilesSubscriptions;
-
   const listenerApiMock = {
     fork: jest.fn(),
     dispatch: jest.fn(),
@@ -38,27 +23,21 @@ describe('media files listeners', () => {
     }
   }
 
+  const mediaFilesRepositoryMock = {
+    fetchMediaFiles: jest.fn(),
+  };
+
   beforeAll(() => {
-    container.bind(Dependencies.SubscribeToMediaFilesUC).toValue(subscribeToMediaFilesUCMock);
-    container.bind(Dependencies.FetchMediaFilesUC).toValue(fetchMediaFilesUCMock);
+    container.bind(Dependencies.MediaFilesRepository).toValue(mediaFilesRepositoryMock);
   });
 
   beforeEach(() => {
-    subscribeToMediaFilesUCMock.invoke.mockResolvedValue({ subscriptions: subscriptionsMock });
-    fetchMediaFilesUCMock.invoke.mockResolvedValue({
+    mediaFilesRepositoryMock.fetchMediaFiles.mockResolvedValue({
       mediaFiles: mediaFilesMap
     })
   });
 
   describe('subscribeToMediaFiles effect', () => {
-    it('should call subscribe to media files UC', async () => {
-      const action = subscribeToMediaFiles();
-
-      await subscribeToMediaFilesEffect(action, listenerApiMock);
-    
-      expect(subscribeToMediaFilesUCMock.invoke).toHaveBeenCalled();
-    });
-
     it('should fork subscriptions', async () => {
       const action = subscribeToMediaFiles();
 
@@ -69,12 +48,12 @@ describe('media files listeners', () => {
   });
 
   describe('fetchMediaFiles effect', () => {
-    it('should call fetch media files UC', async () => {
+    it('should call fetch media files on repository', async () => {
       const action = fetchMediaFiles();
 
       await fetchMediaFilesEffect(action, listenerApiMock);
     
-      expect(fetchMediaFilesUCMock.invoke).toHaveBeenCalled();
+      expect(mediaFilesRepositoryMock.fetchMediaFiles).toHaveBeenCalled();
     });
 
     it('should dispatch mediaFilesAdded action', async () => {
