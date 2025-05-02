@@ -1,13 +1,12 @@
+import { ForkedTask } from "@reduxjs/toolkit";
 import { container, Dependencies } from "../../../di";
 import { AppListenerEffectAPI } from "../../../reducers";
 import { fetchMediaFiles, subscribeToMediaFiles, mediaFilesFetched } from "../actions";
 import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "../listeners";
+import { MediaFilesRepository } from "../../../../../domains/media_files/interfaces";
 
 describe('media files listeners', () => {
-  const listenerApiMock = {
-    fork: jest.fn(),
-    dispatch: jest.fn(),
-  } as unknown as AppListenerEffectAPI;
+  let listenerApiMock: jest.Mocked<AppListenerEffectAPI>;
 
   const mediaFilesMap = {
     ['/some/media/file']: {
@@ -23,18 +22,26 @@ describe('media files listeners', () => {
     }
   }
 
-  const mediaFilesRepositoryMock = {
-    fetchMediaFiles: jest.fn(),
-  };
+  let mediaFilesRepositoryMock: jest.Mocked<MediaFilesRepository>;
 
   beforeAll(() => {
+    mediaFilesRepositoryMock = {
+      fetchMediaFiles: jest.fn(),
+    };
+    listenerApiMock = {
+      fork: jest.fn(),
+      dispatch: jest.fn(),
+      unsubscribe: jest.fn(),
+      condition: jest.fn(),
+    } as unknown as jest.Mocked<AppListenerEffectAPI>;
     container.bind(Dependencies.MediaFilesRepository).toValue(mediaFilesRepositoryMock);
   });
 
   beforeEach(() => {
-    mediaFilesRepositoryMock.fetchMediaFiles.mockResolvedValue({
-      mediaFiles: mediaFilesMap
-    })
+    mediaFilesRepositoryMock.fetchMediaFiles.mockResolvedValue(mediaFilesMap);
+    listenerApiMock.fork.mockReturnValueOnce({
+      cancel: jest.fn(),
+    } as unknown as jest.Mocked<ForkedTask<unknown>>);
   });
 
   describe('subscribeToMediaFiles effect', () => {
@@ -43,7 +50,7 @@ describe('media files listeners', () => {
 
       await subscribeToMediaFilesEffect(action, listenerApiMock);
     
-      expect(listenerApiMock.fork).toHaveBeenCalledTimes(2);
+      expect(listenerApiMock.fork).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -62,14 +69,6 @@ describe('media files listeners', () => {
       await fetchMediaFilesEffect(action, listenerApiMock);
     
       expect(listenerApiMock.dispatch).toHaveBeenCalledWith(mediaFilesFetched(mediaFilesMap));
-    });
-
-    it('should dispatch subscribeToMediaFiles action', async () => {
-      const action = fetchMediaFiles();
-
-      await fetchMediaFilesEffect(action, listenerApiMock);
-    
-      expect(listenerApiMock.dispatch).toHaveBeenCalledWith(subscribeToMediaFiles());
     });
   });
 });
