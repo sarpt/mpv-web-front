@@ -2,8 +2,10 @@ import { addListener, AnyAction, createListenerMiddleware, Dispatch, ListenerEff
 import mediaFilesReducer from "./plocs/media_files/reducer";
 import playbackReducer from "./plocs/playback/reducer";
 import playlistsReducer from "./plocs/playlists/reducer";
+import connectionReducer from "ui/plocs/connection/reducer";
 
 export const reducers = {
+  connections: connectionReducer,
   mediaFiles: mediaFilesReducer,
   playback: playbackReducer,
   playlists: playlistsReducer

@@ -8,6 +8,7 @@ import { useSelectedPlaylist } from "ui/plocs/playlists/hooks/useSelectedPlaylis
 import { subscribeToPlaylists, unsubscribeToPlaylists } from "ui/plocs/playlists/actions";
 import { loadPlaylist } from "ui/plocs/playback/actions";
 import { Playlist } from "src/domains/playlists/entities";
+import { selectConnected } from "ui/plocs/connection/selectors";
 
 import { List } from "./components/List";
 
@@ -32,14 +33,17 @@ export const PlaylistsPage = () => {
   const currentPlaylist = useSelectedPlaylist();
 
   const playlists = useSelector(selectPlaylists);
+  const connected = useSelector(selectConnected);
 
   useEffect(() => {
+    if (!connected) return;
+
     dispatch(subscribeToPlaylists());
 
     return () => {
       dispatch(unsubscribeToPlaylists());
     };
-  }, [dispatch]);
+  }, [connected, dispatch]);
 
   const onPlaylistSelected = useCallback((playlist: Playlist) => {
     dispatch(loadPlaylist(playlist.UUID));

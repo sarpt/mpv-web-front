@@ -13,6 +13,7 @@ import { LoopVariant } from "ui/plocs/playback/models";
 import { AudioSubtitleDialog } from "ui/pages/playback/components/AudioSubtitleDialog";
 import { Progress } from "ui/pages/playback/components/Progress";
 import { LoopDialog } from "ui/pages/playback/components/LoopDialog";
+import { selectConnected } from "ui/plocs/connection/selectors";
 
 const SectionsContainer = styled('div')(({
   display: 'flex',
@@ -57,16 +58,19 @@ export const PlaybackSummary = (props: Props) => {
   const currentSubtitleId = useSelector(selectSubtitleId);
   const currentAudioId = useSelector(selectAudioId);
   const currentLoopVariant = useSelector(selectLoopVariant);
+  const connected = useSelector(selectConnected);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!connected) return;
+
     dispatch(subscribeToPlayback());
   
     return () => {
       dispatch(unsubscribeToPlayback());
     };
-  }, [dispatch]);
+  }, [connected, dispatch]);
 
   const currentMediaFile = useMemo(() => {
     if (!playbackMediaFilePath) return undefined;

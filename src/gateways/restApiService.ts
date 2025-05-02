@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ConnectionRepository } from "src/domains/connection/interfaces";
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
@@ -50,7 +51,7 @@ type Domains = {
   [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository {
+export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository, ConnectionRepository {
   private eventObserver: EventsObserver;
 
   private domains: Domains = {
@@ -78,6 +79,17 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
 
     const eventsSource = new EventSource(url.toString());
     this.eventObserver.setSource(eventsSource);
+  }
+
+  async checkConnection(address: string): Promise<boolean> {
+    try {
+      await fetch(`http://${address}/rest/playback`, {
+        method: 'HEAD',
+      });
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   async changeAudio(audioId: string): Promise<void> {

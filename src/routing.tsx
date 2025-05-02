@@ -2,10 +2,12 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
-import { MediaFilesPage } from "./delivery/ui/pages/media_files/MediaFilesPage";
-import { PlaylistsPage } from "./delivery/ui/pages/playlists/PlaylistsPage";
-import { AppLayout } from "./delivery/ui/common/layouts/AppLayout";
-import { Routes } from "./delivery/ui/common/components/App/models/routes";
+
+import { MediaFilesPage } from "ui/pages/media_files/MediaFilesPage";
+import { PlaylistsPage } from "ui/pages/playlists/PlaylistsPage";
+import { AppLayout } from "ui/common/layouts/AppLayout";
+import { Routes } from "ui/common/components/App/models/routes";
+import { HomePage } from "ui/pages/home/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +24,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/',
-        element: <MediaFilesPage />,
+        element: <HomePage />,
       }
     ]
   }
