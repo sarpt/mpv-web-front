@@ -1,5 +1,7 @@
 import { AnyAction } from "redux"
-import { PlaylistsMap } from "./models";
+
+import { PlaylistsMap } from "src/domains/playlists/entities";
+
 import { playlistsFetchError, playlistsFetched } from "./actions";
 
 type State = {

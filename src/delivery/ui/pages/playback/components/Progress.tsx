@@ -3,9 +3,9 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import { selectMediaFiles } from "../../../plocs/media_files/selectors";
-import { secondsToHHMMSS } from "../../../plocs/playback/functions/formatTime";
-import { selectCurrentTime, selectMediaFilePath } from "../../../plocs/playback/selectors";
+import { selectMediaFiles } from "ui/plocs/media_files/selectors";
+import { secondsToHHMMSS } from "ui/plocs/playback/functions/formatTime";
+import { selectCurrentTime, selectMediaFilePath } from "ui/plocs/playback/selectors";
 
 const ProgressInfoContainer = styled('div')(({
   padding: '10px',

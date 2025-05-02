@@ -1,8 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, styled } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MediaFile } from "../../../plocs/media_files/models";
 import { AudioSelection } from "./controls/AudioSelection";
 import { SubtitlesSelection } from "./controls/SubtitlesSelection";
+import { MediaFile } from "src/domains/media_files/entities";
 
 type Props = {
   mediaFile?: MediaFile,

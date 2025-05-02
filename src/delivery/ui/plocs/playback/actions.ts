@@ -1,5 +1,8 @@
 import { createAction } from "@reduxjs/toolkit";
-import { LoopVariant, Playback } from "./models";
+
+import { Playback } from "src/domains/playback/entities";
+
+import { LoopVariant } from "./models";
 
 enum PlaybackActions {
   ChangeAudio = 'ChangeAudio',

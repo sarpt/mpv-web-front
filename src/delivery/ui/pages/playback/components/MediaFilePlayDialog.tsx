@@ -2,12 +2,12 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/
 import { useCallback, useState } from "react";
 import styled from "styled-components";
 
-import { MediaFile } from "../../../plocs/media_files/models";
-import { LoopVariant } from "../../../plocs/playback/models";
+import { LoopVariant } from "ui/plocs/playback/models";
 
 import { AudioSelection } from "./controls/AudioSelection";
 import { SubtitlesSelection } from "./controls/SubtitlesSelection";
 import { LoopSelection } from "./controls/LoopSelection";
+import { MediaFile } from "src/domains/media_files/entities";
 
 type onOkCallback = (args: {
   subtitleId: string | undefined,

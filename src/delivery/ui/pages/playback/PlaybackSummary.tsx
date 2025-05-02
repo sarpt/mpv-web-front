@@ -6,13 +6,13 @@ import { Fullscreen, FullscreenExit, Loop, Pause } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { changeAudio, changeSubtitles, fullscreen, loop, pause, subscribeToPlayback, unsubscribeToPlayback } from "../../plocs/playback/actions";
-import { selectAudioId, selectFullscreen, selectLoopVariant, selectMediaFilePath, selectPaused, selectSubtitleId } from "../../plocs/playback/selectors";
-import { LoopDialog } from "./components/LoopDialog";
-import { LoopVariant } from "../../plocs/playback/models";
-import { AudioSubtitleDialog } from "./components/AudioSubtitleDialog";
-import { Progress } from "./components/Progress";
+import { selectMediaFiles } from "ui/plocs/media_files/selectors";
+import { changeAudio, changeSubtitles, fullscreen, loop, pause, subscribeToPlayback, unsubscribeToPlayback } from "ui/plocs/playback/actions";
+import { selectAudioId, selectFullscreen, selectLoopVariant, selectMediaFilePath, selectPaused, selectSubtitleId } from "ui/plocs/playback/selectors";
+import { LoopVariant } from "ui/plocs/playback/models";
+import { AudioSubtitleDialog } from "ui/pages/playback/components/AudioSubtitleDialog";
+import { Progress } from "ui/pages/playback/components/Progress";
+import { LoopDialog } from "ui/pages/playback/components/LoopDialog";
 
 const SectionsContainer = styled('div')(({
   display: 'flex',

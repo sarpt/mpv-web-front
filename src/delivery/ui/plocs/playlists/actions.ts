@@ -1,5 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
-import { PlaylistsMap } from "./models";
+import { PlaylistsMap } from "../../../../domains/playlists/entities";
 
 enum PlaylistsActions {
   FetchPlaylists = 'FetchPlaylists',

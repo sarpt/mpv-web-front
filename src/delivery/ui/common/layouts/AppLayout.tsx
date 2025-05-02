@@ -1,10 +1,11 @@
-import { PageViewport } from '../components/App/PageViewport';
-import { Footer } from '../components/App/Footer';
-import { AppContainer } from '../components/App/Container';
-import { PlaybackSummary } from '../../pages/playback/PlaybackSummary';
 import { useState } from 'react';
-import { AppSidebar } from '../components/App/Sidebar';
 import { Outlet } from 'react-router-dom';
+
+import { PageViewport } from 'ui/common/components/App/PageViewport';
+import { PlaybackSummary } from 'ui/pages/playback/PlaybackSummary';
+import { AppSidebar } from 'ui/common/components/App/Sidebar';
+import { Footer } from 'ui/common/components/App/Footer';
+import { AppContainer } from 'ui/common/components/App/Container';
 
 export const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

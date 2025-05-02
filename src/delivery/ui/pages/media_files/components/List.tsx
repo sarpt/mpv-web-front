@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 
-import { EntryRendererProps, VirtualList } from "../../../common/components/VirtualList";
-import { MediaFile } from "../../../plocs/media_files/models";
+import { EntryRendererProps, VirtualList } from "ui/common/components/VirtualList";
+import { MediaFile } from "src/domains/media_files/entities";
+
 import { Item } from "./Item";
 
 type Props = {

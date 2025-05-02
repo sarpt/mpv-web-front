@@ -1,7 +1,9 @@
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import { createSelector } from "@reduxjs/toolkit"
+
+import { PlaylistsMap } from 'src/domains/playlists/entities';
+
 import { selectStoreState } from "../../reducers";
-import { PlaylistsMap } from './models';
 
 const selectPlaylistsState = createSelector(selectStoreState, (state) => state.playlists);
 
