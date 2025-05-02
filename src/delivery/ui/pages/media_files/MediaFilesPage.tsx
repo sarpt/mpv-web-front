@@ -3,13 +3,14 @@ import useSize from "@react-hook/size";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { subscribeToMediaFiles, unsubscribeToMediaFiles } from "../../plocs/media_files/actions";
-import { MediaFile } from "../../plocs/media_files/models";
-import { selectMediaFiles } from "../../plocs/media_files/selectors";
-import { playMediaFile } from "../../plocs/playback/actions";
-import { selectLoopVariant, selectMediaFilePath } from "../../plocs/playback/selectors";
+import { subscribeToMediaFiles, unsubscribeToMediaFiles } from "ui/plocs/media_files/actions";
+import { selectMediaFiles } from "ui/plocs/media_files/selectors";
+import { playMediaFile } from "ui/plocs/playback/actions";
+import { selectLoopVariant, selectMediaFilePath } from "ui/plocs/playback/selectors";
+import { MediaFilePlayDialog } from "ui/pages/playback/components/MediaFilePlayDialog";
+import { MediaFile } from "src/domains/media_files/entities";
+
 import { List } from "./components/List";
-import { MediaFilePlayDialog } from "../playback/components/MediaFilePlayDialog";
 
 const PageBase = styled('div')`
   height: 100%;

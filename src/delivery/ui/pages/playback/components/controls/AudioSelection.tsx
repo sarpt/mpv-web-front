@@ -1,5 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { AudioStream } from "../../../../plocs/media_files/models";
+
+import { AudioStream } from "src/domains/media_files/entities";
 
 type Props = {
     audios: AudioStream[],

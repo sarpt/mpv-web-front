@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
-import { EntryRendererProps, VirtualList } from "../../../common/components/VirtualList";
-import { Playlist } from "../../../plocs/playlists/models";
+import { EntryRendererProps, VirtualList } from "ui/common/components/VirtualList";
 import { Item } from "./Item";
+import { Playlist } from "src/domains/playlists/entities";
 
 type Props = {
   currentPlaylist?: Playlist, 

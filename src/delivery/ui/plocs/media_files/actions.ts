@@ -1,5 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
-import { MediaFilesMap } from "./models";
+import { MediaFilesMap } from "src/domains/media_files/entities";
 
 enum MediaFileActions {
   FetchMediaFiles = 'FetchMediaFiles',

@@ -1,6 +1,8 @@
 import { AnyAction } from "redux"
+
+import { Playback } from "src/domains/playback/entities";
+
 import { playbackFetched, playbackFetchError } from "./actions";
-import { Playback } from "./models";
 
 type State = {
   playback?: Playback,

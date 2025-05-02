@@ -1,5 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { SubtitleStream } from "../../../../plocs/media_files/models";
+
+import { SubtitleStream } from "src/domains/media_files/entities";
 
 type Props = {
     subtitleId?: string,

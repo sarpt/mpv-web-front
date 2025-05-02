@@ -2,7 +2,8 @@ import { styled } from "@mui/material";
 import ListItem from "@mui/material/ListItem/ListItem";
 import ListItemButton from "@mui/material/ListItemButton/ListItemButton";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
-import { MediaFile } from "../../../plocs/media_files/models";
+
+import { MediaFile } from "src/domains/media_files/entities";
 
 const PlayingRow = styled(ListItem)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,

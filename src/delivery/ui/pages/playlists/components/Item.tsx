@@ -2,8 +2,9 @@ import { styled } from "@mui/material";
 import ListItem from "@mui/material/ListItem/ListItem";
 import ListItemButton from "@mui/material/ListItemButton/ListItemButton";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
-import { Playlist } from "../../../plocs/playlists/models";
 import { useMemo } from "react";
+
+import { Playlist } from "src/domains/playlists/entities";
 
 const PlayingRow = styled(ListItem)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
