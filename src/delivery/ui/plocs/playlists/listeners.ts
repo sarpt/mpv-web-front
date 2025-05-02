@@ -5,7 +5,7 @@ import {
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
 
-export const fetchPlaylistsEffect = async (action: ReturnType<typeof fetchPlaylists>, listenerApi: AppListenerEffectAPI) => {
+export const fetchPlaylistsEffect = async (_action: ReturnType<typeof fetchPlaylists>, listenerApi: AppListenerEffectAPI) => {
   const repo = resolve(Dependencies.PlaylistsRepository)();
   const playlists = await repo.fetchPlaylists();
 
@@ -13,7 +13,7 @@ export const fetchPlaylistsEffect = async (action: ReturnType<typeof fetchPlayli
 };
 
 const playlistsPollTimeout = 5000;
-export const subscribeToPlaylistsEffect = async (action: ReturnType<typeof subscribeToPlaylists>, listenerApi: AppListenerEffectAPI) => {
+export const subscribeToPlaylistsEffect = async (_action: ReturnType<typeof subscribeToPlaylists>, listenerApi: AppListenerEffectAPI) => {
     listenerApi.unsubscribe()
 
     const pollingTask = listenerApi.fork(async (forkApi) => {

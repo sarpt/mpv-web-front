@@ -21,7 +21,7 @@ describe('eventsObserver', () => {
 
     beforeEach(() => {
       listenerCb = () => { throw new Error('this listener should not have been called') };
-      eventSourceMock.addEventListener.mockImplementation((name, cb: any) => { listenerCb = cb; });
+      eventSourceMock.addEventListener.mockImplementation((_name, cb: unknown) => { listenerCb = cb as typeof listenerCb; });
       uut.setSource(eventSourceMock);
     });
 

@@ -37,11 +37,11 @@ export const PlaylistsPage = () => {
     return () => {
       dispatch(unsubscribeToPlaylists());
     };
-  }, []);
+  }, [dispatch]);
 
   const onPlaylistSelected = useCallback((playlist: Playlist) => {
     dispatch(loadPlaylist(playlist.UUID));
-  }, []);
+  }, [dispatch]);
 
   return (
     <PageBase>

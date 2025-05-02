@@ -66,7 +66,7 @@ export const PlaybackSummary = (props: Props) => {
     return () => {
       dispatch(unsubscribeToPlayback());
     };
-  }, []);
+  }, [dispatch]);
 
   const currentMediaFile = useMemo(() => {
     if (!playbackMediaFilePath) return undefined;
@@ -76,22 +76,22 @@ export const PlaybackSummary = (props: Props) => {
 
   const togglePlayback = useCallback(() => {
     dispatch(pause(!playbackPaused));
-  }, [playbackPaused]);
+  }, [dispatch, playbackPaused]);
 
   const toggleFullscreen = useCallback(() => {
     dispatch(fullscreen(!playbackFullscreen));
-  }, [playbackFullscreen]);
+  }, [dispatch, playbackFullscreen]);
 
   const onLanguageChange = useCallback((args: { subtitleId?: string, audioId?: string }) => {
     if (args.subtitleId && args.subtitleId !== currentSubtitleId) dispatch(changeSubtitles(args.subtitleId));
     if (args.audioId && args.audioId !== currentAudioId) dispatch(changeAudio(args.audioId));
     setLanguageDialogOpen(false); 
-  }, [currentSubtitleId, currentAudioId]);
+  }, [currentSubtitleId, dispatch, currentAudioId]);
 
   const onLoopChange = useCallback((variant: LoopVariant) => {
     dispatch(loop(variant));
     setLoopDialogOpen(false); 
-  }, []);
+  }, [dispatch]);
 
   const mediaFileSelected = useMemo(() => {
     return !!playbackMediaFilePath;

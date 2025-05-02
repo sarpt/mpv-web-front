@@ -39,6 +39,7 @@ export class EventsObserver {
   private addEventListener(eventName: string) {
     this.eventsMap.set(eventName, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.eventSource?.addEventListener(eventName, (event: any) => {
       this.eventsMap.get(eventName)?.push(event.data);  
     });

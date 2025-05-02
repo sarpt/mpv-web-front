@@ -5,7 +5,7 @@ import {
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
 
-export const fetchMediaFilesEffect = async (action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
+export const fetchMediaFilesEffect = async (_action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
   const repo = resolve(Dependencies.MediaFilesRepository)();
   const mediaFiles = await repo.fetchMediaFiles();
 
@@ -13,7 +13,7 @@ export const fetchMediaFilesEffect = async (action: ReturnType<typeof fetchMedia
 };
 
 const mediaFilesPollTimeoutMs = 5000;
-export const subscribeToMediaFilesEffect = async (action: ReturnType<typeof subscribeToMediaFiles>, listenerApi: AppListenerEffectAPI) => {
+export const subscribeToMediaFilesEffect = async (_action: ReturnType<typeof subscribeToMediaFiles>, listenerApi: AppListenerEffectAPI) => {
     listenerApi.unsubscribe()
 
     const pollingTask = listenerApi.fork(async (forkApi) => {
