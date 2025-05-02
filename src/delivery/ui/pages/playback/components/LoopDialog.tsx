@@ -15,11 +15,11 @@ export const LoopDialog = ({ currentVariant, open, onClose, onOk }: Props) => {
 
   const handleClose = useCallback(() => {
     onClose();
-  }, []);
+  }, [onClose]);
 
   const handleOk = useCallback(() => {
     onOk(loopValue);
-  }, [handleClose, loopValue]);
+  }, [loopValue, onOk]);
 
   useEffect(() => {
     if (open) setLoopValue(currentVariant);

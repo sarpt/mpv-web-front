@@ -26,21 +26,21 @@ export const AudioSubtitleDialog = ({ mediaFile, currentSubtitleId, currentAudio
 
   const handleClose = useCallback(() => {
     onClose();
-  }, []);
+  }, [onClose]);
 
   const handleOk = useCallback(() => {
     onOk({
       subtitleId,
       audioId,
     });
-  }, [subtitleId, audioId]);
+  }, [onOk, subtitleId, audioId]);
 
   useEffect(() => {
     if (!open || !mediaFile) return;
 
     setSubtitleId(currentSubtitleId);
     setAudioId(currentAudioId);
-  }, [open, mediaFile]);
+  }, [open, mediaFile, currentSubtitleId, currentAudioId]);
 
   const subtitles = useMemo(() => {
     if (!mediaFile) return [];

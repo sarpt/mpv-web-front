@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
@@ -39,6 +40,7 @@ type Domain<T = unknown> =  {
   etag?: string | undefined | null,
   latestPayload?: T,
   path: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   responseJsonHandler: (json: any) => T,
 }
 
@@ -51,7 +53,7 @@ type Domains = {
 export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository {
   private eventObserver: EventsObserver;
 
-  private domains: Domains  = {
+  private domains: Domains = {
     [DomainNames.MediaFiles]: {
       path: '/media-files',
       responseJsonHandler: (jsonPayload) => jsonPayload.mediaFiles,

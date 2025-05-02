@@ -42,7 +42,7 @@ export const MediaFilesPage = () => {
     return () => {
       dispatch(unsubscribeToMediaFiles());
     };
-  }, []);
+  }, [dispatch]);
 
   const onMediaFileClicked = useCallback((mediaFile: MediaFile) => {
     setSelectedMediaFile(mediaFile);
@@ -61,7 +61,7 @@ export const MediaFilesPage = () => {
     if (!selectedMediaFile) return;
 
     dispatch(playMediaFile(selectedMediaFile.Path)); // TODO: modify this action
-  }, [selectedMediaFile, setPlaybackOptionsDialogOpen]);
+  }, [dispatch, selectedMediaFile]);
 
   return (
     <PageBase>
