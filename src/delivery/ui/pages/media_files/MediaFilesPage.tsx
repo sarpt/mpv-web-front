@@ -9,6 +9,7 @@ import { playMediaFile } from "ui/plocs/playback/actions";
 import { selectLoopVariant, selectMediaFilePath } from "ui/plocs/playback/selectors";
 import { MediaFilePlayDialog } from "ui/pages/playback/components/MediaFilePlayDialog";
 import { MediaFile } from "src/domains/media_files/entities";
+import { selectConnected } from "ui/plocs/connection/selectors";
 
 import { List } from "./components/List";
 
@@ -36,14 +37,17 @@ export const MediaFilesPage = () => {
   const mediaFiles = useSelector(selectMediaFiles);
   const playbackMediaFilePath = useSelector(selectMediaFilePath);
   const currentLoopVariant = useSelector(selectLoopVariant);
+  const connected = useSelector(selectConnected);
 
   useEffect(() => {
+    if (!connected) return;
+
     dispatch(subscribeToMediaFiles());
 
     return () => {
       dispatch(unsubscribeToMediaFiles());
     };
-  }, [dispatch]);
+  }, [connected, dispatch]);
 
   const onMediaFileClicked = useCallback((mediaFile: MediaFile) => {
     setSelectedMediaFile(mediaFile);
