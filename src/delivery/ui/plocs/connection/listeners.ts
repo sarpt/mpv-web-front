@@ -9,10 +9,13 @@ export const checkConnectionEffect = async (action: ReturnType<typeof checkConne
   const repo = resolve(Dependencies.ConnectionRepository)();
   const connected = await repo.checkConnection(action.payload.address);
 
-  if (connected) {
-    listenerApi.dispatch(connectionSuccessful({ address: action.payload.address, connected: true }));
-  } else {
-    listenerApi.dispatch(connectionFailed(`could not estabilish connection to: ${action.payload.address}`));
-  }
+  connected.match(
+    () => {
+      listenerApi.dispatch(connectionSuccessful({ address: action.payload.address, connected: true }));
+    },
+    (err) => {
+      listenerApi.dispatch(connectionFailed(`could not estabilish connection to "${action.payload.address}": reason: ${err}`));
+    }
+  );
 };
 
