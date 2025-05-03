@@ -7,6 +7,7 @@ import { PlaybackRepository, playMediaFileOpts } from "../domains/playback/inter
 import { PlaylistsMap } from "../domains/playlists/entities";
 import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { EventsObserver } from "./eventsObserver";
+import { makeErr, makeOk, Result } from "src/domains/common/either";
 
 enum PlaybackParameters {
   AudioId = 'audioID',
@@ -68,16 +69,16 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     }
   };
 
-  async checkConnection(address: string): Promise<boolean> {
+  async checkConnection(address: string): Promise<Result<undefined>> {
     try {
       await fetch(`http://${address}/rest/playback`, {
         method: 'HEAD',
       });
       this.address = address;
       this.initSse(address);
-      return true;
+      return makeOk(undefined);
     } catch (err) {
-      return false;
+      return makeErr(new Error(`${err}`));
     }
   }
 
