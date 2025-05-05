@@ -24,3 +24,13 @@ export const selectMediaFiles = createMediaFilesSelector(
   selectMediaFilesList,
   (mediaFilesMap) => mediaFilesMap,
 );
+
+export const selectFocusedPath = createSelector(
+  selectMediaFilesState,
+  (state) => state.focuedPath
+);
+
+export const selectFocusRequestId = createSelector(
+  selectMediaFilesState,
+  (state) => state.focusRequestId
+);

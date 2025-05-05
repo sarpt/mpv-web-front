@@ -15,6 +15,7 @@ import { Progress } from "ui/pages/playback/components/Progress";
 import { LoopDialog } from "ui/pages/playback/components/LoopDialog";
 import { selectConnected } from "ui/plocs/connection/selectors";
 import { PlaybackPath } from "ui/common/components/PlaybackPath";
+import { focusOnMediaFile } from "ui/plocs/media_files/actions";
 
 type Props = {
   onMenuClick: () => void
@@ -75,12 +76,21 @@ export const PlaybackSummary = (props: Props) => {
     return !!playbackMediaFilePath;
   }, [playbackMediaFilePath]);
 
+  const onPlaybackPathClick = useCallback(() => {
+    if (!playbackMediaFilePath) return;
+
+    dispatch(focusOnMediaFile(playbackMediaFilePath));
+  }, [dispatch, playbackMediaFilePath])
+
   return (
     <ThemedContainer>
       <SectionsContainer>
         <MenuIcon onClick={props.onMenuClick} />
         <PlaybackContainer>
-          <PlaybackPathContainer path={playbackMediaFilePath} />
+          <PlaybackPathContainer
+            onClick={onPlaybackPathClick}
+            path={playbackMediaFilePath}
+          />
           <Progress/>
           <ButtonsContainer>
             <PlaybackControlButton

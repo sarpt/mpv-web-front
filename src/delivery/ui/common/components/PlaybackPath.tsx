@@ -1,12 +1,13 @@
 import styled from "@mui/material/styles/styled";
 
 type Props = {
+  onClick?: () => void;
   path: string | undefined;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const PlaybackPath = ({ path, className }: Props) => {
+export const PlaybackPath = ({ path, className, onClick }: Props) => {
   return (
-    <PlaybackPathContainer className={className} title={path}>&#x200E;{path}</PlaybackPathContainer>
+    <PlaybackPathContainer className={className} title={path} onClick={onClick}>&#x200E;{path}</PlaybackPathContainer>
   );
 };
 

@@ -1,10 +1,12 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ReactElement, useRef } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 
 export type EntryRendererProps<T> = { entry: T, idx: number };
 
 export type Props<T> = {
   data: T[],
+  focusedIdx?: number,
+  focusRequestId?: number,
   width: number,
   height: number,
   rowSize: number,
@@ -12,7 +14,15 @@ export type Props<T> = {
   entryRenderer: (props: EntryRendererProps<T>) => ReactElement
 };
 
-export function VirtualList<T>({ data, height, rowSize, entryRenderer, onSelected }: Props<T>) {
+export function VirtualList<T>({
+  data,
+  height,
+  rowSize,
+  entryRenderer,
+  onSelected,
+  focusedIdx,
+  focusRequestId
+}: Props<T>) {
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -20,6 +30,12 @@ export function VirtualList<T>({ data, height, rowSize, entryRenderer, onSelecte
     getScrollElement: () => parentRef.current,
     estimateSize: () => rowSize,
   });
+
+  useEffect(() => {
+    if (focusedIdx === undefined || focusRequestId === undefined) return;
+
+    rowVirtualizer.scrollToIndex(focusedIdx, { align: 'center' });
+  }, [focusedIdx, focusRequestId, rowVirtualizer]);
 
   return (
     <>
