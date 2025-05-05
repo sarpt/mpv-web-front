@@ -1,9 +1,11 @@
 import { AnyAction } from "redux"
 import { MediaFilesMap } from "../../../../domains/media_files/entities";
-import { mediaFilesFetched, mediaFilesFetchError } from "./actions";
+import { focusOnMediaFile, mediaFilesFetched, mediaFilesFetchError } from "./actions";
 
 type State = {
   mediaFiles: MediaFilesMap,
+  focuedPath?: string,
+  focusRequestId?: number,
   errMsg?: string,
 };
 
@@ -24,6 +26,14 @@ export default function mediaFilesReducer(state = initialState, action: AnyActio
     return {
       ...state,
       errMsg: action.payload.errMsg,
+    };
+  }
+
+  if (focusOnMediaFile.match(action)) {
+    return {
+      ...state,
+      focuedPath: action.payload.path,
+      focusRequestId: Date.now(),
     };
   }
 

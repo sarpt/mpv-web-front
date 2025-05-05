@@ -7,6 +7,7 @@ enum MediaFileActions {
   MediaFilesFetchError = 'MediaFilesFetchError',
   SubscribeToMediaFiles = 'SubscribeToMediaFiles',
   UnsubscribeToMediaFiles = 'UnsubscribeToMediaFiles',
+  FocusOnMediaFile = 'FocusOnMediaFile'
 }
 
 export const fetchMediaFiles = createAction(MediaFileActions.FetchMediaFiles);
@@ -27,6 +28,14 @@ export const mediaFilesFetchError = createAction(MediaFileActions.MediaFilesFetc
   return {
     payload: {
       errMsg,
+    },
+  };
+});
+
+export const focusOnMediaFile = createAction(MediaFileActions.FocusOnMediaFile, (path: string) => {
+  return {
+    payload: {
+      path,
     },
   };
 });
