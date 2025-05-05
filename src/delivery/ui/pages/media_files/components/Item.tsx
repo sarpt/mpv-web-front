@@ -4,6 +4,7 @@ import ListItemButton from "@mui/material/ListItemButton/ListItemButton";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 
 import { MediaFile } from "src/domains/media_files/entities";
+import { PlaybackPath } from "ui/common/components/PlaybackPath";
 
 const PlayingRow = styled(ListItem)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -27,7 +28,7 @@ export const Item = ({ idx, entry, selected }: Props) => {
   return (
     <Row key={idx} disablePadding>
       <ListItemButton>
-        <ListItemText primary={<span>{entry.Path}</span>} />
+        <ListItemText primary={<PlaybackPath path={entry.Path}/>} />
       </ListItemButton>
     </Row>
   );

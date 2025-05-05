@@ -7,32 +7,6 @@ import { selectMediaFiles } from "ui/plocs/media_files/selectors";
 import { secondsToHHMMSS } from "ui/plocs/playback/functions/formatTime";
 import { selectCurrentTime, selectMediaFilePath } from "ui/plocs/playback/selectors";
 
-const ProgressInfoContainer = styled('div')(({
-  padding: '10px',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  width: '100%'
-}));
-
-const PlaybackTime = styled('span')(({
-  flexGrow: 0,
-  flexShrink: 1,
-  marginRight: 5,
-  fontWeight: 'bold',
-}));
-
-const PlaybackProgress = styled(LinearProgress)(({
-  flexGrow: 1,
-  flexShrink: 1,
-  [`&.${linearProgressClasses.root}`]: {
-    height: '10px'
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    backgroundColor: '#1b007a',
-  },
-}));
-
 export const Progress = () => {
   const mediaFiles = useSelector(selectMediaFiles);
   const playbackMediaFilePath = useSelector(selectMediaFilePath);
@@ -74,3 +48,28 @@ export const Progress = () => {
     </ProgressInfoContainer>
   );
 };
+
+const ProgressInfoContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: '100%'
+}));
+
+const PlaybackTime = styled('span')(({
+  flexGrow: 0,
+  flexShrink: 1,
+  marginRight: 5,
+  fontWeight: 'bold',
+}));
+
+const PlaybackProgress = styled(LinearProgress)(({
+  flexGrow: 1,
+  flexShrink: 1,
+  [`&.${linearProgressClasses.root}`]: {
+    height: '10px'
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    backgroundColor: '#1b007a',
+  },
+}));

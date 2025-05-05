@@ -14,33 +14,7 @@ import { AudioSubtitleDialog } from "ui/pages/playback/components/AudioSubtitleD
 import { Progress } from "ui/pages/playback/components/Progress";
 import { LoopDialog } from "ui/pages/playback/components/LoopDialog";
 import { selectConnected } from "ui/plocs/connection/selectors";
-
-const SectionsContainer = styled('div')(({
-  display: 'flex',
-  flexDirection: 'row',
-  gap: '15px',
-  flexGrow: 1,
-  alignItems: 'center',
-}));
-
-const PlaybackContainer = styled('div')(({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  flexGrow: 1,
-}));
-
-const ButtonsContainer = styled('div')(({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center'
-}))
-
-const PlaybackControlButton = styled(IconButton)(({ theme }) => {
-  return {
-    color: theme.palette.primary.contrastText
-  };
-})
+import { PlaybackPath } from "ui/common/components/PlaybackPath";
 
 type Props = {
   onMenuClick: () => void
@@ -102,67 +76,110 @@ export const PlaybackSummary = (props: Props) => {
   }, [playbackMediaFilePath]);
 
   return (
-    <SectionsContainer>
-      <MenuIcon onClick={props.onMenuClick} />
-      <PlaybackContainer>
-        <Progress/>
-        <ButtonsContainer>
-          <PlaybackControlButton
-            aria-label="playChange"
-            onClick={togglePlayback}
-            disabled={!mediaFileSelected}
-            title={playbackPaused ? 'Play' : 'Pause'}
-          >
-            {
-              playbackPaused
-                ? <PlayArrowIcon />
-                : <Pause />
-            }
-          </PlaybackControlButton>
-          <PlaybackControlButton
-            aria-label="fullscreen"
-            onClick={toggleFullscreen}
-            disabled={!mediaFileSelected}
-            title={playbackFullscreen ? 'Go fullscreen' : 'Exit fullscreen'}
-          >
-            {
-              playbackFullscreen
-                ? <FullscreenExit/>
-                : <Fullscreen/>
-            }
-          </PlaybackControlButton>
-          <PlaybackControlButton
-            aria-label="loop"
-            onClick={() => setLoopDialogOpen(true)}
-            disabled={!mediaFileSelected}
-            title='Change loop options'
-          >
-            <Loop />
-          </PlaybackControlButton>
-          <PlaybackControlButton
-            aria-label="language"
-            onClick={() => setLanguageDialogOpen(true)}
-            disabled={!mediaFileSelected}
-            title='Audio & Video language'
-          >
-            <LanguageIcon />
-          </PlaybackControlButton>
-          <LoopDialog
-            currentVariant={currentLoopVariant ?? LoopVariant.Off}
-            open={loopDialogOpen}
-            onOk={onLoopChange}
-            onClose={() => setLoopDialogOpen(false)}
-          />
-          <AudioSubtitleDialog
-            mediaFile={currentMediaFile}
-            currentSubtitleId={currentSubtitleId}
-            currentAudioId={currentAudioId}
-            open={languageDialogOpen}
-            onOk={onLanguageChange}
-            onClose={() => setLanguageDialogOpen(false)}
-          />
-        </ButtonsContainer>
-      </PlaybackContainer>
-    </SectionsContainer>
+    <ThemedContainer>
+      <SectionsContainer>
+        <MenuIcon onClick={props.onMenuClick} />
+        <PlaybackContainer>
+          <PlaybackPathContainer path={playbackMediaFilePath} />
+          <Progress/>
+          <ButtonsContainer>
+            <PlaybackControlButton
+              aria-label="playChange"
+              onClick={togglePlayback}
+              disabled={!mediaFileSelected}
+              title={playbackPaused ? 'Play' : 'Pause'}
+            >
+              {
+                playbackPaused
+                  ? <PlayArrowIcon />
+                  : <Pause />
+              }
+            </PlaybackControlButton>
+            <PlaybackControlButton
+              aria-label="fullscreen"
+              onClick={toggleFullscreen}
+              disabled={!mediaFileSelected}
+              title={playbackFullscreen ? 'Go fullscreen' : 'Exit fullscreen'}
+            >
+              {
+                playbackFullscreen
+                  ? <FullscreenExit/>
+                  : <Fullscreen/>
+              }
+            </PlaybackControlButton>
+            <PlaybackControlButton
+              aria-label="loop"
+              onClick={() => setLoopDialogOpen(true)}
+              disabled={!mediaFileSelected}
+              title='Change loop options'
+            >
+              <Loop />
+            </PlaybackControlButton>
+            <PlaybackControlButton
+              aria-label="language"
+              onClick={() => setLanguageDialogOpen(true)}
+              disabled={!mediaFileSelected}
+              title='Audio & Video language'
+            >
+              <LanguageIcon />
+            </PlaybackControlButton>
+            <LoopDialog
+              currentVariant={currentLoopVariant ?? LoopVariant.Off}
+              open={loopDialogOpen}
+              onOk={onLoopChange}
+              onClose={() => setLoopDialogOpen(false)}
+            />
+            <AudioSubtitleDialog
+              mediaFile={currentMediaFile}
+              currentSubtitleId={currentSubtitleId}
+              currentAudioId={currentAudioId}
+              open={languageDialogOpen}
+              onOk={onLanguageChange}
+              onClose={() => setLanguageDialogOpen(false)}
+            />
+          </ButtonsContainer>
+        </PlaybackContainer>
+      </SectionsContainer>
+    </ThemedContainer>
   );
 };
+
+const SectionsContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '15px',
+  flexGrow: 1,
+  alignItems: 'center',
+}));
+
+const PlaybackContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  overflow-x: hidden;
+  padding: 0 10px 0 10px;
+`;
+
+const PlaybackPathContainer = styled(PlaybackPath)`
+  font-weight: bold;
+  text-align: center;
+`;
+
+const ButtonsContainer = styled('div')(({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center'
+}))
+
+const ThemedContainer = styled('div')(({ theme}) => {
+  return {
+    color: theme.palette.primary.contrastText
+  };
+});
+
+const PlaybackControlButton = styled(IconButton)(({ theme }) => {
+  return {
+    color: theme.palette.primary.contrastText
+  };
+});
