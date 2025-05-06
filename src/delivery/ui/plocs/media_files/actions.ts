@@ -5,6 +5,8 @@ enum MediaFileActions {
   FetchMediaFiles = 'FetchMediaFiles',
   MediaFilesFetched = 'MediaFilesFetched',
   MediaFilesFetchError = 'MediaFilesFetchError',
+  MediaFilesAdded = 'MediaFilesAdded',
+  MediaFilesRemoved = 'MediaFilesRemoved',
   SubscribeToMediaFiles = 'SubscribeToMediaFiles',
   UnsubscribeToMediaFiles = 'UnsubscribeToMediaFiles',
   FocusOnMediaFile = 'FocusOnMediaFile'
@@ -20,6 +22,22 @@ export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched
   return {
     payload: {
       mediaFiles,
+    },
+  };
+});
+
+export const mediaFilesAdded = createAction(MediaFileActions.MediaFilesAdded, (added: MediaFilesMap) => {
+  return {
+    payload: {
+      added,
+    },
+  };
+});
+
+export const mediaFilesRemoved = createAction(MediaFileActions.MediaFilesRemoved, (removed: MediaFilesMap) => {
+  return {
+    payload: {
+      removed,
     },
   };
 });

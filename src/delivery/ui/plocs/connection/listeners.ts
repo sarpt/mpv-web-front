@@ -6,7 +6,7 @@ import {
 import { AppListenerEffectAPI } from "../../reducers";
 
 export const checkConnectionEffect = async (action: ReturnType<typeof checkConnection>, listenerApi: AppListenerEffectAPI) => {
-  const repo = resolve(Dependencies.ConnectionRepository)();
+  const repo = resolve(Dependencies.ApiServicesRepository)();
   const connected = await repo.checkConnection(action.payload.address);
 
   connected.match(

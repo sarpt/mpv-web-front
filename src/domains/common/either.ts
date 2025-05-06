@@ -2,6 +2,8 @@ type Either<TA, TB> = {
   match: <RTA, RTB>(whenA: (val: TA) => RTA, whenB: (val: TB) => RTB) => RTA | RTB,
   takeA: (err?: Error) => TA,
   takeB: (err?: Error) => TB,
+  isA: () => boolean,
+  isB: () => boolean,
 };
 
 type side = 'a' | 'b';
@@ -24,6 +26,8 @@ function makeEither<TA, TB>(side: side, val: TA | TB): Either<TA, TB> {
 
       return val as TB;
     },
+    isA: () => side === 'a',
+    isB: () => side === 'b',
   };
 } 
 
@@ -41,7 +45,9 @@ export type Result<TR, TE = Error> = {
   match: <RTR, RTE>(whenResult: (val: TR) => RTR, whenErr: (val: TE) => RTE) => RTR | RTE,
   ok: (err?: Error) => TR,
   okOrDefault: (defValue: TR) => TR,
-  err: (err: Error) => TE,
+  err: (err?: Error) => TE,
+  isOk: () => boolean,
+  isErr: () => boolean,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,6 +91,8 @@ const wrapEitherAsResult = <TR, TE>(either: Either<TR, TE>): Result<TR, TE> => {
           return b;
         }
       );
-    }
+    },
+    isOk: either.isA,
+    isErr: either.isB,
   };
 }
