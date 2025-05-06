@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ConnectionRepository } from "src/domains/connection/interfaces";
+import { ApiService, ApiServicesRepository } from "src/domains/connection/interfaces";
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
 import { PlaybackRepository, playMediaFileOpts } from "../domains/playback/interfaces";
 import { PlaylistsMap } from "../domains/playlists/entities";
 import { PlaylistsRepository } from "../domains/playlists/interfaces";
-import { EventsObserver } from "./eventsObserver";
 import { makeErr, makeOk, Result } from "src/domains/common/either";
 
 enum PlaybackParameters {
@@ -26,12 +25,6 @@ enum DomainNames {
   Playlists = 'Playlists',
 }
 
-const sseChannels = [
-  'mediaFiles',
-  'playback',
-  'playlists'
-];
-
 const etagHeader = 'Etag';
 const cacheControlHeader = 'Cache-Control';
 const cacheControlForEtag = 'no-cache';
@@ -50,9 +43,8 @@ type Domains = {
   [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements MediaFilesRepository, PlaybackRepository, PlaylistsRepository, ConnectionRepository {
+export class RestApiService implements PlaybackRepository, PlaylistsRepository, ApiService {
   private address?: string;
-  private eventObserver?: EventsObserver;
 
   private domains: Domains = {
     [DomainNames.MediaFiles]: {
@@ -69,31 +61,16 @@ export class RestApiService implements MediaFilesRepository, PlaybackRepository,
     }
   };
 
-  async checkConnection(address: string): Promise<Result<undefined>> {
+  async connect(address: string): Promise<Result<undefined>> {
     try {
       await fetch(`http://${address}/rest/playback`, {
         method: 'HEAD',
       });
       this.address = address;
-      this.initSse(address);
       return makeOk(undefined);
     } catch (err) {
       return makeErr(new Error(`${err}`));
     }
-  }
-
-  private initSse(address: string) {
-    this.eventObserver?.close();
-
-    const url = new URL(`http://${address}/sse/channels`);
-    sseChannels.forEach(channel => {
-        url.searchParams.append('channel', channel);
-    });
-
-    this.eventObserver = new EventsObserver();
-
-    const eventsSource = new EventSource(url.toString());
-    this.eventObserver.setSource(eventsSource);
   }
 
   async changeAudio(audioId: string): Promise<void> {
