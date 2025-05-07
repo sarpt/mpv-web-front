@@ -1,6 +1,6 @@
 import { Result } from "src/domains/common/either";
 import { MediaFilesMap } from "src/domains/media_files/entities";
-import { MediaFilesRepository } from "src/domains/media_files/interfaces";
+import { MediaFilesEvents, MediaFilesRepository } from "src/domains/media_files/interfaces";
 import { RestApiService } from "src/gateways/restApiService";
 import { SSEApiService } from "src/gateways/sseApiService";
 
@@ -11,7 +11,7 @@ export class MediaFilesServicesRepo implements MediaFilesRepository {
     return this.restApi.fetchMediaFiles();
   }
 
-  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ name: string; payload: MediaFilesMap; }>, void, unknown>> {
+  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents; payload: MediaFilesMap; }>, void, unknown>> {
     return this.sseApi.iterateMediaFiles();
   }
 }

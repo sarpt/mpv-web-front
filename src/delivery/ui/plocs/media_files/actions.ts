@@ -2,8 +2,6 @@ import { createAction } from "@reduxjs/toolkit";
 import { MediaFilesMap } from "src/domains/media_files/entities";
 
 enum MediaFileActions {
-  FetchMediaFiles = 'FetchMediaFiles',
-  MediaFilesFetched = 'MediaFilesFetched',
   MediaFilesFetchError = 'MediaFilesFetchError',
   MediaFilesAdded = 'MediaFilesAdded',
   MediaFilesRemoved = 'MediaFilesRemoved',
@@ -12,19 +10,9 @@ enum MediaFileActions {
   FocusOnMediaFile = 'FocusOnMediaFile'
 }
 
-export const fetchMediaFiles = createAction(MediaFileActions.FetchMediaFiles);
-
 export const subscribeToMediaFiles = createAction(MediaFileActions.SubscribeToMediaFiles);
 
 export const unsubscribeToMediaFiles = createAction(MediaFileActions.UnsubscribeToMediaFiles);
-
-export const mediaFilesFetched = createAction(MediaFileActions.MediaFilesFetched, (mediaFiles: MediaFilesMap) => {
-  return {
-    payload: {
-      mediaFiles,
-    },
-  };
-});
 
 export const mediaFilesAdded = createAction(MediaFileActions.MediaFilesAdded, (added: MediaFilesMap) => {
   return {

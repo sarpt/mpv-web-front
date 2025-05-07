@@ -1,6 +1,6 @@
 import { AnyAction } from "redux"
 import { MediaFilesMap } from "../../../../domains/media_files/entities";
-import { focusOnMediaFile, mediaFilesAdded, mediaFilesFetched, mediaFilesFetchError, mediaFilesRemoved } from "./actions";
+import { focusOnMediaFile, mediaFilesAdded, mediaFilesFetchError, mediaFilesRemoved } from "./actions";
 
 type State = {
   mediaFiles: MediaFilesMap,
@@ -14,14 +14,6 @@ const initialState: State = {
 };
 
 export default function mediaFilesReducer(state = initialState, action: AnyAction): State {
-  if (mediaFilesFetched.match(action)) {
-    return {
-      ...state,
-      mediaFiles: action.payload.mediaFiles,
-    };
-  }
-
-
   if (mediaFilesFetchError.match(action)) {
     return {
       ...state,

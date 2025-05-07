@@ -1,9 +1,9 @@
 import { ForkedTask } from "@reduxjs/toolkit";
 import { container, Dependencies } from "../../../di";
 import { AppListenerEffectAPI } from "../../../reducers";
-import { fetchMediaFiles, subscribeToMediaFiles, mediaFilesFetched } from "../actions";
-import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "../listeners";
-import { MediaFilesRepository } from "../../../../../domains/media_files/interfaces";
+import { subscribeToMediaFiles } from "../actions";
+import { subscribeToMediaFilesEffect } from "../listeners";
+import { MediaFilesEvents, MediaFilesRepository } from "../../../../../domains/media_files/interfaces";
 import { makeOk } from "src/domains/common/either";
 import { MediaFilesMap } from "src/domains/media_files/entities";
 
@@ -49,7 +49,7 @@ describe('media files listeners', () => {
 
   describe('subscribeToMediaFiles effect', () => {
     it('should fork subscriptions', async () => {
-      const iteratorMock: AsyncGenerator<Awaited<{ name: string, payload: MediaFilesMap }>, void, unknown> = {
+      const iteratorMock: AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap }>, void, unknown> = {
         next: jest.fn(),
         return: jest.fn(),
         throw: jest.fn(),
@@ -62,32 +62,6 @@ describe('media files listeners', () => {
       await subscribeToMediaFilesEffect(action, listenerApiMock);
     
       expect(listenerApiMock.fork).toHaveBeenCalledTimes(1);
-    });
-
-    it('should fetch media files once', async () => {
-      const action = subscribeToMediaFiles();
-
-      await subscribeToMediaFilesEffect(action, listenerApiMock);
-    
-      expect(listenerApiMock.dispatch).toHaveBeenCalledWith(fetchMediaFiles());
-    });
-  });
-
-  describe('fetchMediaFiles effect', () => {
-    it('should call fetch media files on repository', async () => {
-      const action = fetchMediaFiles();
-
-      await fetchMediaFilesEffect(action, listenerApiMock);
-    
-      expect(mediaFilesRepositoryMock.fetchMediaFiles).toHaveBeenCalled();
-    });
-
-    it('should dispatch mediaFilesAdded action', async () => {
-      const action = fetchMediaFiles();
-
-      await fetchMediaFilesEffect(action, listenerApiMock);
-    
-      expect(listenerApiMock.dispatch).toHaveBeenCalledWith(mediaFilesFetched(mediaFilesMap));
     });
   });
 });
