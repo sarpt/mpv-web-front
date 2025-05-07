@@ -3,6 +3,5 @@ import { MediaFilesMap } from "./entities";
 
 export interface MediaFilesRepository {
   fetchMediaFiles(): Promise<MediaFilesMap>,
-  iterateAddedMediaFiles(): Result<AsyncGenerator<Awaited<MediaFilesMap>, void, unknown>>,
-  iterateRemovedMediaFiles(): Result<AsyncGenerator<Awaited<MediaFilesMap>, void, unknown>>,
+  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ name: string, payload: MediaFilesMap }>, void, unknown>>;
 }

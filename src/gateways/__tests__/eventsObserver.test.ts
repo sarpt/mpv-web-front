@@ -13,7 +13,7 @@ describe('eventsObserver', () => {
   });
 
   describe('observe', () => {
-    let listenerCb: (event: { data: string }) => void = () => { throw new Error('this listener should not have been called') };
+    let listenerCb: (event: { data: string }) => void;
 
     const eventSourceMock = {
       addEventListener: jest.fn(),

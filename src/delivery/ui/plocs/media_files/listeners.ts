@@ -24,26 +24,20 @@ export const subscribeToMediaFilesEffect = async (_action: ReturnType<typeof sub
     listenerApi.unsubscribe()
 
     const repo = resolve(Dependencies.MediaFilesRepository)();
-    const addedFilesIteratorResult = repo.iterateAddedMediaFiles();
-    const removedFilesIteratorResult = repo.iterateRemovedMediaFiles();
-    if (addedFilesIteratorResult.isErr() || removedFilesIteratorResult.isErr()) {
+    const mediaFilesIteratorResult = repo.iterateMediaFiles();
+    if (mediaFilesIteratorResult.isErr()) {
       listenerApi.dispatch(mediaFilesFetchError("could not start subscription to media files events"));
       return;
     }
 
-    const addedFilesIterator = addedFilesIteratorResult.ok();
-    const removedFilesIterator = addedFilesIteratorResult.ok();
-
-    // TODO: the logic below could be abstracted such that event observer aggregates results of both iterators
-    const addedFilesPollingTask = listenerApi.fork(async () => {
-      for await (const addedMediaFiles of addedFilesIterator) {
-        listenerApi.dispatch(mediaFilesAdded(addedMediaFiles));
-      }
-    });
-
-    const removedFilesPollingTask = listenerApi.fork(async () => {
-      for await (const removedMediaFiles of removedFilesIterator) {
-        listenerApi.dispatch(mediaFilesRemoved(removedMediaFiles));
+    const mediaFilesIterator = mediaFilesIteratorResult.ok();
+    const mediaFilesPollingTask = listenerApi.fork(async () => {
+      for await (const mediaFilesEvent of mediaFilesIterator) {
+        if (mediaFilesEvent.name === 'mediaFiles.added') {
+          listenerApi.dispatch(mediaFilesAdded(mediaFilesEvent.payload));
+        } else if (mediaFilesEvent.name === 'mediaFiles.removed') {
+          listenerApi.dispatch(mediaFilesRemoved(mediaFilesEvent.payload));
+        }
       }
     });
 
@@ -53,6 +47,5 @@ export const subscribeToMediaFilesEffect = async (_action: ReturnType<typeof sub
     listenerApi.dispatch(fetchMediaFiles());
 
     await listenerApi.condition(unsubscribeToMediaFiles.match);
-    addedFilesPollingTask.cancel();
-    removedFilesPollingTask.cancel();
+    mediaFilesPollingTask.cancel();
 }
