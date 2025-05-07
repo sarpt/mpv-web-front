@@ -29,8 +29,7 @@ describe('media files listeners', () => {
   beforeAll(() => {
     mediaFilesRepositoryMock = {
       fetchMediaFiles: jest.fn(),
-      iterateAddedMediaFiles: jest.fn(),
-      iterateRemovedMediaFiles: jest.fn(),
+      iterateMediaFiles: jest.fn(),
     };
     listenerApiMock = {
       fork: jest.fn(),
@@ -50,20 +49,19 @@ describe('media files listeners', () => {
 
   describe('subscribeToMediaFiles effect', () => {
     it('should fork subscriptions', async () => {
-      const iteratorMock: AsyncGenerator<Awaited<MediaFilesMap>, void, unknown> = {
+      const iteratorMock: AsyncGenerator<Awaited<{ name: string, payload: MediaFilesMap }>, void, unknown> = {
         next: jest.fn(),
         return: jest.fn(),
         throw: jest.fn(),
         [Symbol.asyncIterator]: jest.fn(),
         [Symbol.asyncDispose]: jest.fn(),
       };
-      mediaFilesRepositoryMock.iterateAddedMediaFiles.mockReturnValue(makeOk(iteratorMock));
-      mediaFilesRepositoryMock.iterateRemovedMediaFiles.mockReturnValue(makeOk(iteratorMock));
+      mediaFilesRepositoryMock.iterateMediaFiles.mockReturnValue(makeOk(iteratorMock));
       const action = subscribeToMediaFiles();
 
       await subscribeToMediaFilesEffect(action, listenerApiMock);
     
-      expect(listenerApiMock.fork).toHaveBeenCalledTimes(2);
+      expect(listenerApiMock.fork).toHaveBeenCalledTimes(1);
     });
 
     it('should fetch media files once', async () => {

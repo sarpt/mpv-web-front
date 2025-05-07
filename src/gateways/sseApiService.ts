@@ -38,6 +38,17 @@ export class SSEApiService implements ApiService {
     this.eventObserver.setSource(eventsSource);
   }
 
+  iterateMediaFiles() {
+    if (!this.eventObserver) return makeErr(new Error('connection to server SSE has not been estabilished'));
+
+    const iterator = this.eventObserver.aggregate({
+        'mediaFiles.added': (payload) => JSON.parse(payload) as MediaFilesMap,
+        'mediaFiles.removed': (payload) => JSON.parse(payload) as MediaFilesMap,
+    });
+
+    return makeOk(iterator);
+  }
+
   iterateAddedMediaFiles(): Result<AsyncGenerator<Awaited<MediaFilesMap>, void, unknown>> {
     if (!this.eventObserver) return makeErr(new Error('connection to server SSE has not been estabilished'));
 

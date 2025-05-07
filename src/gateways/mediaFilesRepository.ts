@@ -11,11 +11,7 @@ export class MediaFilesServicesRepo implements MediaFilesRepository {
     return this.restApi.fetchMediaFiles();
   }
 
-  iterateAddedMediaFiles(): Result<AsyncGenerator<Awaited<MediaFilesMap>, void, unknown>> {
-    return this.sseApi.iterateAddedMediaFiles();
-  }
-
-  iterateRemovedMediaFiles(): Result<AsyncGenerator<Awaited<MediaFilesMap>, void, unknown>> {
-    return this.sseApi.iterateRemovedMediaFiles();
+  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ name: string; payload: MediaFilesMap; }>, void, unknown>> {
+    return this.sseApi.iterateMediaFiles();
   }
 }
