@@ -1,7 +1,5 @@
 import { 
-  fetchMediaFiles,
   mediaFilesAdded, 
-  mediaFilesFetched, 
   mediaFilesFetchError,
   mediaFilesRemoved,
   subscribeToMediaFiles,
@@ -12,13 +10,7 @@ import {
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-
-export const fetchMediaFilesEffect = async (_action: ReturnType<typeof fetchMediaFiles>, listenerApi: AppListenerEffectAPI) => {
-  const repo = resolve(Dependencies.MediaFilesRepository)();
-  const mediaFiles = await repo.fetchMediaFiles();
-
-  listenerApi.dispatch(mediaFilesFetched(mediaFiles));
-};
+import { MediaFilesEvents } from "src/domains/media_files/interfaces";
 
 export const subscribeToMediaFilesEffect = async (_action: ReturnType<typeof subscribeToMediaFiles>, listenerApi: AppListenerEffectAPI) => {
     listenerApi.unsubscribe()
@@ -33,18 +25,13 @@ export const subscribeToMediaFilesEffect = async (_action: ReturnType<typeof sub
     const mediaFilesIterator = mediaFilesIteratorResult.ok();
     const mediaFilesPollingTask = listenerApi.fork(async () => {
       for await (const mediaFilesEvent of mediaFilesIterator) {
-        if (mediaFilesEvent.name === 'mediaFiles.added') {
+        if (mediaFilesEvent.eventVariant === MediaFilesEvents.Added) {
           listenerApi.dispatch(mediaFilesAdded(mediaFilesEvent.payload));
-        } else if (mediaFilesEvent.name === 'mediaFiles.removed') {
+        } else if (mediaFilesEvent.eventVariant === MediaFilesEvents.Removed) {
           listenerApi.dispatch(mediaFilesRemoved(mediaFilesEvent.payload));
         }
       }
     });
-
-    // fetch initial state of media files
-    // TODO: could be replaced with a "replay" event but that probably could be implemented better
-    // with aggregation of event iterators
-    listenerApi.dispatch(fetchMediaFiles());
 
     await listenerApi.condition(unsubscribeToMediaFiles.match);
     mediaFilesPollingTask.cancel();

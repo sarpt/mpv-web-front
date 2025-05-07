@@ -1,20 +1,9 @@
-async function tick() {
-  await new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    });
-  });
-}
-
 type EventResult<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   F extends (eventPayload: string) => any,
   T extends Record<string, F>,
   K extends keyof T
-> = {
-  name: string,
-  payload: ReturnType<T[K]>
-};
+> = ReturnType<T[K]>;
 
 export class EventsObserver {
   private eventsMap: Map<string, string[]> = new Map();
@@ -43,7 +32,7 @@ export class EventsObserver {
     return this.iterateOverEvents(event);
   }
 
-  async *aggregate<
+  aggregate<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     F extends (eventPayload: string) => any,
     T extends Record<string, F>,
@@ -55,37 +44,49 @@ export class EventsObserver {
       eventToIterator.set(eventName, this.observeRaw(eventName));
     }
 
+    // start iterating over events as soon as aggregate is called
+    // this way next() already awaits on events and does not require immedate consumption of retured generator
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const iteratorPromises: Map<string, Promise<{ eventName: string, result: IteratorResult<any> }>> = new Map();
-    while (eventToIterator.size) {
-      for (const [eventName, iterator] of eventToIterator.entries()) {
-        if (iteratorPromises.has(eventName)) continue;
-
-        iteratorPromises.set(eventName, iterator.next().then(result => {
-          return {
-            eventName,
-            result
-          };
-        }));
-      }
-
-      const { eventName, result } = await Promise.any(iteratorPromises.values());
-      const mapper = eventToMapper[eventName];
-      if (!mapper) {
-        console.error(`could not find mapper for received event name "${eventName}"`);
-        continue;
-      }
-
-      yield {
-        name: eventName,
-        payload: mapper(result.value)
-      }
-    
-      iteratorPromises.delete(eventName);
-      if (result.done) {
-        eventToIterator.delete(eventName);
-      }
+    for (const [eventName, iterator] of eventToIterator.entries()) {
+      iteratorPromises.set(eventName, iterator.next().then(result => {
+        return {
+          eventName,
+          result
+        };
+      }));
     }
+
+    return async function*() {
+      while (eventToIterator.size) {
+        const { eventName, result } = await Promise.any(iteratorPromises.values());
+        const mapper = eventToMapper[eventName];
+        if (!mapper) {
+          console.error(`could not find mapper for received event name "${eventName}"`);
+          continue;
+        }
+
+        yield mapper(result.value);
+      
+        iteratorPromises.delete(eventName);
+        if (result.done) {
+          eventToIterator.delete(eventName);
+        } else {
+          const iterator = eventToIterator.get(eventName);
+          if (!iterator) {
+            throw new Error('iterator could not be found');
+          }
+
+          iteratorPromises.set(eventName, iterator.next().then(result => {
+            return {
+              eventName,
+              result
+            };
+          }));
+        }
+      }
+    }();
   }
 
   close() {
@@ -97,7 +98,6 @@ export class EventsObserver {
       await this.waitTillEventsAvailable(eventName);
 
       while (this.eventsMap.get(eventName)?.length) {
-        await tick();
         yield this.eventsMap.get(eventName)?.shift() ?? '';
       }
     }
@@ -117,4 +117,12 @@ export class EventsObserver {
       await tick();
     }
   }
+}
+
+async function tick(timeoutMs = 1000) {
+  await new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeoutMs);
+  });
 }

@@ -1,6 +1,6 @@
 import { checkConnection } from "ui/plocs/connection/actions";
-import { fetchMediaFiles, subscribeToMediaFiles } from "./plocs/media_files/actions";
-import { fetchMediaFilesEffect, subscribeToMediaFilesEffect } from "./plocs/media_files/listeners";
+import { subscribeToMediaFiles } from "./plocs/media_files/actions";
+import { subscribeToMediaFilesEffect } from "./plocs/media_files/listeners";
 import { changeAudio, changeSubtitles, fetchPlayback, fullscreen, loadPlaylist, loop, pause, playMediaFile, subscribeToPlayback } from "./plocs/playback/actions";
 import { changeAudioEffect, changePauseEffect, changeSubtitlesEffect, fetchPlaybackEffect, fullscreenEffect, loadPlaylistEffect, loopEffect, playMediaFileEffect, subscribeToPlaybackEffect } from "./plocs/playback/listeners";
 import { fetchPlaylists, subscribeToPlaylists } from "./plocs/playlists/actions";
@@ -12,11 +12,6 @@ export function initListeners() {
   startAppListening({
     actionCreator: checkConnection,
     effect: checkConnectionEffect
-  });
-
-  startAppListening({
-    actionCreator: fetchMediaFiles,
-    effect: fetchMediaFilesEffect
   });
 
   startAppListening({
