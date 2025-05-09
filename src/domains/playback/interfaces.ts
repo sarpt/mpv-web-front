@@ -1,6 +1,20 @@
 import { LoopVariant } from "../../delivery/ui/plocs/playback/models";
 import { Playback } from "./entities";
 
+export enum PlaybackEvents {
+  AudioIdChange =  'audioIdChange',
+  CurrentChapterIndexChange =  'currentChapterIndexChange',
+  FullscreenChange = 'fullscreenChange',
+  LoopFileChange =  'loopFileChange',
+  MediaFileChange =  'mediaFileChange',
+  PauseChange =  'pauseChange',
+  PlaybackTimeChange =  'playbackTimeChange',
+  PlaylistSelectionChange =  'playlistSelectionChange',
+  PlaylistCurrentIdxChange =  'playlistCurrentIdxChange',
+  SubtitleIdChange =  'subtitleIdChange',
+  Replay = 'replay'
+}
+
 export type playMediaFileOpts = {
   audioId?: string;
   append?: boolean;
