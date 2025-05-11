@@ -8,6 +8,7 @@ import { ApiServicesRepository } from "src/domains/connection/interfaces";
 import { SSEApiService } from "src/gateways/sseApiService";
 import { ApiServices } from "src/gateways/apiServicesRepository";
 import { MediaFilesServicesRepo } from "src/gateways/mediaFilesRepository";
+import { PlaybackServicesRepo } from "src/gateways/playbackRepository";
 
 export const Dependencies = {
   "ApiServicesRepository": token<ApiServicesRepository>("ApiServicesRepository"),
@@ -24,9 +25,10 @@ export function init() {
   const sseApiService = new SSEApiService();
   const apiServicesRepo = new ApiServices([restApiService, sseApiService]);
   const mediaFilesRepo = new MediaFilesServicesRepo(restApiService, sseApiService);
+  const playbackRepo = new PlaybackServicesRepo(restApiService, sseApiService);
 
   container.bind<ApiServicesRepository>(Dependencies.ApiServicesRepository).toValue(apiServicesRepo);
   container.bind<MediaFilesRepository>(Dependencies.MediaFilesRepository).toValue(mediaFilesRepo);
-  container.bind<PlaybackRepository>(Dependencies.PlaybackRepository).toValue(restApiService);
+  container.bind<PlaybackRepository>(Dependencies.PlaybackRepository).toValue(playbackRepo);
   container.bind<PlaylistsRepository>(Dependencies.PlaylistsRepository).toValue(restApiService);
 }

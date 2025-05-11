@@ -1,35 +1,56 @@
+import { PlaybackEvents } from 'src/domains/playback/interfaces';
 import {
   resolve,
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
-import { changeAudio, changeSubtitles, fetchPlayback, fullscreen, loadPlaylist, loop, pause, playbackFetched, playbackFetchError, playMediaFile, subscribeToPlayback, unsubscribeToPlayback } from "./actions";
+import {
+  changeAudio,
+  changeSubtitles,
+  fullscreen,
+  loadPlaylist,
+  loop,
+  pause,
+  playbackFetched,
+  playbackFetchError,
+  playMediaFile,
+  subscribeToPlayback,
+  unsubscribeToPlayback
+} from "./actions";
 
-export const fetchPlaybackEffect = async (_action: ReturnType<typeof fetchPlayback>, listenerApi: AppListenerEffectAPI) => {
-  const repo = resolve(Dependencies.PlaybackRepository)();
-  const playback = await repo.fetchPlayback();
-
-  if (playback) {
-    listenerApi.dispatch(playbackFetched(playback));
-  } else {
-    listenerApi.dispatch(playbackFetchError(''))
-  }
-};
-
-const playbackPollTimeoutMs = 200;
 export const subscribeToPlaybackEffect = async (_action: ReturnType<typeof subscribeToPlayback>, listenerApi: AppListenerEffectAPI) => {
-    listenerApi.unsubscribe()
+  listenerApi.unsubscribe()
 
-    const pollingTask = listenerApi.fork(async (forkApi) => {
-      while (true) {
-        await forkApi.delay(playbackPollTimeoutMs)
+  const repo = resolve(Dependencies.PlaybackRepository)();
+  const playbackIteratorResult = repo.iteratePlayback();
+  if (playbackIteratorResult.isErr()) {
+    listenerApi.dispatch(playbackFetchError("could not start subscription to media files events"));
+    return;
+  }
 
-        listenerApi.dispatch(fetchPlayback());
+  const playbackIterator = playbackIteratorResult.ok();
+  const playbackPollingTask = listenerApi.fork(async () => {
+    for await (const playbackEvent of playbackIterator) {
+      if (
+        playbackEvent.eventVariant === PlaybackEvents.AudioIdChange ||
+        playbackEvent.eventVariant === PlaybackEvents.CurrentChapterIndexChange ||
+        playbackEvent.eventVariant === PlaybackEvents.FullscreenChange ||
+        playbackEvent.eventVariant === PlaybackEvents.LoopFileChange ||
+        playbackEvent.eventVariant === PlaybackEvents.MediaFileChange ||
+        playbackEvent.eventVariant === PlaybackEvents.PauseChange ||
+        playbackEvent.eventVariant === PlaybackEvents.PlaybackTimeChange ||
+        playbackEvent.eventVariant === PlaybackEvents.PlaylistCurrentIdxChange ||
+        playbackEvent.eventVariant === PlaybackEvents.PlaylistSelectionChange ||
+        playbackEvent.eventVariant === PlaybackEvents.Replay ||
+        playbackEvent.eventVariant === PlaybackEvents.SubtitleIdChange
+      ) {
+        listenerApi.dispatch(playbackFetched(playbackEvent.payload));
       }
-    })
+    }
+  });
 
-    await listenerApi.condition(unsubscribeToPlayback.match);
-    pollingTask.cancel();
+  await listenerApi.condition(unsubscribeToPlayback.match);
+  playbackPollingTask.cancel();
 }
 
 export const playMediaFileEffect = async (action: ReturnType<typeof playMediaFile>, _listenerApi: AppListenerEffectAPI) => {
