@@ -15,7 +15,7 @@ export const AudioSelection = ({ audioId, audios, onAudioChange }: Props) => {
         <Select
             labelId="audio-id-select-label"
             id="audio-id-select"
-            value={audioId}
+            value={audioId ?? ''}
             label="Audio"
             onChange={event => onAudioChange(event.target.value)}
             disabled={audios.length <= 1}
