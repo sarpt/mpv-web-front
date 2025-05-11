@@ -1,5 +1,5 @@
 import Drawer from "@mui/material/Drawer";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -31,6 +31,7 @@ export const AppSidebar = ({
   open,
   changeOpen
 }: Props) => {
+    const navigate = useNavigate();
     return (
       <Drawer
         anchor='left'
@@ -41,13 +42,11 @@ export const AppSidebar = ({
           {navigationEntries.map(entry => {
             return (
               <ListItem key={entry.title} disablePadding>
-                <ListItemButton>
+                <ListItemButton onClick={() => navigate(entry.route)}>
                   <ListItemIcon>
                     {entry.icon}
                   </ListItemIcon>
-                  <ListItemText primary={
-                    <Link to={entry.route}>{entry.title}</Link>
-                  } />
+                  <ListItemText primary={entry.title} />
                 </ListItemButton>
               </ListItem>
             );
