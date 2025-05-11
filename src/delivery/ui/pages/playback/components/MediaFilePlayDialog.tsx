@@ -63,7 +63,7 @@ export const MediaFilePlayDialog = ({ mediaFile, open, onClose, onOk, currentLoo
       </DialogContent>
       <DialogActions>
         <Button onClick={handleAppendToPlaylist}>Append to playlist</Button>
-        <Button onClick={handlePlay}>Play</Button>
+        <Button onClick={handlePlay} variant='contained'>Play</Button>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
