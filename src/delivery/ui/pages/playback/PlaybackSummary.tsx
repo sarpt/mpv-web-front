@@ -25,15 +25,16 @@ export const PlaybackSummary = (props: Props) => {
   const [loopDialogOpen, setLoopDialogOpen] = useState<boolean>(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState<boolean>(false);
 
-  const mediaFiles = useSelector(selectMediaFiles);
+  const connected = useSelector(selectConnected);
 
+  const mediaFiles = useSelector(selectMediaFiles);
+  
   const playbackMediaFilePath = useSelector(selectMediaFilePath);
   const playbackPaused = useSelector(selectPaused);
   const playbackFullscreen = useSelector(selectFullscreen);
   const currentSubtitleId = useSelector(selectSubtitleId);
   const currentAudioId = useSelector(selectAudioId);
   const currentLoopVariant = useSelector(selectLoopVariant);
-  const connected = useSelector(selectConnected);
 
   const dispatch = useDispatch();
 
@@ -85,7 +86,9 @@ export const PlaybackSummary = (props: Props) => {
   return (
     <ThemedContainer>
       <SectionsContainer>
-        <MenuIcon onClick={props.onMenuClick} />
+        <PlaybackControlButton disabled={!connected} onClick={props.onMenuClick}>
+          <MenuIcon />
+        </PlaybackControlButton>
         <PlaybackContainer>
           <PlaybackPathContainer
             onClick={onPlaybackPathClick}
