@@ -1,4 +1,4 @@
-import { createSelectorCreator, defaultMemoize } from 'reselect';
+import { createSelectorCreator, lruMemoize } from 'reselect';
 import { createSelector } from "@reduxjs/toolkit"
 
 import { PlaylistsMap } from 'src/domains/playlists/entities';
@@ -9,7 +9,7 @@ const selectPlaylistsState = createSelector(selectStoreState, (state) => state.p
 
 const getPlaylistsListIdentity = (playlists: PlaylistsMap) => Object.keys(playlists).join(';');
 const createPlaylistsSelector = createSelectorCreator(
-  defaultMemoize,
+  lruMemoize,
   (a: PlaylistsMap, b: PlaylistsMap): boolean => {
     return getPlaylistsListIdentity(a) === getPlaylistsListIdentity(b)
   }
