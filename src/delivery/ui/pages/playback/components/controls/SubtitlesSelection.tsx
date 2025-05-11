@@ -15,7 +15,7 @@ export const SubtitlesSelection = ({ subtitles, subtitleId, onSubtitleChange }: 
         <Select
             labelId="subtitles-id-select-label"
             id="subtitles-id-select"
-            value={subtitleId}
+            value={subtitleId ?? ''}
             label="Subtitles"
             onChange={event => onSubtitleChange(event.target.value)}
             disabled={subtitles.length <= 1}
