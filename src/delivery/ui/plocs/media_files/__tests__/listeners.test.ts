@@ -33,7 +33,7 @@ describe('media files listeners', () => {
 
   describe('subscribeToMediaFiles effect', () => {
     it('should fork subscriptions', async () => {
-      const iteratorMock: AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap }>, void, unknown> = {
+      const iteratorMock: AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap | undefined }>, void, unknown> = {
         next: jest.fn(),
         return: jest.fn(),
         throw: jest.fn(),
