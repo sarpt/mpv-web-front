@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ApiService, ApiServicesRepository } from "src/domains/connection/interfaces";
+import { ApiService } from "src/domains/connection/interfaces";
 import { MediaFilesMap } from "../domains/media_files/entities";
-import { MediaFilesRepository } from "../domains/media_files/interfaces";
 import { LoopVariant, Playback } from "../domains/playback/entities";
-import { PlaybackRepository, playMediaFileOpts } from "../domains/playback/interfaces";
+import { playMediaFileOpts } from "../domains/playback/interfaces";
 import { PlaylistsMap } from "../domains/playlists/entities";
 import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { makeErr, makeOk, Result } from "src/domains/common/either";
@@ -43,7 +42,7 @@ type Domains = {
   [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements PlaybackRepository, PlaylistsRepository, ApiService {
+export class RestApiService implements PlaylistsRepository, ApiService {
   private address?: string;
 
   private domains: Domains = {
@@ -85,30 +84,12 @@ export class RestApiService implements PlaybackRepository, PlaylistsRepository, 
     });
   }
 
-  async fetchMediaFiles(): Promise<MediaFilesMap> {
-    try {
-      return await this.fetchRestData(DomainNames.MediaFiles) as MediaFilesMap;
-    } catch (err) {
-      // TODO: add error handling idiot
-      return {};
-    }
-  }
-
   async fetchPlaylists(): Promise<PlaylistsMap> {
     try {
       return await this.fetchRestData(DomainNames.Playlists) as PlaylistsMap;
     } catch (err) {
       // TODO: add error handling idiot
       return {};
-    }
-  }
-
-  async fetchPlayback(): Promise<Playback | undefined> {
-    try {
-      return await this.fetchRestData(DomainNames.Playback) as Playback;
-    } catch (err) {
-      // TODO: add error handling idiot
-      return;
     }
   }
 
@@ -147,20 +128,23 @@ export class RestApiService implements PlaybackRepository, PlaylistsRepository, 
     });
   }
 
-  private async postPlayback(params: Partial<Record<PlaybackParameters, unknown>>): Promise<void> {
+  private async postPlayback(params: Partial<Record<PlaybackParameters, unknown>>): Promise<Result<void>> {
     const formData = new FormData();
     for (const [key, value] of Object.entries(params)) {
       formData.set(key, `${value}`);
     }
 
     try {
-      await fetch(`http://${this.address}/rest/playback`, {
+      const result = await fetch(`http://${this.address}/rest/playback`, {
         method: 'POST',
         body: formData,
       });
+
+      if (result.status === 200) return makeOk(undefined as void);
+    
+      return makeErr(new Error(`code: ${result.status}; ${await result.text()}`));
     } catch (err) {
-      // TODO: add error handling idiot
-      return;
+      return makeErr(new Error(`fetch resulted in an error: ${err}`));
     }
   }
 

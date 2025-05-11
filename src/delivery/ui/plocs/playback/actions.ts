@@ -7,7 +7,6 @@ import { LoopVariant } from "./models";
 enum PlaybackActions {
   ChangeAudio = 'ChangeAudio',
   ChangeSubtitles = 'ChangeSubtitles',
-  FetchPlayback = 'FetchPlayback',
   Fullscreen = 'Fullscreen',
   LoadPlaylist = 'LoadPlaylist',
   Loop = 'Loop',
@@ -34,8 +33,6 @@ export const changeSubtitles = createAction(PlaybackActions.ChangeSubtitles, (su
     },
   };
 });
-
-export const fetchPlayback = createAction(PlaybackActions.FetchPlayback);
 
 export const subscribeToPlayback = createAction(PlaybackActions.SubscribeToPlayback);
 

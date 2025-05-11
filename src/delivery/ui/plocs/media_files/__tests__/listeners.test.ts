@@ -10,25 +10,10 @@ import { MediaFilesMap } from "src/domains/media_files/entities";
 describe('media files listeners', () => {
   let listenerApiMock: jest.Mocked<AppListenerEffectAPI>;
 
-  const mediaFilesMap = {
-    ['/some/media/file']: {
-      Title: 'File',
-      FormatLongName: 'Matroska',
-      FormatName: 'mkv',
-      Chapters: [],
-      Path: '/some/media/file',
-      AudioStreams: [],
-      SubtitleStreams: [],
-      VideoStreams: [],
-      Duration: 4,
-    }
-  }
-
   let mediaFilesRepositoryMock: jest.Mocked<MediaFilesRepository>;
 
   beforeAll(() => {
     mediaFilesRepositoryMock = {
-      fetchMediaFiles: jest.fn(),
       iterateMediaFiles: jest.fn(),
     };
     listenerApiMock = {
@@ -41,7 +26,6 @@ describe('media files listeners', () => {
   });
 
   beforeEach(() => {
-    mediaFilesRepositoryMock.fetchMediaFiles.mockResolvedValue(mediaFilesMap);
     listenerApiMock.fork.mockReturnValue({
       cancel: jest.fn(),
     } as unknown as jest.Mocked<ForkedTask<unknown>>);
