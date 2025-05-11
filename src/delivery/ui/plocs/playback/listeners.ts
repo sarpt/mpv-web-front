@@ -30,22 +30,27 @@ export const subscribeToPlaybackEffect = async (_action: ReturnType<typeof subsc
 
   const playbackIterator = playbackIteratorResult.ok();
   const playbackPollingTask = listenerApi.fork(async () => {
-    for await (const playbackEvent of playbackIterator) {
-      if (
-        playbackEvent.eventVariant === PlaybackEvents.AudioIdChange ||
-        playbackEvent.eventVariant === PlaybackEvents.CurrentChapterIndexChange ||
-        playbackEvent.eventVariant === PlaybackEvents.FullscreenChange ||
-        playbackEvent.eventVariant === PlaybackEvents.LoopFileChange ||
-        playbackEvent.eventVariant === PlaybackEvents.MediaFileChange ||
-        playbackEvent.eventVariant === PlaybackEvents.PauseChange ||
-        playbackEvent.eventVariant === PlaybackEvents.PlaybackTimeChange ||
-        playbackEvent.eventVariant === PlaybackEvents.PlaylistCurrentIdxChange ||
-        playbackEvent.eventVariant === PlaybackEvents.PlaylistSelectionChange ||
-        playbackEvent.eventVariant === PlaybackEvents.Replay ||
-        playbackEvent.eventVariant === PlaybackEvents.SubtitleIdChange
-      ) {
-        listenerApi.dispatch(playbackFetched(playbackEvent.payload));
+    try {
+      for await (const playbackEvent of playbackIterator) {
+        if (
+          playbackEvent.eventVariant === PlaybackEvents.AudioIdChange ||
+          playbackEvent.eventVariant === PlaybackEvents.CurrentChapterIndexChange ||
+          playbackEvent.eventVariant === PlaybackEvents.FullscreenChange ||
+          playbackEvent.eventVariant === PlaybackEvents.LoopFileChange ||
+          playbackEvent.eventVariant === PlaybackEvents.MediaFileChange ||
+          playbackEvent.eventVariant === PlaybackEvents.PauseChange ||
+          playbackEvent.eventVariant === PlaybackEvents.PlaybackTimeChange ||
+          playbackEvent.eventVariant === PlaybackEvents.PlaylistCurrentIdxChange ||
+          playbackEvent.eventVariant === PlaybackEvents.PlaylistSelectionChange ||
+          playbackEvent.eventVariant === PlaybackEvents.Replay ||
+          playbackEvent.eventVariant === PlaybackEvents.SubtitleIdChange
+        ) {
+          if (playbackEvent.payload) listenerApi.dispatch(playbackFetched(playbackEvent.payload));
+        }
       }
+    } catch (err) {
+      // print an error since fork swallows thrown errors
+      console.error(err);
     }
   });
 

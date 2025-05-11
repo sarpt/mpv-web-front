@@ -10,7 +10,7 @@ export class MediaFilesServicesRepo implements MediaFilesRepository {
     private readonly sseApi: SSEApiService
   ) {}
 
-  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents; payload: MediaFilesMap; }>, void, unknown>> {
+  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents; payload: MediaFilesMap | undefined; }>, void, unknown>> {
     return this.sseApi.iterateMediaFiles();
   }
 }

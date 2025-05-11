@@ -31,5 +31,5 @@ export interface PlaybackRepository {
   setPause(paused: boolean): Promise<void>,
   setFullscreen(enabled: boolean): Promise<void>,
   setLoopFile(variant: LoopVariant): Promise<void>,
-  iteratePlayback(): Result<AsyncGenerator<Awaited<{ eventVariant: PlaybackEvents, payload: Playback }>, void, unknown>>;
+  iteratePlayback(): Result<AsyncGenerator<Awaited<{ eventVariant: PlaybackEvents, payload: Playback | undefined }>, void, unknown>>;
 }

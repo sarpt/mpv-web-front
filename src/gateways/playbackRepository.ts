@@ -39,7 +39,7 @@ export class PlaybackServicesRepo implements PlaybackRepository {
     return this.restApi.setLoopFile(variant);
   }
 
-  iteratePlayback(): Result<AsyncGenerator<Awaited<{ eventVariant: PlaybackEvents; payload: Playback; }>, void, unknown>> {
+  iteratePlayback(): Result<AsyncGenerator<Awaited<{ eventVariant: PlaybackEvents; payload: Playback | undefined; }>, void, unknown>> {
     return this.sseApi.iteratePlayback();
   }
 }
