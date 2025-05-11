@@ -8,6 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from '@mui/icons-material/InboxOutlined'
 import MailIcon from '@mui/icons-material/MailOutlined'
 import { Routes } from "./models/routes";
+import { useCallback } from "react";
 
 type Props = {
   open: boolean,
@@ -32,6 +33,12 @@ export const AppSidebar = ({
   changeOpen
 }: Props) => {
     const navigate = useNavigate();
+    
+    const onListItemClick = useCallback((entry: { route: Routes }) => {
+      navigate(entry.route);
+      changeOpen(false);
+    }, [changeOpen, navigate]);
+
     return (
       <Drawer
         anchor='left'
@@ -42,7 +49,7 @@ export const AppSidebar = ({
           {navigationEntries.map(entry => {
             return (
               <ListItem key={entry.title} disablePadding>
-                <ListItemButton onClick={() => navigate(entry.route)}>
+                <ListItemButton onClick={() => onListItemClick(entry)}>
                   <ListItemIcon>
                     {entry.icon}
                   </ListItemIcon>
