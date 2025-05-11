@@ -34,7 +34,7 @@ export class EventsObserver {
 
   aggregate<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    F extends (eventPayload: string) => any,
+    F extends (eventPayload: string | undefined) => any,
     T extends Record<string, F>,
     K extends keyof T
   >(eventToMapper: T): AsyncGenerator<EventResult<F, T, K>, void, unknown> {

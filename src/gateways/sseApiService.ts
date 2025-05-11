@@ -16,8 +16,8 @@ const sseChannels = Object.values(Domains);
 
 export class SSEApiService implements ApiService {
   private eventObserver?: EventsObserver;
-  private mediaFilesIterator?: AsyncGenerator<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap }, void, unknown>;
-  private playbackIterator?: AsyncGenerator<{ eventVariant: PlaybackEvents, payload: Playback }, void, unknown>;
+  private mediaFilesIterator?: AsyncGenerator<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap | undefined }, void, unknown>;
+  private playbackIterator?: AsyncGenerator<{ eventVariant: PlaybackEvents, payload: Playback | undefined }, void, unknown>;
 
   async connect(address: string): Promise<Result<undefined>> {
     try {
@@ -49,90 +49,48 @@ export class SSEApiService implements ApiService {
     // without this the first call to "next" on generator from event observer might be too late and events can be missed
     this.mediaFilesIterator = this.eventObserver.aggregate({
         [createChannelEvent(Domains.MediaFiles, MediaFilesEvents.Added)]: (payload) => {
-          return {
-            eventVariant: MediaFilesEvents.Added,
-            payload: JSON.parse(payload) as MediaFilesMap
-          };
+          return mapPayload<MediaFilesMap, MediaFilesEvents>(MediaFilesEvents.Added, payload);
         },
         [createChannelEvent(Domains.MediaFiles, MediaFilesEvents.Removed)]: (payload) => {
-          return {
-            eventVariant: MediaFilesEvents.Removed,
-            payload: JSON.parse(payload) as MediaFilesMap
-          };
+          return mapPayload<MediaFilesMap, MediaFilesEvents>(MediaFilesEvents.Removed, payload);
         },
         [createChannelEvent(Domains.MediaFiles, MediaFilesEvents.Replay)]: (payload) => {
-          return {
-            eventVariant: MediaFilesEvents.Replay,
-            payload: JSON.parse(payload) as MediaFilesMap
-          };
+          return mapPayload<MediaFilesMap, MediaFilesEvents>(MediaFilesEvents.Replay, payload);
         },
     });
     this.playbackIterator = this.eventObserver.aggregate({
       [createChannelEvent(Domains.Playback, PlaybackEvents.AudioIdChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.AudioIdChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.AudioIdChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.CurrentChapterIndexChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.CurrentChapterIndexChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.CurrentChapterIndexChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.FullscreenChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.FullscreenChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.FullscreenChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.LoopFileChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.LoopFileChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.LoopFileChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.MediaFileChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.MediaFileChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.MediaFileChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.PauseChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.PauseChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.PauseChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.PlaybackTimeChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.PlaybackTimeChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.PlaybackTimeChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.PlaylistCurrentIdxChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.PlaylistCurrentIdxChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.PlaylistCurrentIdxChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.PlaylistSelectionChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.PlaylistSelectionChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.PlaylistSelectionChange, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.Replay)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.Replay,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.Replay, payload);
       },
       [createChannelEvent(Domains.Playback, PlaybackEvents.SubtitleIdChange)]: (payload) => {
-        return {
-          eventVariant: PlaybackEvents.SubtitleIdChange,
-          payload: JSON.parse(payload) as Playback 
-        };
+        return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.SubtitleIdChange, payload);
       },
     });
   }
@@ -154,4 +112,11 @@ export class SSEApiService implements ApiService {
 
 export function createChannelEvent(domain: Domains, ev: MediaFilesEvents | PlaybackEvents): string {
   return `${domain}.${ev}`;
+}
+
+function mapPayload<T, E>(ev: E, payload: string | undefined): { eventVariant: E, payload: T | undefined } {
+  return {
+    eventVariant: ev,
+    payload: payload ? JSON.parse(payload) as T : undefined
+  };
 }

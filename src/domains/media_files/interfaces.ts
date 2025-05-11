@@ -8,5 +8,5 @@ export enum MediaFilesEvents {
 }
 
 export interface MediaFilesRepository {
-  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap }>, void, unknown>>;
+  iterateMediaFiles(): Result<AsyncGenerator<Awaited<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap | undefined }>, void, unknown>>;
 }
