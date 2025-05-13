@@ -4,6 +4,7 @@ import { MediaFilesMap } from "src/domains/media_files/entities";
 import { MediaFilesEvents } from "src/domains/media_files/interfaces";
 import { Playback } from "src/domains/playback/entities";
 import { PlaybackEvents } from "src/domains/playback/interfaces";
+import { PlaylistEvents, PlaylistsMap } from "src/domains/playlists/entities";
 import { EventsObserver } from "src/gateways/eventsObserver";
 
 export enum Domains {
@@ -18,6 +19,7 @@ export class SSEApiService implements ApiService {
   private eventObserver?: EventsObserver;
   private mediaFilesIterator?: AsyncGenerator<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap | undefined }, void, unknown>;
   private playbackIterator?: AsyncGenerator<{ eventVariant: PlaybackEvents, payload: Playback | undefined }, void, unknown>;
+  private playlistsIterator?: AsyncGenerator<{ eventVariant: PlaylistEvents, payload: PlaylistsMap | undefined }, void, unknown>;
 
   async connect(address: string): Promise<Result<undefined>> {
     try {
@@ -93,6 +95,17 @@ export class SSEApiService implements ApiService {
         return mapPayload<Playback, PlaybackEvents>(PlaybackEvents.SubtitleIdChange, payload);
       },
     });
+    this.playlistsIterator = this.eventObserver.aggregate({
+      [createChannelEvent(Domains.Playlists, PlaylistEvents.Replay)]: (payload) => {
+        return mapPayload<PlaylistsMap, PlaylistEvents>(PlaylistEvents.Replay, payload);
+      },
+      [createChannelEvent(Domains.Playlists, PlaylistEvents.Added)]: (payload) => {
+        return mapPayload<PlaylistsMap, PlaylistEvents>(PlaylistEvents.Added, payload);
+      },
+      [createChannelEvent(Domains.Playlists, PlaylistEvents.ItemsChange)]: (payload) => {
+        return mapPayload<PlaylistsMap, PlaylistEvents>(PlaylistEvents.ItemsChange, payload);
+      },
+    })
   }
 
   iterateMediaFiles() {
@@ -108,9 +121,17 @@ export class SSEApiService implements ApiService {
 
     return makeOk(iterator);
   }
+
+  iteratePlaylists() {
+    const iterator = this.playlistsIterator;
+    if (!iterator) return makeErr(new Error('connection to server SSE has not been estabilished'));
+
+    return makeOk(iterator);
+  }
 }
 
-export function createChannelEvent(domain: Domains, ev: MediaFilesEvents | PlaybackEvents): string {
+type ChannelEvents = MediaFilesEvents | PlaybackEvents | PlaylistEvents;
+export function createChannelEvent(domain: Domains, ev: ChannelEvents): string {
   return `${domain}.${ev}`;
 }
 

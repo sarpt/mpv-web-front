@@ -1,29 +1,39 @@
-import { fetchPlaylists, playlistsFetched, subscribeToPlaylists, unsubscribeToPlaylists } from "./actions";
+import { playlistsFetched, playlistsFetchError, subscribeToPlaylists, unsubscribeToPlaylists } from "./actions";
 import {
   resolve,
   Dependencies
 } from '../../di';
 import { AppListenerEffectAPI } from "../../reducers";
+import { PlaylistEvents } from "src/domains/playlists/entities";
 
-export const fetchPlaylistsEffect = async (_action: ReturnType<typeof fetchPlaylists>, listenerApi: AppListenerEffectAPI) => {
-  const repo = resolve(Dependencies.PlaylistsRepository)();
-  const playlists = await repo.fetchPlaylists();
-
-  listenerApi.dispatch(playlistsFetched(playlists));
-};
-
-const playlistsPollTimeout = 5000;
 export const subscribeToPlaylistsEffect = async (_action: ReturnType<typeof subscribeToPlaylists>, listenerApi: AppListenerEffectAPI) => {
-    listenerApi.unsubscribe()
+  listenerApi.unsubscribe()
 
-    const pollingTask = listenerApi.fork(async (forkApi) => {
-      while (true) {
-        listenerApi.dispatch(fetchPlaylists());
+  const repo = resolve(Dependencies.PlaylistsRepository)();
+  const playlistsIteratorResult = repo.iteratePlaylists();
+  if (playlistsIteratorResult.isErr()) {
+    listenerApi.dispatch(playlistsFetchError("could not start subscription to media files events"));
+    return;
+  }
 
-        await forkApi.delay(playlistsPollTimeout)
+  const playlistsIterator = playlistsIteratorResult.ok();
+  const pollingTask = listenerApi.fork(async () => {
+    try {
+      for await (const playlistsEvent of playlistsIterator) {
+        if (
+          playlistsEvent.eventVariant === PlaylistEvents.Added ||
+          playlistsEvent.eventVariant === PlaylistEvents.ItemsChange ||
+          playlistsEvent.eventVariant === PlaylistEvents.Replay
+        ) {
+          if (playlistsEvent.payload) listenerApi.dispatch(playlistsFetched(playlistsEvent.payload));
+        }
       }
-    })
+    } catch (err) {
+      // print an error since fork swallows thrown errors
+      console.error(err);
+    }
+  })
 
-    await listenerApi.condition(unsubscribeToPlaylists.match);
-    pollingTask.cancel();
+  await listenerApi.condition(unsubscribeToPlaylists.match);
+  pollingTask.cancel();
 }
