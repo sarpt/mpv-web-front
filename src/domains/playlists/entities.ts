@@ -15,4 +15,10 @@ export type Playlist = {
 	UUID: string,
 };
 
+export enum PlaylistEvents {
+  Added = 'added',
+  ItemsChange = 'itemsChange',
+  Replay =  'replay',
+}
+
 export type PlaylistsMap = { [key in string]: Playlist };

@@ -3,8 +3,8 @@ import { subscribeToMediaFiles } from "./plocs/media_files/actions";
 import { subscribeToMediaFilesEffect } from "./plocs/media_files/listeners";
 import { changeAudio, changeSubtitles, fullscreen, loadPlaylist, loop, pause, playMediaFile, subscribeToPlayback } from "./plocs/playback/actions";
 import { changeAudioEffect, changePauseEffect, changeSubtitlesEffect, fullscreenEffect, loadPlaylistEffect, loopEffect, playMediaFileEffect, subscribeToPlaybackEffect } from "./plocs/playback/listeners";
-import { fetchPlaylists, subscribeToPlaylists } from "./plocs/playlists/actions";
-import { fetchPlaylistsEffect, subscribeToPlaylistsEffect } from "./plocs/playlists/listeners";
+import { subscribeToPlaylists } from "./plocs/playlists/actions";
+import { subscribeToPlaylistsEffect } from "./plocs/playlists/listeners";
 import { appListenersMiddleware, startAppListening } from "./reducers";
 import { checkConnectionEffect } from "ui/plocs/connection/listeners";
 
@@ -37,11 +37,6 @@ export function initListeners() {
   startAppListening({
     actionCreator: loadPlaylist,
     effect: loadPlaylistEffect 
-  });
-
-  startAppListening({
-    actionCreator: fetchPlaylists,
-    effect: fetchPlaylistsEffect
   });
 
   startAppListening({

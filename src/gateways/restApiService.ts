@@ -4,7 +4,6 @@ import { MediaFilesMap } from "../domains/media_files/entities";
 import { LoopVariant, Playback } from "../domains/playback/entities";
 import { playMediaFileOpts } from "../domains/playback/interfaces";
 import { PlaylistsMap } from "../domains/playlists/entities";
-import { PlaylistsRepository } from "../domains/playlists/interfaces";
 import { makeErr, makeOk, Result } from "src/domains/common/either";
 
 enum PlaybackParameters {
@@ -42,7 +41,7 @@ type Domains = {
   [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements PlaylistsRepository, ApiService {
+export class RestApiService implements ApiService {
   private address?: string;
 
   private domains: Domains = {
@@ -82,15 +81,6 @@ export class RestApiService implements PlaylistsRepository, ApiService {
     await this.postPlayback({
       [PlaybackParameters.SubtitleId]: subtitleId
     });
-  }
-
-  async fetchPlaylists(): Promise<PlaylistsMap> {
-    try {
-      return await this.fetchRestData(DomainNames.Playlists) as PlaylistsMap;
-    } catch (err) {
-      // TODO: add error handling idiot
-      return {};
-    }
   }
 
   async playMediaFile(path: string, opts?: playMediaFileOpts): Promise<void> {
