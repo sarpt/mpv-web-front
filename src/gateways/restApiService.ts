@@ -121,6 +121,8 @@ export class RestApiService implements ApiService {
   private async postPlayback(params: Partial<Record<PlaybackParameters, unknown>>): Promise<Result<void>> {
     const formData = new FormData();
     for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null) continue;
+
       formData.set(key, `${value}`);
     }
 
