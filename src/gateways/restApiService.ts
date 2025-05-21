@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ApiService } from "src/domains/connection/interfaces";
 import { MediaFilesMap } from "../domains/media_files/entities";
 import { LoopVariant, Playback } from "../domains/playback/entities";

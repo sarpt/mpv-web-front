@@ -5,14 +5,20 @@ type EventResult<
   K extends keyof T
 > = ReturnType<T[K]>;
 
+type SourceEvent = {
+  eventName: string,
+  data: string
+};
+
 export class EventsObserver {
-  private eventsMap: Map<string, string[]> = new Map();
+  private registeredEvents: Set<string> = new Set();
+  private eventsQueue: SourceEvent[] = [];
   private eventSource: EventSource | undefined;
 
   setSource(eventSource: EventSource) {
     this.eventSource = eventSource;
 
-    for (const [eventName] of this.eventsMap.entries()) {
+    for (const eventName of this.registeredEvents) {
       this.addEventListener(eventName);
     }
   }
@@ -21,7 +27,7 @@ export class EventsObserver {
     const iterator = this.observeRaw(event);
     return async function*() {
       for await (const ev of iterator) {
-        yield JSON.parse(ev) as T
+        yield JSON.parse(ev.data) as T
       }
     }();
   }
@@ -38,7 +44,7 @@ export class EventsObserver {
     T extends Record<string, F>,
     K extends keyof T
   >(eventToMapper: T): AsyncGenerator<EventResult<F, T, K>, void, unknown> {
-    const eventToIterator = new Map<string, AsyncIterator<string>>;
+    const eventToIterator = new Map<string, AsyncIterator<SourceEvent>>;
   
     for (const eventName of Object.keys(eventToMapper)) {
       eventToIterator.set(eventName, this.observeRaw(eventName));
@@ -47,8 +53,7 @@ export class EventsObserver {
     // start iterating over events as soon as aggregate is called
     // this way next() already awaits on events and does not require immedate consumption of retured generator
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const iteratorPromises: Map<string, Promise<{ eventName: string, result: IteratorResult<any> }>> = new Map();
+    const iteratorPromises: Map<string, Promise<{ eventName: string, result: IteratorResult<SourceEvent, SourceEvent> }>> = new Map();
     for (const [eventName, iterator] of eventToIterator.entries()) {
       iteratorPromises.set(eventName, iterator.next().then(result => {
         return {
@@ -67,7 +72,7 @@ export class EventsObserver {
           continue;
         }
 
-        yield mapper(result.value);
+        yield mapper(result.value.data);
       
         iteratorPromises.delete(eventName);
         if (result.done) {
@@ -95,27 +100,30 @@ export class EventsObserver {
 
   private async *iterateOverEvents(eventName: string) {
     while(true) {
-      await this.waitTillEventsAvailable(eventName);
-
-      while (this.eventsMap.get(eventName)?.length) {
-        yield this.eventsMap.get(eventName)?.shift() ?? '';
-      }
+      yield this.waitTillEventsAvailable(eventName);
     }
   }
 
   private addEventListener(eventName: string) {
-    this.eventsMap.set(eventName, []);
+    if (this.registeredEvents.has(eventName)) return;
+
+    this.registeredEvents.add(eventName);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.eventSource?.addEventListener(eventName, (event: any) => {
-      this.eventsMap.get(eventName)?.push(event.data);  
+      this.eventsQueue.push({
+        eventName,
+        data: event.data ?? ''
+      });
     });
   }
 
-  private async waitTillEventsAvailable(event: string) {
-    while (!this.eventsMap.get(event)?.length) {
+  private async waitTillEventsAvailable(eventName: string): Promise<SourceEvent> {
+    while (this.eventsQueue[0]?.eventName !== eventName) {
       await tick();
     }
+
+    return this.eventsQueue.shift()!;
   }
 }
 
