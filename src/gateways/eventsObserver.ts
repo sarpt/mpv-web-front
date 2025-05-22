@@ -133,7 +133,7 @@ export class EventsObserver {
   }
 }
 
-async function tick(timeoutMs = 1000) {
+async function tick(timeoutMs = 500) {
   await new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve();
