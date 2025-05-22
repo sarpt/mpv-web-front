@@ -1,9 +1,11 @@
+import { styled } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { useCallback, useState } from "react";
 
 type Props = {
   editMode: boolean,
   address: string,
+  connected: boolean,
   onAbort: () => void,
   onAddressClick: () => void,
   onSubmit: (newAddress: string) => void,
@@ -11,6 +13,7 @@ type Props = {
 
 export const AddressInput = ({
   address,
+  connected,
   onAbort,
   onAddressClick,
   onSubmit,
@@ -24,7 +27,12 @@ export const AddressInput = ({
 
   if (!editMode) {
     return (
-      <span onClick={() => onAddressClick()}>{address}</span>
+      <AddressText
+        connected={connected}
+        onClick={() => onAddressClick()}
+      >
+        {address}
+      </AddressText>
     );
   }
 
@@ -45,6 +53,11 @@ export const AddressInput = ({
       }}
       onBlur={() => abort()}
       size='small'
+      color={connected ? 'primary' : 'error'}
     />
   );
 };
+
+const AddressText = styled('span')<{ connected: boolean }>`
+  color: ${props => props.connected ? props.theme.palette.text.primary : props.theme.palette.error.main};
+`;

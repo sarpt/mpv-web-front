@@ -38,6 +38,7 @@ export const ConnectionStatus = () => {
       </IconButton>
       <LanIcon />
       <AddressInput
+        connected={connection.connected}
         address={connection.address}
         editMode={editMode}
         onAbort={onAddressAbort}
@@ -47,7 +48,7 @@ export const ConnectionStatus = () => {
       {
         connectionLoading
         ? <CircularProgress size='1em' />
-        : connection.connected ? <CheckIcon /> : <ErrorIcon />
+        : connection.connected ? <CheckIcon color='success' /> : <ErrorIcon color='error' />
       }
     </ConnectionStatusContainer>
   );
