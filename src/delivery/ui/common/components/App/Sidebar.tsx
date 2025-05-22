@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import Drawer from "@mui/material/Drawer";
 import { useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
@@ -5,28 +6,14 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from '@mui/icons-material/InboxOutlined'
-import MailIcon from '@mui/icons-material/MailOutlined'
-import { Routes } from "./models/routes";
-import { useCallback } from "react";
+
+import { navigationEntries } from "ui/plocs/navigation/entries";
+import { Routes } from "ui/plocs/navigation/models";
 
 type Props = {
   open: boolean,
   changeOpen: (open: boolean) => void
 };
-
-const navigationEntries = [
-  {
-    title: 'Mediafiles',
-    icon: <InboxIcon />,
-    route: Routes.MediaFiles,
-  },
-  {
-    title: 'Playlists',
-    icon: <MailIcon />,
-    route: Routes.Playlists
-  }
-];
 
 export const AppSidebar = ({
   open,
@@ -46,7 +33,7 @@ export const AppSidebar = ({
         onClose={() => changeOpen(false)}
       >
         <List>
-          {navigationEntries.map(entry => {
+          {Object.values(navigationEntries).map(entry => {
             return (
               <ListItem key={entry.title} disablePadding>
                 <ListItemButton onClick={() => onListItemClick(entry)}>
