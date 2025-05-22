@@ -35,7 +35,7 @@ export class EventsObserver {
   private observeRaw(event: string) {
     this.addEventListener(event);
 
-    return this.iterateOverEvents(event);
+    return this.iterateOverEventsOfName(event);
   }
 
   aggregate<
@@ -44,52 +44,21 @@ export class EventsObserver {
     T extends Record<string, F>,
     K extends keyof T
   >(eventToMapper: T): AsyncGenerator<EventResult<F, T, K>, void, unknown> {
-    const eventToIterator = new Map<string, AsyncIterator<SourceEvent>>;
-  
-    for (const eventName of Object.keys(eventToMapper)) {
-      eventToIterator.set(eventName, this.observeRaw(eventName));
+    const allEventNames = Object.keys(eventToMapper);
+    for (const eventName of allEventNames) {
+      this.addEventListener(eventName);
     }
 
-    // start iterating over events as soon as aggregate is called
-    // this way next() already awaits on events and does not require immedate consumption of retured generator
-
-    const iteratorPromises: Map<string, Promise<{ eventName: string, result: IteratorResult<SourceEvent, SourceEvent> }>> = new Map();
-    for (const [eventName, iterator] of eventToIterator.entries()) {
-      iteratorPromises.set(eventName, iterator.next().then(result => {
-        return {
-          eventName,
-          result
-        };
-      }));
-    }
-
+    const eventsIterator = this.iterateOverEvents(allEventNames);
     return async function*() {
-      while (eventToIterator.size) {
-        const { eventName, result } = await Promise.any(iteratorPromises.values());
+      for await (const { eventName, data } of eventsIterator) {
         const mapper = eventToMapper[eventName];
         if (!mapper) {
           console.error(`could not find mapper for received event name "${eventName}"`);
           continue;
         }
 
-        yield mapper(result.value.data);
-      
-        iteratorPromises.delete(eventName);
-        if (result.done) {
-          eventToIterator.delete(eventName);
-        } else {
-          const iterator = eventToIterator.get(eventName);
-          if (!iterator) {
-            throw new Error('iterator could not be found');
-          }
-
-          iteratorPromises.set(eventName, iterator.next().then(result => {
-            return {
-              eventName,
-              result
-            };
-          }));
-        }
+        yield mapper(data);
       }
     }();
   }
@@ -98,14 +67,25 @@ export class EventsObserver {
     this.eventSource?.close();
   }
 
-  private async *iterateOverEvents(eventName: string) {
+  private async *iterateOverEventsOfName(eventName: string) {
     while(true) {
       yield this.waitTillEventsAvailable(eventName);
     }
   }
 
+  private async *iterateOverEvents(events: string[]) {
+    while(true) {
+      const availableEvents = await this.waitTillAnyEventAvailable(events);
+      for (const event of availableEvents) {
+        yield event;
+      }
+    }
+  }
+
   private addEventListener(eventName: string) {
-    if (this.registeredEvents.has(eventName)) return;
+    if (this.registeredEvents.has(eventName)) {
+      throw new Error(`event "${eventName}" already has been subscribed to - iterating over events by more than one observer is not supported`);
+    }
 
     this.registeredEvents.add(eventName);
 
@@ -118,12 +98,38 @@ export class EventsObserver {
     });
   }
 
+  private async waitTillAnyEventAvailable(eventNames: string[]): Promise<SourceEvent[]> {
+    let events: SourceEvent[] = [];
+    do {
+      await tick();
+      events = this.collectAvailableEvents(eventNames)!;
+    } while (!events.length);
+
+    return events;
+  }
+
   private async waitTillEventsAvailable(eventName: string): Promise<SourceEvent> {
     while (this.eventsQueue[0]?.eventName !== eventName) {
       await tick();
     }
 
     return this.eventsQueue.shift()!;
+  }
+
+  private collectAvailableEvents(eventNames: string[]): SourceEvent[] {
+    const availableEvents: SourceEvent[] = [];
+    const newEventsQueue = [];
+    for (const event of this.eventsQueue) {
+      const matches = eventNames.some(eventName => eventName === event.eventName);
+      if (matches) {
+        availableEvents.push(event);
+      } else {
+        newEventsQueue.push(event);
+      }
+    }
+
+    this.eventsQueue = newEventsQueue;
+    return availableEvents;
   }
 }
 
