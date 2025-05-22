@@ -1,12 +1,14 @@
 import { styled } from "@mui/material";
 
 import { ConnectionStatus } from "ui/pages/components/ConnectionStatus";
+import { QuickLinks } from "ui/pages/components/QuickLinks";
 
 export const HomePage = () => {
   return (
     <PageBase>
       <Title>MPV Web Front</Title>
       <ConnectionStatus />
+      <QuickLinks />
     </PageBase>
   );
 }
@@ -25,4 +27,4 @@ const PageBase = styled('div')`
 const Title = styled('span')`
   font-size: 32px;
   font-weight: bold;
-`
+`;
