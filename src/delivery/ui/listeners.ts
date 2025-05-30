@@ -1,4 +1,4 @@
-import { checkConnection } from "ui/plocs/connection/actions";
+import { checkConnection, connectionFailed } from "ui/plocs/connection/actions";
 import { subscribeToMediaFiles } from "./plocs/media_files/actions";
 import { subscribeToMediaFilesEffect } from "./plocs/media_files/listeners";
 import { changeAudio, changeSubtitles, fullscreen, loadPlaylist, loop, pause, playMediaFile, subscribeToPlayback } from "./plocs/playback/actions";
@@ -6,12 +6,17 @@ import { changeAudioEffect, changePauseEffect, changeSubtitlesEffect, fullscreen
 import { subscribeToPlaylists } from "./plocs/playlists/actions";
 import { subscribeToPlaylistsEffect } from "./plocs/playlists/listeners";
 import { appListenersMiddleware, startAppListening } from "./reducers";
-import { checkConnectionEffect } from "ui/plocs/connection/listeners";
+import { checkConnectionEffect, scheduleNextConnectionCheck } from "ui/plocs/connection/listeners";
 
 export function initListeners() {
   startAppListening({
     actionCreator: checkConnection,
     effect: checkConnectionEffect
+  });
+
+  startAppListening({
+    actionCreator: connectionFailed,
+    effect: scheduleNextConnectionCheck
   });
 
   startAppListening({
