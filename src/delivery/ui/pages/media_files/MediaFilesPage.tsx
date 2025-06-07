@@ -3,7 +3,7 @@ import useSize from "@react-hook/size";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { subscribeToMediaFiles, unsubscribeToMediaFiles } from "ui/plocs/media_files/actions";
+import { focusOnMediaFile, subscribeToMediaFiles, unsubscribeToMediaFiles } from "ui/plocs/media_files/actions";
 import { selectMediaFiles } from "ui/plocs/media_files/selectors";
 import { playMediaFile } from "ui/plocs/playback/actions";
 import { selectLoopVariant, selectMediaFilePath } from "ui/plocs/playback/selectors";
@@ -12,11 +12,15 @@ import { MediaFile } from "src/domains/media_files/entities";
 import { selectConnected } from "ui/plocs/connection/selectors";
 
 import { List } from "./components/List";
+import { SearchBar } from "ui/pages/media_files/components/SearchBar";
 
 const PageBase = styled('div')`
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   padding: 10px;
+  gap: 10px;
 `;
 
 const ListContainer = styled('div')`
@@ -31,6 +35,7 @@ export const MediaFilesPage = () => {
   const [width, height] = useSize(parentRef);
   const [playbackOptionsDialogOpen, setPlaybackOptionsDialogOpen] = useState(false);
   const [selectedMediaFile, setSelectedMediaFile] = useState<MediaFile | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const dispatch = useDispatch();
 
@@ -68,6 +73,20 @@ export const MediaFilesPage = () => {
     dispatch(playMediaFile(selectedMediaFile.Path)); // TODO: modify this action
   }, [dispatch, selectedMediaFile]);
 
+  const onSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+
+    const caseInsensitiveQuery = query.toLowerCase();
+    const newFocusedMediaFile = Object.values(mediaFiles)
+      .find(
+        mediaFile => mediaFile.Title.toLowerCase().includes(caseInsensitiveQuery)
+          || mediaFile.Path.toLowerCase().includes(caseInsensitiveQuery)
+      );
+    if (!newFocusedMediaFile) return;
+
+    dispatch(focusOnMediaFile(newFocusedMediaFile.Path));
+  }, [dispatch, mediaFiles]);
+
   return (
     <PageBase>
       <ListContainer ref={node => node && setParentRef(node)}>
@@ -78,6 +97,12 @@ export const MediaFilesPage = () => {
           height={height}
           onMediaFileSelected={onMediaFileClicked} />
       </ListContainer>
+      <SearchBar
+        value={searchQuery}
+        onSearch={onSearch}
+        open={true}
+        abort={() => {}}
+      />
       <MediaFilePlayDialog
         onOk={handlePlayDialogOk}
         mediaFile={selectedMediaFile}
