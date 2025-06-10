@@ -55,9 +55,10 @@ export const MediaFilesPage = () => {
   }, [connected, dispatch]);
 
   const onMediaFileClicked = useCallback((mediaFile: MediaFile) => {
+    dispatch(focusOnMediaFile(mediaFile.Path));
     setSelectedMediaFile(mediaFile);
     setPlaybackOptionsDialogOpen(true);
-  }, [setSelectedMediaFile, setPlaybackOptionsDialogOpen]);
+  }, [dispatch, setSelectedMediaFile, setPlaybackOptionsDialogOpen]);
 
   const currentMediaFile = useMemo(() => {
     if (!playbackMediaFilePath) return undefined;
@@ -75,6 +76,8 @@ export const MediaFilesPage = () => {
 
   const onSearch = useCallback((query: string) => {
     setSearchQuery(query);
+
+    if (!query) return;
 
     const caseInsensitiveQuery = query.toLowerCase();
     const newFocusedMediaFile = Object.values(mediaFiles)

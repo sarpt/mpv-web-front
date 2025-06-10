@@ -6,30 +6,45 @@ import ListItemText from "@mui/material/ListItemText/ListItemText";
 import { MediaFile } from "src/domains/media_files/entities";
 import { PlaybackPath } from "ui/common/components/PlaybackPath";
 
-const PlayingRow = styled(ListItem)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-}));
+const borderSizePx = 3;
 
-const EvenRow = styled(ListItem)`
-  background-color: rgb(255, 255, 255);
-`;
+type Props = {
+  entry: MediaFile,
+  idx: number,
+  selected: boolean,
+  focused: boolean,
+  rowSizePx: number,
+};
 
-const OddRow = styled(ListItem)`
-  background-color: rgb(220, 220, 220);
-`;
-
-export type Props = { entry: MediaFile, idx: number, selected?: boolean };
-
-export const Item = ({ idx, entry, selected }: Props) => {
+export const Item = ({ idx, entry, selected, focused, rowSizePx }: Props) => {
   let Row = idx % 2 ? OddRow : EvenRow;
   if (selected) Row = PlayingRow;
 
   return (
-    <Row key={idx} disablePadding>
-      <ListItemButton>
+    <Row focused={focused} key={idx} disablePadding>
+      <ListItemButton style={{ height: `${rowSizePx - 2 * borderSizePx}px` }}>
         <ListItemText primary={<PlaybackPath path={entry.Path}/>} />
       </ListItemButton>
     </Row>
   );
 };
+
+const CommonRow = styled(ListItem)<{ focused: boolean }>`
+  height: 42px;
+  border: ${borderSizePx}px;
+  border-style: solid;
+  border-color: ${props => props.focused ? '#42f389' : 'transparent'};
+`;
+
+const PlayingRow = styled(CommonRow)`
+  background-color: ${props => props.theme.palette.primary.main};
+  color: ${props => props.theme.palette.primary.contrastText};
+`;
+
+const EvenRow = styled(CommonRow)`
+  background-color: rgb(255, 255, 255);
+`;
+
+const OddRow = styled(CommonRow)`
+  background-color: rgb(220, 220, 220);
+`;

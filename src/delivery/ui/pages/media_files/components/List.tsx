@@ -15,14 +15,11 @@ type Props = {
   height: number, 
 };
 
-const rowSize = 48;
+const rowSizePx = 42;
 
 export const List = ({ mediaFiles, height, width, onMediaFileSelected, currentMediaFile }: Props) => {
   const focusedPath = useSelector(selectFocusedPath);
   const focusRequestId = useSelector(selectFocusRequestId);
-  const entryRenderer = useCallback((props: EntryRendererProps<MediaFile>) => {
-    return <Item selected={currentMediaFile?.Path === props.entry.Path} {...props} />;
-  }, [currentMediaFile?.Path]);
 
   const focusedEntryIdx = useMemo(() => {
     if (!focusedPath) return undefined;
@@ -31,6 +28,15 @@ export const List = ({ mediaFiles, height, width, onMediaFileSelected, currentMe
     return idx !== -1 ? idx : undefined;
   }, [mediaFiles, focusedPath]);
 
+  const entryRenderer = useCallback((props: EntryRendererProps<MediaFile>) => {
+    return <Item
+      focused={focusedPath === props.entry.Path}
+      selected={currentMediaFile?.Path === props.entry.Path}
+      rowSizePx={rowSizePx}
+      {...props}
+    />;
+  }, [focusedPath, currentMediaFile?.Path]);
+
   return (
     <VirtualList
       focusedIdx={focusedEntryIdx}
@@ -38,7 +44,7 @@ export const List = ({ mediaFiles, height, width, onMediaFileSelected, currentMe
       width={width}
       height={height}
       data={mediaFiles}
-      rowSize={rowSize}
+      rowSize={rowSizePx}
       entryRenderer={entryRenderer}
       onSelected={onMediaFileSelected}
     />
