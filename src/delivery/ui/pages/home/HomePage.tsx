@@ -1,4 +1,5 @@
 import { styled } from "@mui/material";
+import { AppVersion } from "ui/pages/components/AppVersion";
 
 import { ConnectionStatus } from "ui/pages/components/ConnectionStatus";
 import { QuickLinks } from "ui/pages/components/QuickLinks";
@@ -7,6 +8,7 @@ export const HomePage = () => {
   return (
     <PageBase>
       <Title>MPV Web Front</Title>
+      <AppVersion />
       <ConnectionStatus />
       <QuickLinks />
     </PageBase>
