@@ -7,6 +7,8 @@ import { subscribeToPlaylists } from "./plocs/playlists/actions";
 import { subscribeToPlaylistsEffect } from "./plocs/playlists/listeners";
 import { appListenersMiddleware, startAppListening } from "./reducers";
 import { checkConnectionEffect, scheduleNextConnectionCheck } from "ui/plocs/connection/listeners";
+import { checkLatestFrontendRelease } from "ui/plocs/packages/actions";
+import { checkLatestFrontendReleaseEffect } from "ui/plocs/packages/listeners";
 
 export function initListeners() {
   startAppListening({
@@ -67,6 +69,11 @@ export function initListeners() {
   startAppListening({
     actionCreator: loop,
     effect: loopEffect,
+  });
+
+  startAppListening({
+    actionCreator: checkLatestFrontendRelease,
+    effect: checkLatestFrontendReleaseEffect,
   });
 
   return appListenersMiddleware;

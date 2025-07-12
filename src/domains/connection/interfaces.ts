@@ -1,9 +1,9 @@
 import { Result } from "src/domains/common/either";
 
-export interface ApiServicesRepository {
+export interface MpvWebApiServicesRepository {
   checkConnection(address: string): Promise<Result<undefined>>,
 }
 
-export interface ApiService {
+export interface MpvWebApiService {
   connect(address: string): Promise<Result<undefined>>,
 }

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { Provider, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Routing } from "src/routing";
 import { checkConnection } from "ui/plocs/connection/actions";
-import { store } from "ui/store";
+import { checkLatestFrontendRelease } from "ui/plocs/packages/actions";
 
 const defaultAddress = 'localhost:3001';
 
@@ -11,11 +11,10 @@ export const Main = () => {
 
   useEffect(() => {
     dispatch(checkConnection(defaultAddress));
+    dispatch(checkLatestFrontendRelease());
   }, [dispatch]);
 
   return (
-    <Provider store={store}>
-      <Routing />
-    </Provider>
+    <Routing />
   );
 };

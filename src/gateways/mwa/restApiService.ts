@@ -1,8 +1,8 @@
-import { ApiService } from "src/domains/connection/interfaces";
-import { MediaFilesMap } from "../domains/media_files/entities";
-import { LoopVariant, Playback } from "../domains/playback/entities";
-import { playMediaFileOpts } from "../domains/playback/interfaces";
-import { PlaylistsMap } from "../domains/playlists/entities";
+import { MpvWebApiService } from "src/domains/connection/interfaces";
+import { MediaFilesMap } from "../../domains/media_files/entities";
+import { LoopVariant, Playback } from "../../domains/playback/entities";
+import { playMediaFileOpts } from "../../domains/playback/interfaces";
+import { PlaylistsMap } from "../../domains/playlists/entities";
 import { makeErr, makeOk, Result } from "src/domains/common/either";
 
 enum PlaybackParameters {
@@ -40,7 +40,7 @@ type Domains = {
   [DomainNames.Playlists]: Domain<PlaylistsMap>
 }
 
-export class RestApiService implements ApiService {
+export class RestApiService implements MpvWebApiService {
   private address?: string;
 
   private domains: Domains = {
