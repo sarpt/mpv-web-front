@@ -33,15 +33,10 @@ export class MpvWebClientRestApiService {
 
   async updateToPackage(frontendRelease: FrontendPackageRelease): Promise<Result<undefined>> {
     const url = this.getApiAdddress(ApiEndpoints.FrontendUpdate);
-    const formData = new FormData();
-    formData.set('name', frontendRelease.name);
-    formData.set('version', frontendRelease.version);
-    formData.set('description', frontendRelease.description);
-
     try {
       await fetch(url, {
         method: 'POST',
-        body: formData,
+        body: JSON.stringify({ version: frontendRelease.version }),
       });
       return makeOk(undefined);
     } catch (err) {

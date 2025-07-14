@@ -1,4 +1,4 @@
-import { checkLatestFrontendRelease, latestFrontendReleaseCheckFailed, latestFrontendReleaseCheckSuccessful } from 'ui/plocs/packages/actions';
+import { checkLatestFrontendRelease, frontendUpdateFailed, frontendUpdateSuccessful, latestFrontendReleaseCheckFailed, latestFrontendReleaseCheckSuccessful, updateFrontend } from 'ui/plocs/packages/actions';
 import {
   resolve,
   Dependencies
@@ -19,3 +19,16 @@ export const checkLatestFrontendReleaseEffect = async (_action: ReturnType<typeo
   );
 };
 
+export const updateFrontendEffect = async (action: ReturnType<typeof updateFrontend>, listenerApi: AppListenerEffectAPI) => {
+  const service = resolve(Dependencies.MpvWebClientRestApiService)();
+  const latestPackageResult = await service.updateToPackage(action.payload.frontedPackageRelease);
+
+  latestPackageResult.match(
+    () => {
+      listenerApi.dispatch(frontendUpdateSuccessful());
+    },
+    (err) => {
+      listenerApi.dispatch(frontendUpdateFailed(`could not update frontend package: ${err}`));
+    }
+  );
+};

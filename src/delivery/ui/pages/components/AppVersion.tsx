@@ -1,24 +1,17 @@
-import { CircularProgress, Link, styled } from "@mui/material";
-import { useCallback } from "react";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Link, styled } from "@mui/material";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { FrontendPackageRelease } from "src/domains/packages/entities";
 import { updateFrontend } from "ui/plocs/packages/actions";
 import { selectCheckingLatestFrontendRelease, selectLatestFrontendRelease, selectShouldUpdateFrontend } from "ui/plocs/packages/selectors";
 
 export const AppVersion = () => {
-  return (
-    <VersionInfoContainer>
-      <div>Version: {APP_VERSION}</div>
-      <LatestVersion />
-    </VersionInfoContainer>
-  );
-};
+  const dispatch = useDispatch();
+  const [updateDialogOpen, setUpdateDialogOpen] = useState<boolean>(false);
 
-const LatestVersion = () => {
   const latestVersionCheckInProgress = useSelector(selectCheckingLatestFrontendRelease);
   const latestVersionInfo = useSelector(selectLatestFrontendRelease);
   const shouldUpdateFrontend = useSelector(selectShouldUpdateFrontend);
-
-  const dispatch = useDispatch();
 
   const updateRelease = useCallback(() => {
     if (!latestVersionInfo) return;
@@ -26,6 +19,38 @@ const LatestVersion = () => {
     dispatch(updateFrontend(latestVersionInfo));
   }, [dispatch, latestVersionInfo]);
 
+  return (
+    <VersionInfoContainer>
+      <div>Version: {APP_VERSION}</div>
+      <LatestVersion
+        latestVersionCheckInProgress={latestVersionCheckInProgress}
+        latestVersionInfo={latestVersionInfo}
+        shouldUpdateFrontend={shouldUpdateFrontend}
+        onUpdate={() => setUpdateDialogOpen(true)}
+      />
+      <UpdateDialog
+        open={updateDialogOpen}
+        pkgRelease={latestVersionInfo}
+        onClose={() => setUpdateDialogOpen(false)}
+        onUpdate={updateRelease}
+      />
+    </VersionInfoContainer>
+  );
+};
+
+type LatestVersionProps = {
+  latestVersionCheckInProgress: boolean,
+  latestVersionInfo: FrontendPackageRelease | undefined,
+  shouldUpdateFrontend: boolean,
+  onUpdate: () => void,
+};
+
+const LatestVersion = ({
+  latestVersionCheckInProgress,
+  latestVersionInfo,
+  shouldUpdateFrontend,
+  onUpdate
+}: LatestVersionProps) => {
   if (latestVersionCheckInProgress) {
     return <CircularProgress size='1em' />
   }
@@ -35,11 +60,9 @@ const LatestVersion = () => {
   }
 
   return (
-    <div>
-      <Link component="button" onClick={() => updateRelease()}>
-        New frontend version available: {latestVersionInfo.version}. Click here to update it
-      </Link>
-    </div>
+    <Link component="button" onClick={onUpdate}>
+      New frontend version available: {latestVersionInfo.version}. Click here to update it
+    </Link>
   )
 };
 
@@ -48,3 +71,42 @@ const VersionInfoContainer = styled('div')`
   flex-direction: column;
   align-items: center;
 `;
+
+type UpdateDialogProps = {
+  open: boolean,
+  onUpdate: () => void,
+  onClose: () => void,
+  pkgRelease: FrontendPackageRelease | undefined,
+};
+
+const UpdateDialog = ({
+  open,
+  pkgRelease,
+  onUpdate,
+  onClose
+}: UpdateDialogProps) => {
+  if (!pkgRelease) return <></>;
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Frontend version {pkgRelease.version}</DialogTitle>
+      <DialogContent>
+        {pkgRelease.description}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={onClose}
+        >
+          Close
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onUpdate}
+        >
+          Update
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
