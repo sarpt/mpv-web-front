@@ -1,5 +1,5 @@
 import { makeErr, makeOk, Result } from "src/domains/common/either";
-import { ApiService } from "src/domains/connection/interfaces";
+import { MpvWebApiService } from "src/domains/connection/interfaces";
 import { MediaFilesMap } from "src/domains/media_files/entities";
 import { MediaFilesEvents } from "src/domains/media_files/interfaces";
 import { Playback } from "src/domains/playback/entities";
@@ -15,7 +15,7 @@ export enum Domains {
 
 const sseChannels = Object.values(Domains);
 
-export class SSEApiService implements ApiService {
+export class SSEApiService implements MpvWebApiService {
   private eventObserver?: EventsObserver;
   private mediaFilesIterator?: AsyncGenerator<{ eventVariant: MediaFilesEvents, payload: MediaFilesMap | undefined }, void, unknown>;
   private playbackIterator?: AsyncGenerator<{ eventVariant: PlaybackEvents, payload: Playback | undefined }, void, unknown>;

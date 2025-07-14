@@ -1,8 +1,8 @@
 import { Result } from "src/domains/common/either";
 import { Playback } from "src/domains/playback/entities";
 import { PlaybackEvents, PlaybackRepository, playMediaFileOpts } from "src/domains/playback/interfaces";
-import { RestApiService } from "src/gateways/restApiService";
-import { SSEApiService } from "src/gateways/sseApiService";
+import { RestApiService } from "src/gateways/mwa/restApiService";
+import { SSEApiService } from "src/gateways/mwa/sseApiService";
 import { LoopVariant } from "ui/plocs/playback/models";
 
 export class PlaybackServicesRepo implements PlaybackRepository {

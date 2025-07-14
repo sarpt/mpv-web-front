@@ -1,7 +1,7 @@
 import { Result } from "src/domains/common/either";
 import { PlaylistEvents, PlaylistsMap } from "src/domains/playlists/entities";
 import { PlaylistsRepository } from "src/domains/playlists/interfaces";
-import { SSEApiService } from "src/gateways/sseApiService";
+import { SSEApiService } from "src/gateways/mwa/sseApiService";
 
 export class PlaylistsSeriveRepo implements PlaylistsRepository {
   constructor(
