@@ -12,10 +12,11 @@ enum PackageActions {
 
 export const checkLatestFrontendRelease = createAction(PackageActions.CheckLatestFrontendRelease);
 
-export const latestFrontendReleaseCheckSuccessful = createAction(PackageActions.LatestFrontendReleaseCheckSuccsessful, (frontendPackageRelease: FrontendPackageRelease) => {
+export const latestFrontendReleaseCheckSuccessful = createAction(PackageActions.LatestFrontendReleaseCheckSuccsessful, (frontendPackageRelease: FrontendPackageRelease, shouldUpdate: boolean) => {
   return {
     payload: {
       frontendPackageRelease,
+      shouldUpdate
     },
   };
 });

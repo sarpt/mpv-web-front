@@ -10,8 +10,8 @@ export const checkLatestFrontendReleaseEffect = async (_action: ReturnType<typeo
   const latestPackageResult = await service.getLatestPackage();
 
   latestPackageResult.match(
-    (release) => {
-      listenerApi.dispatch(latestFrontendReleaseCheckSuccessful(release));
+    (response) => {
+      listenerApi.dispatch(latestFrontendReleaseCheckSuccessful(response.latest_release, response.should_update));
     },
     (err) => {
       listenerApi.dispatch(latestFrontendReleaseCheckFailed(`could not check for the latest frontend release, reason: ${err}`));

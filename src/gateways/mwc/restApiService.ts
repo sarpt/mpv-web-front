@@ -6,8 +6,14 @@ enum ApiEndpoints {
   FrontendUpdate = 'frontend/update',
 }
 
+type GetLatestPackageResponse = {
+  latest_release: FrontendPackageRelease,
+  local_version?: string,
+  should_update: boolean,
+};
+
 export class MpvWebClientRestApiService {
-  async getLatestPackage(): Promise<Result<FrontendPackageRelease>> {
+  async getLatestPackage(): Promise<Result<GetLatestPackageResponse>> {
     const url = this.getApiAdddress(ApiEndpoints.FrontendLatest);
     try {
       const result = await fetch(url, {
@@ -15,7 +21,7 @@ export class MpvWebClientRestApiService {
       });
 
       const latestPackageRelease = await result.json();
-      if (!isFrontendPackageRelease(latestPackageRelease)) {
+      if (!isGetLatestPackageResponse(latestPackageRelease)) {
         return makeErr(new Error("received latest frontend check result is not a proper frontend package info"));
       }
 
@@ -46,6 +52,12 @@ export class MpvWebClientRestApiService {
   private getApiAdddress(endpoint: ApiEndpoints): string {
     return `${location.protocol}//${location.host}/api/${endpoint}`;
   }
+}
+
+function isGetLatestPackageResponse(json: unknown): json is GetLatestPackageResponse {
+  if (!json || typeof json !== 'object') return false;
+
+  return 'latest_release' in json && 'local_version' in json && 'should_update' in json && isFrontendPackageRelease(json['latest_release']);
 }
 
 function isFrontendPackageRelease(json: unknown): json is FrontendPackageRelease {

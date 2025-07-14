@@ -4,6 +4,7 @@ import { checkLatestFrontendRelease, frontendUpdateFailed, frontendUpdateSuccess
 
 type State = {
   latestFrontendRelease?: FrontendPackageRelease,
+  shouldUpdateFrontend: boolean,
   checkingLatestFrontend: boolean,
   updatingFrontend: boolean,
   frontendReloadNeeded: boolean,
@@ -11,6 +12,7 @@ type State = {
 };
 
 const initialState: State = {
+  shouldUpdateFrontend: false,
   checkingLatestFrontend: false,
   updatingFrontend: false,
   frontendReloadNeeded: false,
@@ -29,6 +31,7 @@ export default function packagesReducer(state = initialState, action: UnknownAct
     return {
       ...state,
       latestFrontendRelease: action.payload.frontendPackageRelease,
+      shouldUpdateFrontend: action.payload.shouldUpdate,
       checkingLatestFrontend: false,
     };
   }
