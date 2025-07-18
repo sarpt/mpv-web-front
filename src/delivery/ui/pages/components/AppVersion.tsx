@@ -27,15 +27,16 @@ export const AppVersion = () => {
     dispatch(updateFrontend(latestVersionInfo));
   }, [dispatch, latestVersionInfo]);
 
-
   return (
     <VersionInfoContainer>
       <div>Version: {APP_VERSION}</div>
       <LatestVersion
+        frontendReloadNeeded={frontendReloadNeeded}
         latestVersionCheckInProgress={latestVersionCheckInProgress}
         latestVersionInfo={latestVersionInfo}
         shouldUpdateFrontend={shouldUpdateFrontend}
         onUpdate={() => setUpdateDialogOpen(true)}
+        onReload={onReload}
       />
       <UpdateDialog
         isFrontendUpdateInProgress={isFrontendUpdateInProgress}
@@ -51,17 +52,21 @@ export const AppVersion = () => {
 };
 
 type LatestVersionProps = {
+  frontendReloadNeeded: boolean,
   latestVersionCheckInProgress: boolean,
   latestVersionInfo: FrontendPackageRelease | undefined,
   shouldUpdateFrontend: boolean,
   onUpdate: () => void,
+  onReload: () => void,
 };
 
 const LatestVersion = ({
   latestVersionCheckInProgress,
+  frontendReloadNeeded,
   latestVersionInfo,
   shouldUpdateFrontend,
-  onUpdate
+  onUpdate,
+  onReload
 }: LatestVersionProps) => {
   if (latestVersionCheckInProgress) {
     return <CircularProgress size='1em' />
@@ -69,6 +74,14 @@ const LatestVersion = ({
 
   if (!latestVersionInfo || !shouldUpdateFrontend) {
     return <></>
+  }
+
+  if (frontendReloadNeeded) {
+    return (
+      <Link component="button" onClick={onReload} fontStyle={{ color: 'red' }}>
+        Currently loaded frontend is outdated, please reload window or click here to use frontend version {latestVersionInfo.version}
+      </Link>
+    );
   }
 
   return (
@@ -144,6 +157,10 @@ const UpdateDialog = ({
   );
 };
 
+const onReload = () => {
+  window.location.reload();
+};
+
 const ColumnFlex = styled('div')`
   display: flex;
   flex-direction: column;
@@ -151,11 +168,6 @@ const ColumnFlex = styled('div')`
 
 const UpdateDialogContent = styled(ColumnFlex)`
   gap: 8px;
-`;
-
-const UpdateSuccededInfo = styled('span')`
-  color: green;  
-  font-weight: bold;
 `;
 
 const UpdateProgressContainer = styled(ColumnFlex)`
@@ -170,6 +182,7 @@ const VersionInfoContainer = styled(ColumnFlex)`
   align-items: center;
 `;
 
-const onReload = () => {
-  window.location.reload();
-};
+const UpdateSuccededInfo = styled('span')`
+  color: green;  
+  font-weight: bold;
+`;
