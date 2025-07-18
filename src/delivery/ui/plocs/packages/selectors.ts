@@ -9,6 +9,16 @@ export const selectCheckingLatestFrontendRelease = createSelector(
   (state) => state.checkingLatestFrontend
 );
 
+export const selectIsFrontendUpdateInProgress = createSelector(
+  selectPackagesState,
+  (state) => state.frontendUpdateInProgress
+);
+
+export const selectFrontendReloadNeeded = createSelector(
+  selectPackagesState,
+  (state) => state.frontendReloadNeeded
+);
+
 export const selectLatestFrontendRelease = createSelector(
   selectPackagesState,
   (state) => state.latestFrontendRelease

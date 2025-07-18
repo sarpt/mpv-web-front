@@ -6,7 +6,7 @@ type State = {
   latestFrontendRelease?: FrontendPackageRelease,
   shouldUpdateFrontend: boolean,
   checkingLatestFrontend: boolean,
-  updatingFrontend: boolean,
+  frontendUpdateInProgress: boolean,
   frontendReloadNeeded: boolean,
   errMsg?: string,
 };
@@ -14,7 +14,7 @@ type State = {
 const initialState: State = {
   shouldUpdateFrontend: false,
   checkingLatestFrontend: false,
-  updatingFrontend: false,
+  frontendUpdateInProgress: false,
   frontendReloadNeeded: false,
 };
 
@@ -47,7 +47,7 @@ export default function packagesReducer(state = initialState, action: UnknownAct
   if (updateFrontend.match(action)) {
     return {
       ...state,
-      updatingFrontend: true,
+      frontendUpdateInProgress: true,
     };
   }
 
@@ -55,7 +55,7 @@ export default function packagesReducer(state = initialState, action: UnknownAct
     return {
       ...state,
       errMsg: undefined,
-      updatingFrontend: false,
+      frontendUpdateInProgress: false,
       frontendReloadNeeded: true,
     };
   }
@@ -64,7 +64,7 @@ export default function packagesReducer(state = initialState, action: UnknownAct
     return {
       ...state,
       errMsg: action.payload.errMsg,
-      updatingFrontend: false,
+      frontendUpdateInProgress: false,
     };
   }
 
