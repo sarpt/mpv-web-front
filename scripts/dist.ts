@@ -1,6 +1,9 @@
 import { execSync } from "child_process";
-import { mkdirSync, readdirSync, writeFileSync } from "fs";
+import { createReadStream, createWriteStream } from "fs";
 import { join, sep } from "path";
+import { createGzip } from 'zlib';
+import { pipeline } from 'stream/promises';
+import { rm, mkdir, readdir, writeFile } from "fs/promises";
 
 import packageJson from '../package.json' with { type: "json" };
 
@@ -8,7 +11,7 @@ const buildDir = "build";
 const distDir = "dist";
 const manifestFilename = "pkg_manifest.toml";
 
-function main() {
+async function main() {
   const version = getVersion();
   console.info(`version: ${version}`);
 
@@ -17,16 +20,17 @@ function main() {
   console.info(`commit: ${commitShort}`);
 
   try {
-    mkdirSync(distDir);
+    await mkdir(distDir);
   } catch (err) {
     if (!isEexist(err)) {
       console.error(`could not ensure "dist" directory ${err}`);
       process.exit(2);
     }
   }
-  createPackageManifest(version, commitShort);
-
-  const buildFiles = getBuildFiles();
+  await createPackageManifest(version, commitShort);
+  
+  await gzipFiles();
+  const buildFiles = await getBuildFiles();
   const distPackagePath = tarPackage(buildFiles, version);
   if (!distPackagePath) {
     console.error(`package has not been created`);
@@ -51,21 +55,33 @@ function getVersion(): string {
   return packageJson.version;
 }
 
-function getBuildFiles(): string[] {
-  const dirents = readdirSync(buildDir, { recursive: true, withFileTypes: true });
+async function getBuildFiles(): Promise<string[]> {
   const names: string[] = [];
-
-  for (const entry of dirents) {
-    if (!entry.isFile()) continue;
-
-    const fullPath = join(entry.parentPath, entry.name).replace(`${buildDir}${sep}`, '');
-    names.push(fullPath);
+  for await (const entry of iterateEntries(buildDir)) {
+    names.push(join(entry.parentPath, entry.name).replace(`${buildDir}${sep}`, ''));
   }
 
   return names;
 }
 
-function createPackageManifest(version: string, commit: string) {
+const gzippableExtensions = [
+  '.js',
+  '.html'
+];
+async function gzipFiles() {
+  for await (const entry of iterateEntries(buildDir)) {
+    const shouldGzip = gzippableExtensions.some(allowedExt => entry.name.endsWith(allowedExt));
+    if (!shouldGzip) continue;
+
+    const gzip = createGzip();
+    const source = createReadStream(join(entry.parentPath, entry.name));
+    const destination = createWriteStream(join(entry.parentPath, `${entry.name}.gz`));
+    await pipeline(source, gzip, destination);
+    await rm(join(entry.parentPath, entry.name));
+  }
+}
+
+async function createPackageManifest(version: string, commit: string) {
   const packageManifestLines = [
     "[version_info]",
     `version = "${version}"`,
@@ -73,7 +89,7 @@ function createPackageManifest(version: string, commit: string) {
   ];
 
   const manifest_path = join(buildDir, manifestFilename);
-  writeFileSync(manifest_path, packageManifestLines.join('\n'), { flag: 'w'});
+  await writeFile(manifest_path, packageManifestLines.join('\n'), { flag: 'w'});
 }
 
 function tarPackage(files: string[], version: string): string | undefined {
@@ -96,4 +112,16 @@ function isErr(err: unknown): err is { code: string } {
   return !!(err && err['code']);
 }
 
-main();
+async function *iterateEntries(dir: string) {
+  const dirents = await readdir(dir, { recursive: true, withFileTypes: true });
+
+  for (const entry of dirents) {
+    if (!entry.isFile()) continue;
+
+    yield entry;
+  }
+
+  return;
+}
+
+await main();
