@@ -27,9 +27,15 @@ async function main() {
       process.exit(2);
     }
   }
-  await createPackageManifest(version, commitShort);
-  
+
   await gzipFiles();
+  const entrypoint = await getEntrypoint();
+  if (!entrypoint) {
+    console.error(`could not resolve entrypoint file name from build files`);
+    process.exit(4);
+  }
+  await createPackageManifest(version, commitShort, entrypoint);
+
   const buildFiles = await getBuildFiles();
   const distPackagePath = tarPackage(buildFiles, version);
   if (!distPackagePath) {
@@ -64,6 +70,13 @@ async function getBuildFiles(): Promise<string[]> {
   return names;
 }
 
+const defaultEntrypointName = 'index.html';
+async function getEntrypoint(): Promise<string | undefined> {
+  for await (const entry of iterateEntries(buildDir)) {
+    if (entry.name.startsWith(defaultEntrypointName)) return entry.name;
+  }
+}
+
 const gzippableExtensions = [
   '.js',
   '.html'
@@ -81,11 +94,12 @@ async function gzipFiles() {
   }
 }
 
-async function createPackageManifest(version: string, commit: string) {
+async function createPackageManifest(version: string, commit: string, entrypoint: string) {
   const packageManifestLines = [
     "[version_info]",
     `version = "${version}"`,
     `commit = "${commit}"`,
+    `entrypoint = "${entrypoint}"`
   ];
 
   const manifest_path = join(buildDir, manifestFilename);
